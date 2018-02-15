@@ -18,7 +18,7 @@ Le jar destinée à être lancé en mode java web start (jws) depuis l'applicati
 
 ### Logiciel
 
-L'application est prévue pour tourner sur du java 8. Elle est lancée en JWS il faudra donc autoriser l'application qui va demander touts les droits sur la machine cliente.
+L'application est prévue pour tourner sur du java 8. Elle est lancée en JWS il faudra donc autoriser l'application qui va demander tous les droits sur la machine cliente.
 
 ### Materiel
 
