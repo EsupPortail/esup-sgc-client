@@ -33,4 +33,16 @@ Lorsqu'une carte est posée sur le lecteur de carte, la webcam detecte le QR cod
 
 Dans le dossier esup-sgc-client executer : mvn clean package
 
+A la fin de la compilation le jar esupsgcclient-1.0-SNAPSHOT-jar-with-dependencies.jar va être signé (l'application doit être signée car elle demande une élévation de droits au lancement)
+Le keystore pour la signature est déclaré dans le pom.xml :
+
+```
+<configuration>
+  <keystore>src/etc/keystore.jks</keystore>
+  <alias>server</alias>
+  <storepass>leocarte</storepass>
+  <keypass>leocarte</keypass>
+</configuration>
+```
+
 Copier le fichier esupsgcclient-1.0-SNAPSHOT-jar-with-dependencies.jar à la racine de votre webapp esup-sgc
