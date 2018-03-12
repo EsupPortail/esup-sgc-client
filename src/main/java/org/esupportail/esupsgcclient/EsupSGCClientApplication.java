@@ -61,7 +61,7 @@ public class EsupSGCClientApplication {
 						esupSGCJFrame.setStepReadCSN(Color.GREEN);
 						esupSGCJFrame.addLogTextLn("csn : " + csn);
 
-						encodingService.selectForEncoding(qrcode);
+						encodingService.checkBeforeEncoding(qrcode, csn);
 
 						esupSGCJFrame.setStepSelectSGC(Color.GREEN);
 						esupSGCJFrame.addLogTextLn(qrcode + " now selected");
@@ -84,7 +84,7 @@ public class EsupSGCClientApplication {
 									esupSGCJFrame.addLogTextLn("Cnous Encoding :  OK");
 									log.info("cnous encoding : OK");
 									esupSGCJFrame.addLogTextLn("Cnous csv start :  OK");
-									if (encodingService.sendCnousCsv()) {
+									if (encodingService.sendCnousCsv(csn)) {
 										esupSGCJFrame.setStepSendCSV(Color.GREEN);
 										esupSGCJFrame.addLogTextLn("Cnous csv send :  OK");
 										log.info("cnous csv send : OK");

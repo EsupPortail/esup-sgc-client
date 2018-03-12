@@ -59,8 +59,8 @@ public class EncodingService {
 			eppnInit = eppnAndNumeroId.get("eppnInit");
 		}
 		
-		if(cnousFournisseurCarteRunExe.isReady()){
-			cnousOK=true;
+		if(encodeCnous){
+			if(cnousFournisseurCarteRunExe.isReady()) cnousOK=true;
 		}
 
 	}
@@ -87,14 +87,14 @@ public class EncodingService {
 		}
 	}
 	
-	public void selectForEncoding(String qrcode) throws EncodingException{
+	public void checkBeforeEncoding(String qrcode, String csn) throws EncodingException{
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.add("Content-Type", MediaType.APPLICATION_JSON.toString());
 		Map<String, String> requestBody = new HashMap<String, String>();
-		requestBody.put("eppnInit", eppnInit);
 		requestBody.put("qrcode", qrcode);
+		requestBody.put("csn", csn);
 		HttpEntity<Map<String, String>> httpEntity = new HttpEntity<Map<String, String>>(requestBody, httpHeaders);
-		String selectUrl = sgcUrl + "/wsrest/nfc/select4encode";	
+		String selectUrl = sgcUrl + "/wsrest/nfc/check4encode";	
 		
 		try {
 			restTemplate.postForObject(selectUrl, httpEntity, String.class);
@@ -176,7 +176,7 @@ public class EncodingService {
 
 	}
 	
-	public boolean sendCnousCsv() throws EncodingException{
+	public boolean sendCnousCsv(String csn) throws EncodingException{
 		try{
 			File file = new File(csvPath);
 			LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
@@ -188,7 +188,7 @@ public class EncodingService {
 					map, headers);
 
 			ResponseEntity<String> fileSendResult = restTemplate.exchange(
-				sgcUrl + "/wsrest/nfc/addCrousCsvFile?authToken=" + authToken,
+				sgcUrl + "/wsrest/nfc/addCrousCsvFile?authToken=" + authToken + "&csn=" + csn,
 				HttpMethod.POST, requestEntity,
 				String.class);
 			log.debug("csv send : " + fileSendResult.getBody());
