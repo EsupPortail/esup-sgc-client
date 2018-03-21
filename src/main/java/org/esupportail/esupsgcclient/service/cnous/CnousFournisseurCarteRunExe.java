@@ -19,7 +19,7 @@ public class CnousFournisseurCarteRunExe {
 		this.pathToExe = pathToExe;
 	}
 
-	public boolean isReady(){
+	public boolean check() throws CnousFournisseurCarteException{
 		String readResult = "";
 		ProcessBuilder processBuilder;
 		Process process;
@@ -34,6 +34,7 @@ public class CnousFournisseurCarteRunExe {
 				}
 		} catch (IOException e) {
 			log.error("cnous api not ready", e);
+			throw new CnousFournisseurCarteException("cnous api not ready", e);
 		}
 		if(readResult.equals("true")){
 			log.info("cnous api ready");

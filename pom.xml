@@ -10,6 +10,7 @@
 	<url>http://maven.apache.org</url>
 	<properties>
 		<spring.version>3.2.8.RELEASE</spring.version>
+		<java.version>1.8</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -86,19 +87,32 @@
 	<build>
 		<plugins>
 			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <version>3.1</version>
+		        <configuration>
+		          <source>${java.version}</source>
+		          <target>${java.version}</target>
+		        </configuration>
+	      	</plugin>
+			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-jar-plugin</artifactId>
 			    <version>2.2</version>
-			    <!-- nothing here -->
+   		        <configuration>
+		          <source>${java.version}</source>
+		          <target>${java.version}</target>
+		        </configuration>
 			  </plugin>
 			  <plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-assembly-plugin</artifactId>
 			    <version>2.2-beta-4</version>
-			    
 			    <configuration>
-		    	<additionalClasspathElement>${basedir}/src/images/</additionalClasspathElement>
-			    <additionalClasspathElement>${basedir}/src/font/</additionalClasspathElement>
+   		          <source>${java.version}</source>
+		          <target>${java.version}</target>
+	    		  <additionalClasspathElement>${basedir}/src/images/</additionalClasspathElement>
+		    	  <additionalClasspathElement>${basedir}/src/font/</additionalClasspathElement>
 			      <descriptorRefs>
 			        <descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
@@ -136,7 +150,7 @@
 	                  </execution>
 	              </executions>
 	              <configuration>
-	                  <keystore>src/etc/keystore.jks</keystore>
+			  <keystore>src/etc/keystore.jks</keystore>
 	                  <alias>server</alias>
 	                  <storepass>leocarte</storepass>
 	                  <keypass>leocarte</keypass>

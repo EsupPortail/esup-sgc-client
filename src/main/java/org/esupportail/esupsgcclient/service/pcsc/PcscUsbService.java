@@ -27,14 +27,19 @@ public class PcscUsbService {
 	private TerminalFactory context;
 	public CardTerminals terminals;
 	
-	public PcscUsbService() {
+	public PcscUsbService() throws PcscException {
 		Security.addProvider(new Smartcardio());
 		try {
 			context = TerminalFactory.getInstance("PC/SC", null, Smartcardio.PROVIDER_NAME);
 			terminals = context.terminals();
+			if(terminals.list().isEmpty()) {
+				throw new PcscException("no PC/SC reader found");
+			}
 		} catch (Exception e) {
 			log.error("Exception retrieving context", e);
+			throw new PcscException("Exception retrieving context");
 		}
+
 	}
 	
 	public boolean isCardOnTerminal() throws CardException{

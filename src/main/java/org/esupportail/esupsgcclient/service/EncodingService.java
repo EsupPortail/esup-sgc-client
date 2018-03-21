@@ -37,6 +37,7 @@ public class EncodingService {
 	public String numeroId = "0000000000000000000";
 	public String eppnInit = "user@univ-ville.fr";
 	public Boolean encodeCnous = false;
+
 	
 	public static String pathToExe = "c:\\cnousApi\\";
 	public static String csvPath = "c:\\cnousApi\\csv_out.csv";
@@ -45,10 +46,12 @@ public class EncodingService {
 	
 	private boolean cnousOK = false;
 	private static CnousFournisseurCarteRunExe cnousFournisseurCarteRunExe = new CnousFournisseurCarteRunExe(pathToExe);
-	private static PcscUsbService pcscUsbService = new PcscUsbService();
+	private static PcscUsbService pcscUsbService ;
 	
-	public void init(String[] args){
+	public void init(String[] args) throws EncodingException, PcscException, CnousFournisseurCarteException {
 		
+		pcscUsbService = new PcscUsbService();
+				
 		if(args.length>0) {
 			authToken =  args[0];
 			esupNfcTagServerUrl = args[1];
@@ -60,7 +63,12 @@ public class EncodingService {
 		}
 		
 		if(encodeCnous){
-			if(cnousFournisseurCarteRunExe.isReady()) cnousOK=true;
+			try{
+				cnousOK = cnousFournisseurCarteRunExe.check();
+			}catch(CnousFournisseurCarteException e){
+				throw new CnousFournisseurCarteException(e.getMessage(), e);
+			}
+
 		}
 
 	}
@@ -87,7 +95,7 @@ public class EncodingService {
 		}
 	}
 	
-	public void checkBeforeEncoding(String qrcode, String csn) throws EncodingException{
+	public void checkBeforeEncoding(String qrcode, String csn) throws CheckSgcException{
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.add("Content-Type", MediaType.APPLICATION_JSON.toString());
 		Map<String, String> requestBody = new HashMap<String, String>();
@@ -101,18 +109,18 @@ public class EncodingService {
 		} catch (HttpClientErrorException e) {
 			if(HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
 				log.warn("Card for " + qrcode + " not found, please check its state in SGC web application.");
-				throw new EncodingException("Card for " + qrcode + " not found, please check its state in SGC web application.");	
+				throw new CheckSgcException("Card for " + qrcode + " not found, please check its state in SGC web application.");	
 
 			} else {
 				log.error(e);
-				throw new EncodingException("SGC select error : " + e.getResponseBodyAsString());
+				throw new CheckSgcException("SGC select error : " + e.getResponseBodyAsString());
 			}
 		} catch (HttpServerErrorException e) {
 			log.error(e);
-			throw new EncodingException("SGC select error : Web Server Error " + e.getResponseBodyAsString());
+			throw new CheckSgcException("SGC select error : Web Server Error " + e.getResponseBodyAsString());
 		} catch (Exception e){
 			log.error(e);
-			throw new EncodingException("SGC select error", e);
+			throw new CheckSgcException("SGC select error", e);
 		}
 	}
 	
@@ -143,12 +151,10 @@ public class EncodingService {
 						throw new PcscException("pcsc send apdu error", e);
 					}
 				} else {
-					esupSGCJFrame.addLogTextLn(".");
 					log.info("Encoding  : OK");
 					return nfcResultBean.getFullApdu();
 				}
 				}else{
-					esupSGCJFrame.addLogTextLn(".");
 					throw new EncodingException("return is null");
 				}
 			}

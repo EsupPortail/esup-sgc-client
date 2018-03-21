@@ -2,13 +2,19 @@ package org.esupportail.esupsgcclient.service.webcam;
 
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.ui.EsupSGCJFrame;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Service;
 
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
+import com.google.zxing.DecodeHintType;
 import com.google.zxing.LuminanceSource;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.NotFoundException;
@@ -39,26 +45,31 @@ public class WebcamQRCodeReader {
 
 	public String readQrCode() {
 		Result result = null;
-		BufferedImage image = null;
 		while(result == null) {
-			esupSGCJFrame.panel.resume();
+			BufferedImage image = null;
+			esupSGCJFrame.webCamPanel.resume();
 			if (esupSGCJFrame.webcam.isOpen() && (image=esupSGCJFrame.webcam.getImage()) != null) {
 				image = esupSGCJFrame.webcam.getImage();
 				LuminanceSource source = new BufferedImageLuminanceSource(image);
 				BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 				try {
-					result = new MultiFormatReader().decode(bitmap);
+					MultiFormatReader qrReader = new MultiFormatReader();
+					Map<DecodeHintType, Object> hints = new EnumMap<DecodeHintType, Object>(DecodeHintType.class);
+					hints.put(DecodeHintType.CHARACTER_SET, "UTF-8");
+					hints.put(DecodeHintType.TRY_HARDER, true);
+					List<BarcodeFormat> barcodeFormats = new ArrayList<BarcodeFormat>();
+					barcodeFormats.add(BarcodeFormat.QR_CODE);
+					hints.put(DecodeHintType.POSSIBLE_FORMATS, barcodeFormats);
+					qrReader.setHints(hints);
+					result = qrReader.decode(bitmap);
 					return result.getText();
 				} catch (NotFoundException e) {
-					esupSGCJFrame.addLogTextLn("no QR code found in image");
-					esupSGCJFrame.initSteps();
+					log.trace("QRCode not found");
 				}
 			}
-			esupSGCJFrame.panel.pause();
-			//tempo cpu usage ?
-			Utils.sleep(200);
+			esupSGCJFrame.webCamPanel.pause();
+			Utils.sleep(250);
 		}
-		log.error("QRCode read error");
 		return null;
 	}
 	
