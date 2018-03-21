@@ -69,6 +69,7 @@ public class EsupSGCJFrame extends JFrame {
 	
 	public JButton buttonLogs = new JButton("Masquer les logs");
 	public JButton buttonExit = new JButton("Quitter");
+	public JButton buttonRestart = new JButton("Restart");
 	
 	public EsupSGCJFrame() throws HeadlessException {
 		super();
@@ -150,6 +151,8 @@ public class EsupSGCJFrame extends JFrame {
 		buttonsJPanel.setMaximumSize(new Dimension(1000, 50));
 		buttonsJPanel.setBackground(BACK);
 		buttonsJPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		buttonsJPanel.add(buttonRestart);
+		buttonsJPanel.add(Box.createRigidArea(new Dimension(5,0)));
 		buttonsJPanel.add(buttonLogs);
 		buttonsJPanel.add(Box.createRigidArea(new Dimension(5,0)));
 		buttonsJPanel.add(buttonExit);
@@ -279,7 +282,9 @@ public class EsupSGCJFrame extends JFrame {
 	
 	public void exit(){
 		if(webcam != null){
-			webCamPanel.stop();
+			if(webCamPanel != null) {
+				webCamPanel.stop();
+			}
 			webcam.close();
 		}
 	}

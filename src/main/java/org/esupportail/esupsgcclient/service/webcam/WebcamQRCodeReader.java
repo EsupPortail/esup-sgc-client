@@ -45,8 +45,10 @@ public class WebcamQRCodeReader {
 
 	public String readQrCode() {
 		Result result = null;
+		int nbTry = 0;
 		while(result == null) {
 			BufferedImage image = null;
+			nbTry++;
 			esupSGCJFrame.webCamPanel.resume();
 			if (esupSGCJFrame.webcam.isOpen() && (image=esupSGCJFrame.webcam.getImage()) != null) {
 				image = esupSGCJFrame.webcam.getImage();
@@ -67,6 +69,7 @@ public class WebcamQRCodeReader {
 					log.trace("QRCode not found");
 				}
 			}
+			if(nbTry > 20) break;
 			esupSGCJFrame.webCamPanel.pause();
 			Utils.sleep(250);
 		}
