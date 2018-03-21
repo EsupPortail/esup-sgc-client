@@ -3,15 +3,21 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.esupportail.esupsgcclient</groupId>
-	<artifactId>esupsgcclient</artifactId>
+	<artifactId>esupsgcclient-r2d2</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>esupsgcclient</name>
+	<name>esupsgcclient-r2d2</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<spring.version>3.2.8.RELEASE</spring.version>
-		<java.version>1.8</java.version>
+	        <java.version>1.8</java.version>
 	</properties>
+	<repositories>
+	<repository>
+		<id>zebra-local-repo</id>
+		<url>file://${project.basedir}/src/lib</url>
+	</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -63,11 +69,6 @@
 			<artifactId>webcam-capture</artifactId>
 			<version>0.3.10</version>
 		</dependency> 		
-		<dependency>
-			<groupId>com.google.zxing</groupId>
-			<artifactId>javase</artifactId>
-			<version>2.1</version>
-		</dependency>
 	   <dependency>
 	       <groupId>org.slf4j</groupId>
 	       <artifactId>slf4j-api</artifactId>
@@ -79,40 +80,126 @@
 		    <version>1.7.5</version>
 		</dependency>	
 		<dependency>
-		    <groupId>commons-io</groupId>
-		    <artifactId>commons-io</artifactId>
-		    <version>2.5</version>
+		    <groupId>com.google.zxing</groupId>
+		    <artifactId>javase</artifactId>
+		    <version>3.3.1</version>
 		</dependency>
+
+<dependency>
+    <groupId>net.sf.barcode4j</groupId>
+    <artifactId>barcode4j</artifactId>
+    <version>2.1</version>
+</dependency>
+<dependency>
+    <groupId>commons-codec</groupId>
+    <artifactId>commons-codec</artifactId>
+    <version>1.8</version>
+</dependency>
+<dependency>
+    <groupId>commons-io</groupId>
+    <artifactId>commons-io</artifactId>
+    <version>2.2</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <version>3.4</version>
+</dependency>
+<dependency>
+    <groupId>commons-validator</groupId>
+    <artifactId>commons-validator</artifactId>
+    <version>1.4.0</version>
+</dependency>
+<dependency>
+    <groupId>dom4j</groupId>
+    <artifactId>dom4j</artifactId>
+    <version>1.6.1</version>
+</dependency>
+<dependency>
+    <groupId>jaxen</groupId>
+    <artifactId>jaxen</artifactId>
+    <version>1.1-beta-6</version>
+</dependency>
+<dependency>
+    <groupId>org.usb4java</groupId>
+    <artifactId>libusb4java</artifactId>
+    <version>1.2.0</version>
+</dependency>
+<dependency>
+    <groupId>org.simpleframework</groupId>
+    <artifactId>simple-xml</artifactId>
+    <version>2.7.1</version>
+</dependency>
+<dependency>
+    <groupId>org.snmp4j</groupId>
+    <artifactId>snmp4j</artifactId>
+    <version>2.5.0</version>
+</dependency>
+<dependency>
+    <groupId>org.usb4java</groupId>
+    <artifactId>usb4java</artifactId>
+    <version>1.2.0</version>
+</dependency>
+
+<dependency>
+     <groupId>com.zebra.sdk.comm</groupId>
+     <artifactId>ZSDK_API</artifactId>
+     <version>2.12.3968</version>
+</dependency>
+
+<dependency>
+     <groupId>com.zebra.sdk.common.card	</groupId>
+     <artifactId>ZSDK_CARD_API</artifactId>
+     <version>2.12.3968</version>
+</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>
+		<plugin>
+		    <artifactId>maven-dependency-plugin</artifactId>
+		    <executions>
+		        <execution>
+		            <phase>package</phase>
+		            <goals>
+		                <goal>copy-dependencies</goal>
+		            </goals>
+		            <configuration>
+		                <outputDirectory>${project.build.directory}/lib</outputDirectory>
+		                <includeArtifactIds>ZSDK_API</includeArtifactIds>
+		            </configuration>
+		        </execution>
+		    </executions>
+		</plugin>
 			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-compiler-plugin</artifactId>
-		        <version>3.1</version>
-		        <configuration>
-		          <source>${java.version}</source>
-		          <target>${java.version}</target>
-		        </configuration>
-	      	</plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-compiler-plugin</artifactId>
+			  <version>3.1</version>
+			  <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+			  </configuration>
+			</plugin>
 			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-jar-plugin</artifactId>
 			    <version>2.2</version>
-   		        <configuration>
-		          <source>${java.version}</source>
-		          <target>${java.version}</target>
-		        </configuration>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+			    <!-- nothing here -->
 			  </plugin>
 			  <plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-assembly-plugin</artifactId>
 			    <version>2.2-beta-4</version>
 			    <configuration>
-   		          <source>${java.version}</source>
-		          <target>${java.version}</target>
-	    		  <additionalClasspathElement>${basedir}/src/images/</additionalClasspathElement>
-		    	  <additionalClasspathElement>${basedir}/src/font/</additionalClasspathElement>
+	                    <source>${java.version}</source>
+        	            <target>${java.version}</target>
+			    <additionalClasspathElement>${basedir}/src/images/</additionalClasspathElement>
+			    <additionalClasspathElement>${basedir}/src/font/</additionalClasspathElement>
+			    <additionalClasspathElement>${basedir}/lib/</additionalClasspathElement>
 			      <descriptorRefs>
 			        <descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
