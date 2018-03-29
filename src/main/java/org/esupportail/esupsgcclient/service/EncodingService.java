@@ -30,14 +30,13 @@ import org.springframework.web.client.RestTemplate;
 public class EncodingService {
 
 	private final static Logger log = Logger.getLogger(EncodingService.class);
-	
+
 	public String authToken =  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	public String esupNfcTagServerUrl = "https://esup-nfc-tag-test.univ-ville.fr";
 	public String sgcUrl = "https://esup-sgc-test.univ-ville.fr";
 	public String numeroId = "0000000000000000000";
 	public String eppnInit = "user@univ-ville.fr";
 	public Boolean encodeCnous = false;
-
 	
 	public static String pathToExe = "c:\\cnousApi\\";
 	public static String csvPath = "c:\\cnousApi\\csv_out.csv";
@@ -140,22 +139,26 @@ public class EncodingService {
 			while(true){
 				log.info("RAPDU : "+ result);
 				String url = esupNfcTagServerUrl + "/desfire-ws/?result="+ result +"&numeroId="+numeroId+"&cardId="+cardId;
-				nfcResultBean = restTemplate.getForObject(url, NfcResultBean.class);
-				log.info("SAPDU : "+ nfcResultBean.getFullApdu());
-				if(nfcResultBean.getFullApdu()!=null){
-				if(!"END".equals(nfcResultBean.getFullApdu()) ) {
-					try {
-						result = pcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
-						esupSGCJFrame.addLogText(".");
-					} catch (CardException e) {
-						throw new PcscException("pcsc send apdu error", e);
+				try {
+					nfcResultBean = restTemplate.getForObject(url, NfcResultBean.class);
+					log.info("SAPDU : "+ nfcResultBean.getFullApdu());
+					if(nfcResultBean.getFullApdu()!=null){
+					if(!"END".equals(nfcResultBean.getFullApdu()) ) {
+						try {
+							result = pcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
+							esupSGCJFrame.addLogText(".");
+						} catch (CardException e) {
+							throw new PcscException("pcsc send apdu error", e);
+						}
+					} else {
+						log.info("Encoding  : OK");
+						return nfcResultBean.getFullApdu();
 					}
-				} else {
-					log.info("Encoding  : OK");
-					return nfcResultBean.getFullApdu();
-				}
-				}else{
-					throw new EncodingException("return is null");
+					}else{
+						throw new EncodingException("return is null");
+					}
+				} catch (Exception e) {
+					throw new EncodingException("rest template erreur", e);
 				}
 			}
 		} else {
