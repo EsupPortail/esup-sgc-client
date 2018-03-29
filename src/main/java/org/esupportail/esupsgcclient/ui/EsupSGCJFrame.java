@@ -55,7 +55,10 @@ public class EsupSGCJFrame extends JFrame {
 	public JLabel stepEncodageCnous = new JLabel("Encodage CNOUS");
 	public JLabel stepSendCSV = new JLabel("Envoi du CSV");
 	
-	private JTextArea logTextarea = new JTextArea();
+	public JLabel image1JPanel = new JLabel();
+	public JLabel image2JPanel = new JLabel("", SwingConstants.LEFT);
+    
+	private JTextArea logTextarea = new JTextArea(20, 100);
 	private String lastText = null;
 	private Font fontTitle = Font.getFont("Arial");
 	private Font fontStep = Font.getFont("Arial");
@@ -109,10 +112,19 @@ public class EsupSGCJFrame extends JFrame {
 		
 		fontTitle = fontTitle.deriveFont(30f);
 		fontStep = fontStep.deriveFont(24f);
+
+		JPanel logosJPanel = new JPanel();
+		logosJPanel.setBackground(new Color(0,0,0,0));
+		logosJPanel.setMaximumSize(new Dimension(1000, 100));
+		logosJPanel.setLayout(new BoxLayout(logosJPanel, BoxLayout.X_AXIS));
+		logosJPanel.add(image1JPanel);
+		logosJPanel.add(Box.createRigidArea(new Dimension(500,0)));
+		logosJPanel.add(image2JPanel);
 		
 		JPanel titleJPanel = new JPanel();
 		titleJPanel.setLayout(new BoxLayout(titleJPanel, BoxLayout.X_AXIS));
 		titleJPanel.setBackground(BACK);
+		
 		JLabel title = new JLabel("", SwingConstants.LEFT);
 		title.setFont(fontTitle);
 		title.setText("ESUP-SGC-CLIENT : ");
@@ -160,10 +172,12 @@ public class EsupSGCJFrame extends JFrame {
 		
 		
 		logJPanel.setLayout(new BorderLayout());
-		logJPanel.setMaximumSize(new Dimension(1000, 250));
+		logJPanel.setMaximumSize(new Dimension(1000, 300));
 		logJPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		logTextarea.setEditable(false);
+		logTextarea.setMaximumSize(new Dimension(1000, 300));
 		JScrollPane scroll = new JScrollPane(logTextarea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setMaximumSize(new Dimension(1000, 300));
 		scroll.setAutoscrolls(true);
 		logJPanel.add(scroll);
 		
@@ -186,6 +200,7 @@ public class EsupSGCJFrame extends JFrame {
 		mainJPanel.setBackground(BACK);
 		mainJPanel.setLayout(new BoxLayout(mainJPanel, BoxLayout.Y_AXIS));
 		
+		mainJPanel.add(logosJPanel);
 		mainJPanel.add(titleJPanel);
 		mainJPanel.add(webCamJPanel);
 		mainJPanel.add(processJPanel);
@@ -268,7 +283,6 @@ public class EsupSGCJFrame extends JFrame {
 	public void addLogText(String text) {
 		logTextarea.append(text);
 		lastText = text;
-		logTextarea.setCaretPosition(logTextarea.getDocument().getLength());
 	}
 	
 	public void addLogTextLn(String type, String text) {

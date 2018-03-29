@@ -37,7 +37,6 @@ public class EncodingService {
 	public String numeroId = "0000000000000000000";
 	public String eppnInit = "user@univ-ville.fr";
 	public Boolean encodeCnous = false;
-
 	
 	public static String pathToExe = "c:\\cnousApi\\";
 	public static String csvPath = "c:\\cnousApi\\csv_out.csv";

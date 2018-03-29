@@ -5,12 +5,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.CheckSgcException;
@@ -18,7 +21,6 @@ import org.esupportail.esupsgcclient.service.EncodingException;
 import org.esupportail.esupsgcclient.service.EncodingService;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.pcsc.PcscException;
-import org.esupportail.esupsgcclient.service.printer.PrinterException;
 import org.esupportail.esupsgcclient.service.printer.ZebraPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.WebcamQRCodeReader;
 import org.esupportail.esupsgcclient.ui.EsupSGCJFrame;
@@ -52,6 +54,19 @@ public class EsupSGCClientApplication {
 			esupSGCJFrame.changeTextPrincipal("Chargement...", Color.BLACK);
 			addJframeListerners();
 			esupSGCJFrame.initSteps();
+			
+			try {
+				String path1 = encodingService.sgcUrl + "/resources/images/logo1.png";
+				URL url1 = new URL(path1);
+				BufferedImage bufImg1 = ImageIO.read(url1);
+				esupSGCJFrame.image1JPanel.setIcon(new ImageIcon(bufImg1));
+				String path2 = encodingService.sgcUrl + "/resources/images/logo2.png";
+				URL url2 = new URL(path2);
+				BufferedImage bufImg2 = ImageIO.read(url2);
+				esupSGCJFrame.image2JPanel.setIcon(new ImageIcon(bufImg2));
+			}catch (Exception e){
+				log.warn("logo display error", e);
+			}
 			
 			esupSGCJFrame.stepClientReady.setForeground(ORANGE);
 			esupSGCJFrame.initWebCam();
@@ -131,7 +146,7 @@ public class EsupSGCClientApplication {
 			esupSGCJFrame.addLogTextLn("ERROR", getExceptionString(e));
 			log.error("Erreur zebra", e);
 		}catch (Exception e) {
-			esupSGCJFrame.addLogTextLn("ERROR", "FATAL ERROR !!!");
+			esupSGCJFrame.addLogTextLn("ERROR", "Erreur inconue");
 			esupSGCJFrame.stepClientReady.setForeground(Color.RED);
 			esupSGCJFrame.stepClientReady.setText("Client non prêt");
 			esupSGCJFrame.changeTextPrincipal("Erreur inconnue, voir les logs", Color.RED);
