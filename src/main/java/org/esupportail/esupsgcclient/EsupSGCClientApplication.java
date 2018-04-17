@@ -49,9 +49,6 @@ public class EsupSGCClientApplication {
 			addJframeListerners();
 			esupSGCJFrame.initSteps();
 
-			encodingService.init(args);
-			esupSGCJFrame.addLogTextLn("INFO", "pc/sc : OK");
-			
 			try {
 				String path1 = encodingService.sgcUrl + "/resources/images/logo1.png";
 				URL url1 = new URL(path1);
@@ -65,11 +62,15 @@ public class EsupSGCClientApplication {
 				log.warn("logo display error", e);
 			}
 			
+			esupSGCJFrame.repaint();
+			encodingService.init(args);
+			esupSGCJFrame.addLogTextLn("INFO", "pc/sc : OK");
+			
 			esupSGCJFrame.stepClientReady.setForeground(ORANGE);
 			esupSGCJFrame.initWebCam();
 			esupSGCJFrame.addLogTextLn("INFO", "webcam : OK");
 			
-			if(encodingService.encodeCnous){			
+			if(encodingService.encodeCnous){	
 				esupSGCJFrame.addLogTextLn("INFO", "dll cnous : OK");				
 			}else{
 				esupSGCJFrame.stepEncodageCnous.setVisible(false);

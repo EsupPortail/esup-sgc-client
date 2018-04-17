@@ -30,7 +30,6 @@ import org.springframework.web.client.RestTemplate;
 public class EncodingService {
 
 	private final static Logger log = Logger.getLogger(EncodingService.class);
-
 	public String authToken =  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	public String esupNfcTagServerUrl = "https://esup-nfc-tag-test.univ-ville.fr";
 	public String sgcUrl = "https://esup-sgc-test.univ-ville.fr";
@@ -66,6 +65,9 @@ public class EncodingService {
 				cnousOK = cnousFournisseurCarteRunExe.check();
 			}catch(CnousFournisseurCarteException e){
 				throw new CnousFournisseurCarteException(e.getMessage(), e);
+			}
+			if(!cnousOK) {
+				throw new CnousFournisseurCarteException("Erreur cnousApi");
 			}
 
 		}
@@ -139,26 +141,22 @@ public class EncodingService {
 			while(true){
 				log.info("RAPDU : "+ result);
 				String url = esupNfcTagServerUrl + "/desfire-ws/?result="+ result +"&numeroId="+numeroId+"&cardId="+cardId;
-				try {
-					nfcResultBean = restTemplate.getForObject(url, NfcResultBean.class);
-					log.info("SAPDU : "+ nfcResultBean.getFullApdu());
-					if(nfcResultBean.getFullApdu()!=null){
-					if(!"END".equals(nfcResultBean.getFullApdu()) ) {
-						try {
-							result = pcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
-							esupSGCJFrame.addLogText(".");
-						} catch (CardException e) {
-							throw new PcscException("pcsc send apdu error", e);
-						}
-					} else {
-						log.info("Encoding  : OK");
-						return nfcResultBean.getFullApdu();
+				nfcResultBean = restTemplate.getForObject(url, NfcResultBean.class);
+				log.info("SAPDU : "+ nfcResultBean.getFullApdu());
+				if(nfcResultBean.getFullApdu()!=null){
+				if(!"END".equals(nfcResultBean.getFullApdu()) ) {
+					try {
+						result = pcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
+						esupSGCJFrame.addLogText(".");
+					} catch (CardException e) {
+						throw new PcscException("pcsc send apdu error", e);
 					}
-					}else{
-						throw new EncodingException("return is null");
-					}
-				} catch (Exception e) {
-					throw new EncodingException("rest template erreur", e);
+				} else {
+					log.info("Encoding  : OK");
+					return nfcResultBean.getFullApdu();
+				}
+				}else{
+					throw new EncodingException("return is null");
 				}
 			}
 		} else {
