@@ -68,6 +68,7 @@ public class EsupSGCClientApplication {
 				log.warn("logo display error", e);
 			}
 			
+			esupSGCJFrame.repaint();
 			esupSGCJFrame.stepClientReady.setForeground(ORANGE);
 			esupSGCJFrame.initWebCam();
 			esupSGCJFrame.addLogTextLn("INFO", "webcam : OK");
@@ -146,7 +147,7 @@ public class EsupSGCClientApplication {
 			esupSGCJFrame.addLogTextLn("ERROR", getExceptionString(e));
 			log.error("Erreur zebra", e);
 		}catch (Exception e) {
-			esupSGCJFrame.addLogTextLn("ERROR", "Erreur inconue");
+			esupSGCJFrame.addLogTextLn("ERROR", "erreur inconue");
 			esupSGCJFrame.stepClientReady.setForeground(Color.RED);
 			esupSGCJFrame.stepClientReady.setText("Client non prêt");
 			esupSGCJFrame.changeTextPrincipal("Erreur inconnue, voir les logs", Color.RED);

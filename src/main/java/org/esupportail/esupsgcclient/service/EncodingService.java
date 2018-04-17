@@ -30,7 +30,7 @@ import org.springframework.web.client.RestTemplate;
 public class EncodingService {
 
 	private final static Logger log = Logger.getLogger(EncodingService.class);
-	
+
 	public String authToken =  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	public String esupNfcTagServerUrl = "https://esup-nfc-tag-test.univ-ville.fr";
 	public String sgcUrl = "https://esup-sgc-test.univ-ville.fr";
@@ -66,6 +66,9 @@ public class EncodingService {
 				cnousOK = cnousFournisseurCarteRunExe.check();
 			}catch(CnousFournisseurCarteException e){
 				throw new CnousFournisseurCarteException(e.getMessage(), e);
+			}
+			if(!cnousOK) {
+				throw new CnousFournisseurCarteException("Erreur cnousApi");
 			}
 
 		}
