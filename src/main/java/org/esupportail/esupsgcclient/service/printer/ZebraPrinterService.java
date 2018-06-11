@@ -1,6 +1,5 @@
 package org.esupportail.esupsgcclient.service.printer;
 
-import java.awt.Color;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -17,7 +16,6 @@ import com.zebra.sdk.common.card.exceptions.ZebraCardException;
 import com.zebra.sdk.common.card.jobSettings.ZebraCardJobSettingNames;
 import com.zebra.sdk.common.card.printer.ZebraCardPrinter;
 import com.zebra.sdk.common.card.printer.ZebraCardPrinterFactory;
-import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.discovery.DiscoveredPrinter;
 import com.zebra.sdk.printer.discovery.DiscoveredUsbPrinter;
 import com.zebra.sdk.printer.discovery.UsbDiscoverer;
@@ -28,51 +26,41 @@ import com.zebra.sdk.zxp.device.internal.ZxpDevice;
 
 public class ZebraPrinterService {
 	
-	public final Integer RESUME_OPTION = 0;
-	private final Integer CARD_FEED_TIMEOUT = 30000;
+	private final static Logger log = Logger.getLogger(EsupSGCClientApplication.class);
 	
-	Logger log = Logger.getLogger(EsupSGCClientApplication.class);
+	private static Integer CARD_FEED_TIMEOUT = 30000;
 	
-	DiscoveredUsbPrinter discoveredPrinters;
-	ZebraCardPrinterFactory zebraCardPrinterFactory;
-	ZebraCardPrinter zebraCardPrinter;
-	ZebraPrinter zebraPrinter;
-	ZxpDevice zxpDevice;
-	ZXPPrn zxpPrn;
-	Connection connection;
-	int jobId;
+	public static ZebraCardPrinter zebraCardPrinter;
+	private static ZxpDevice zxpDevice;
+	private static ZXPPrn zxpPrn;
+	private static Connection connection;
+	private static int jobId;
 	
-	public ZebraPrinterService() throws ConnectionException {
+	public static void init() throws ConnectionException{
 
 		DiscoveredUsbPrinter[] discoveredPrinters;
-		try {
-			discoveredPrinters = UsbDiscoverer.getZebraUsbPrinters();
-			for(DiscoveredUsbPrinter discoveredUsbPrinter : discoveredPrinters) {
-				DiscoveredPrinter discoveredPrinter =  discoveredUsbPrinter;
-				connection = discoveredPrinter.getConnection();
-				
-				try {
-					if (!connection.isConnected()) connection.open();
-					Utils.sleep(1000);
-					zebraCardPrinter = ZebraCardPrinterFactory.getInstance(connection);
-					zxpDevice = new ZxpDevice(connection);
-					zxpPrn = zxpDevice.getZxpPrinter();
-					break;
-				}catch(Exception e) {
-					log.error(e.getMessage());
-					throw new ConnectionException(e);
-				}
+		discoveredPrinters = UsbDiscoverer.getZebraUsbPrinters();
+		for(DiscoveredUsbPrinter discoveredUsbPrinter : discoveredPrinters) {
+			DiscoveredPrinter discoveredPrinter =  discoveredUsbPrinter;
+			connection = discoveredPrinter.getConnection();
+			
+			try {
+				if (!connection.isConnected()) connection.open();
+				Utils.sleep(1000);
+				zebraCardPrinter = ZebraCardPrinterFactory.getInstance(connection);
+				zxpDevice = new ZxpDevice(connection);
+				zxpPrn = zxpDevice.getZxpPrinter();
+				break;
+			}catch(Exception e) {
+				log.error("Zebra init error", e);
+				throw new ConnectionException(e);
 			}
-			if(zebraCardPrinter != null ) {
-					setSmartcardJob();
-			}
-		} catch (ConnectionException e) {
-			log.error("zebra connection error", e);
 		}
-		
-
+		if(zebraCardPrinter != null ) {
+				setSmartcardJob();
+		}
 	}
-	public void setSmartcardJob(){
+	public static void setSmartcardJob(){
 		try {
 			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_SOURCE, "Feeder");
 			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_DESTINATION, "Hold");
@@ -82,7 +70,7 @@ public class ZebraPrinterService {
 		}
 	}
 
-	public void launchEncoding() {
+	public static void launchEncoding() {
 		try {
 			setSmartcardJob();
 			jobId = zebraCardPrinter.smartCardEncode(1);
@@ -91,7 +79,7 @@ public class ZebraPrinterService {
 		}
 	}
 	
-	public boolean pollJobStatus(){
+	public static boolean pollJobStatus(){
 		boolean done = false;
 		long start = System.currentTimeMillis();
 
@@ -138,7 +126,7 @@ public class ZebraPrinterService {
 		return done;
 	}
 	
-	public void cancelJob(){
+	public static void cancelJob(){
 		try {
 			zebraCardPrinter.cancel(jobId);
 			log.info("Job ID " + jobId + " was cancelled.%n");
@@ -148,58 +136,66 @@ public class ZebraPrinterService {
 		
 	}
 	
-	public void cancelJobs() throws ConnectionException, ZebraCardException {
+	public static void cancelJobs() throws ConnectionException, ZebraCardException {
+		if(zebraCardPrinter != null) {
 			List<JobStatus> jobs = zebraCardPrinter.getJobList();
 			for(JobStatus job : jobs) {
 				zebraCardPrinter.cancel(job.jobId);
 			}
-
+		} else {
+			throw new ZebraCardException("zebraCardPrinter is null - try reset printer");
+		}
 	}
 	
-	public void resume(){
+	public void resume() throws ZebraCardException{
 		try {
 			zebraCardPrinter.resume();
 		} catch (ZebraCardException | ConnectionException e) {
 			log.error("Zebra resume error", e);
+			throw new ZebraCardException("zebraCardPrinter is null - try reset printer");
 		}
 	}
 
-	public void reverseCard(){
+	public static void reverseCard() throws ZebraCardException{
 		log.info("try to reverse card");
 		try {
 			zxpPrn.flipCard(new Response(), new CardError());
 		} catch (ConnectionException e) {
 			log.error("Zebra resume error", e);
+			throw new ZebraCardException("zebraCardPrinter is null - try reset printer");
 		}
 	}
 	
-	public void reset() {
+	public static void reset() throws ZebraCardException {
 		try {
 			zebraCardPrinter.reset();
 		} catch (ZebraCardException | ConnectionException e) {
 			log.error("Zebra resume error", e);
+			throw new ZebraCardException("zebraCardPrinter is null - try reset printer");
 		}
 	}
 	
-	public String getStatus() throws ConnectionException, SettingsException, ZebraCardException {
+	public static String getStatus() {
 		String status = null;
-		while(status == null){
-			Utils.sleep(250);
-			log.debug(zebraCardPrinter.getPrinterStatus().status +" : " +  zebraCardPrinter.getPrinterStatus().alarmInfo.description);
-			status = zebraCardPrinter.getPrinterStatus().status + " " + zebraCardPrinter.getPrinterStatus().alarmInfo.description;
+		if(zebraCardPrinter != null) {
+			while(status == null){
+				Utils.sleep(250);
+				try {
+					log.debug(zebraCardPrinter.getPrinterStatus().status +" : " +  zebraCardPrinter.getPrinterStatus().alarmInfo.description);
+					status = zebraCardPrinter.getPrinterStatus().status + " " + zebraCardPrinter.getPrinterStatus().alarmInfo.description;
+				} catch (ConnectionException | SettingsException | ZebraCardException e) {
+					log.error(e);
+				}
+			}
 		}
 		return status;
 	}
-	
-	public ZebraCardPrinter getZebraCardPrinter() {
-		return zebraCardPrinter;
-	}
 
-	public int getJobId() {
+	public static int getJobId() {
 		return jobId;
 	}
 	
-	public String getStatusMessage(String status) {
+	public static String getStatusMessage(String status) {
 		if(status.toLowerCase().contains("out of cards")) {
 			return "Chargeur vide";
 		}else if(status.toLowerCase().contains("jam")) {
