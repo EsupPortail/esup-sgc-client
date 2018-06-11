@@ -13,8 +13,6 @@ public class CnousFournisseurCarteRunExe {
 	
 	private String pathToExe;
 	
-	
-	
 	public CnousFournisseurCarteRunExe(String pathToExe) {
 		this.pathToExe = pathToExe;
 	}

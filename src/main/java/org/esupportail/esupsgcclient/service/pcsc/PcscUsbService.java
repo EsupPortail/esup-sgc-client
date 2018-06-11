@@ -18,16 +18,17 @@ import org.apache.log4j.Logger;
 import jnasmartcardio.Smartcardio;
 import jnasmartcardio.Smartcardio.JnaPCSCException;
 
+@SuppressWarnings("restriction")
 public class PcscUsbService {
 
 	private final static Logger log = Logger.getLogger(PcscUsbService.class);
 	
-	private Card card;
-	private CardTerminal cardTerminal;
-	private TerminalFactory context;
-	public CardTerminals terminals;
+	private static Card card;
+	private static CardTerminal cardTerminal;
+	private static TerminalFactory context;
+	private static CardTerminals terminals;
 	
-	public PcscUsbService() throws PcscException {
+	public static void init() throws PcscException {
 		Security.addProvider(new Smartcardio());
 		try {
 			context = TerminalFactory.getInstance("PC/SC", null, Smartcardio.PROVIDER_NAME);
@@ -36,17 +37,15 @@ public class PcscUsbService {
 				throw new PcscException("no PC/SC reader found");
 			}
 		} catch (Exception e) {
-			log.error("Exception retrieving context", e);
-			throw new PcscException("Exception retrieving context");
+			throw new PcscException("Exception retrieving context", e);
 		}
-
 	}
 	
-	public boolean isCardOnTerminal() throws CardException{
+	public static boolean isCardOnTerminal() throws CardException{
 		return cardTerminal.waitForCardAbsent(2);
 	}
 	
-	public String connection() throws CardException{
+	public static String connection() throws CardException{
 		for (CardTerminal terminal : terminals.list()) {
 			if(!terminal.getName().contains("6121") && terminal.isCardPresent()){
 				cardTerminal = terminal;
@@ -61,7 +60,7 @@ public class PcscUsbService {
 		throw new CardException("No NFC reader found with card on it - NFC reader found : " + getNamesOfTerminals(terminals));
 	}
 
-	private String getNamesOfTerminals(CardTerminals terminals) throws CardException {
+	private static String getNamesOfTerminals(CardTerminals terminals) throws CardException {
 		List<String> terminalsNames = new ArrayList<String>();  
 		for (CardTerminal terminal : terminals.list()) {
 			terminalsNames.add(terminal.getName());
@@ -80,22 +79,21 @@ public class PcscUsbService {
 		return false;
 	}
 	
-	public String sendAPDU(String apdu) throws CardException{
+	public static String sendAPDU(String apdu) throws CardException{
 		ResponseAPDU answer = null;
 		answer = card.getBasicChannel().transmit(new CommandAPDU(hexStringToByteArray(apdu)));
 		return byteArrayToHexString(answer.getBytes());
 
 	}
 
-	public String getCardId() throws CardException{
+	public static String getCardId() throws CardException{
 		ResponseAPDU answer;
 		answer = card.getBasicChannel().transmit(new CommandAPDU(hexStringToByteArray("FFCA000000")));
 		byte[] uid = Arrays.copyOfRange(answer.getBytes(), 0, answer.getBytes().length-2);
 		return byteArrayToHexString(uid);
-	
 	}
 	
-	public void disconnect() throws PcscException{
+	public static void disconnect() throws PcscException{
 		try {
 			card.disconnect(false);
 		} catch (CardException e) {
@@ -103,7 +101,7 @@ public class PcscUsbService {
 		}
 	}
 
-	public byte[] hexStringToByteArray(String s) {
+	public static byte[] hexStringToByteArray(String s) {
 		s = s.replace(" ", "");
 		int len = s.length();
 		byte[] data = new byte[len / 2];
@@ -114,9 +112,9 @@ public class PcscUsbService {
 		return data;
 	}
 
-	final protected static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+	final private static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
-	public String byteArrayToHexString(byte[] bytes) {
+	public static String byteArrayToHexString(byte[] bytes) {
 		char[] hexChars = new char[bytes.length*2];
 		int v;
 
