@@ -36,7 +36,7 @@ public class QrcodeReadTask extends Task<String> {
 			BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(imageProperty.get(), null);
 			qrcode = QRCodeReader.readQrCode(webcamBufferedImage);
 			if (webcamBufferedImage != null) {
-				if (qrcode != null || nbReadRetry > 15) {
+				if (qrcode != null) {
 					break;
 				}
 			}else {
