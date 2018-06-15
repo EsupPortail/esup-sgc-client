@@ -61,6 +61,24 @@ public class MainLoopService extends Service<Void> {
 					mainPane.addLogTextLn("INFO", "Encoding : Start");
 
 					EncodingTask encodingTask = new EncodingTask(EncodingService.esupNfcTagServerUrl, EncodingService.numeroId, csn, mainPane.logTextarea);
+					encodingTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
+						@Override
+						public void handle(WorkerStateEvent event) {
+							customLog("ERROR", "Erreur d'encodage, voir les logs", encodingTask.getException());
+							mainPane.changeStepEncodageApp("red");
+							WaitRemoveCardTask waitRemoveCardTask = new WaitRemoveCardTask();
+							waitRemoveCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+								@Override
+								public void handle(WorkerStateEvent t) {
+									restart();
+								}
+							});
+							mainPane.addLogTextLn("INFO", "please change card");
+							Thread waitRemoveCardThread = new Thread(waitRemoveCardTask);
+							waitRemoveCardThread.setDaemon(true);
+							waitRemoveCardThread.start();
+						}
+					});	
 					encodingTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 						@Override
 						public void handle(WorkerStateEvent event) {
