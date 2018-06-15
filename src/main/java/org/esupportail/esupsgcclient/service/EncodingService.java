@@ -37,12 +37,12 @@ public class EncodingService {
 	private static String csvPath = "c:\\cnousApi\\csv_out.csv";
 	private static CnousFournisseurCarteRunExe cnousFournisseurCarteRunExe;
 	private static boolean cnousOK = false;
-		
+
 	public static String esupNfcTagServerUrl = "https://esup-nfc-tag.univ-ville.fr";
 	private static String sgcUrl = "https://esup-sgc.univ-ville.fr";
 	public static String numeroId = "0000000000000000000";
 	private static String eppnInit = "user@univ-ville.fr";
-	
+
 	private static String authToken = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 	
 	public static void init(String[] args) throws EncodingException, PcscException, CnousFournisseurCarteException {
@@ -151,13 +151,16 @@ public class EncodingService {
 			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 			HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(
 					map, headers);
-
-			ResponseEntity<String> fileSendResult = restTemplate.exchange(
-				sgcUrl + "/wsrest/nfc/addCrousCsvFile?authToken=" + authToken + "&csn=" + csn,
-				HttpMethod.POST, requestEntity,
-				String.class);
-			log.debug("csv send : " + fileSendResult.getBody());
-		}catch (Exception e) {
+			try {
+				ResponseEntity<String> fileSendResult = restTemplate.exchange(
+					sgcUrl + "/wsrest/nfc/addCrousCsvFile?authToken=" + authToken + "&csn=" + csn,
+					HttpMethod.POST, requestEntity,
+					String.class);
+				log.debug("csv send : " + fileSendResult.getBody());
+			} catch(HttpClientErrorException clientEx) {
+				throw new EncodingException("Exception during calling esupSgc (adding crous csv)", clientEx);
+			}
+		} catch (Exception e) {
 			log.error("Erreur lors de l'envoi du CSV", e);
 			throw new EncodingException("Erreur lors de l'envoi du CSV", e);
 		}
