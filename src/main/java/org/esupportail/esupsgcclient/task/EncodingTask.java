@@ -8,6 +8,7 @@ import org.esupportail.esupsgcclient.service.EncodingException;
 import org.esupportail.esupsgcclient.service.pcsc.PcscException;
 import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javafx.application.Platform;
@@ -35,34 +36,38 @@ public class EncodingTask extends Task<String> {
 	}
 
 	@Override
-    protected String call() throws Exception {
+    protected String call() throws Exception, EncodingException, PcscException {
 		NfcResultBean nfcResultBean;
 		log.info("Encoding : Start");
 		String result = "";
 		while(true){
-			log.info("RAPDU : "+ result);
-			String url = esupNfcTagServerUrl + "/desfire-ws/?result="+ result +"&numeroId="+numeroId+"&cardId="+cardId;
-			nfcResultBean = restTemplate.getForObject(url, NfcResultBean.class);
+			log.info("RAPDU : " + result);
+			String url = String.format("%s/desfire-ws/?result=%s&numeroId=%s&cardId=%s", esupNfcTagServerUrl, result, numeroId, cardId);
+			try {
+				nfcResultBean = restTemplate.getForObject(url, NfcResultBean.class);
+			} catch(HttpClientErrorException clientEx) {
+				throw new EncodingException("Exception during calling esupnfcTagServer", clientEx);
+			}
 			log.info("SAPDU : "+ nfcResultBean.getFullApdu());
-			if(nfcResultBean.getFullApdu()!=null){
-			if(!"END".equals(nfcResultBean.getFullApdu()) ) {
-				try {
-					result = PcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
-			        Platform.runLater(new Runnable() {
-			            @Override public void run() {
-			            	logTextarea.appendText(".");
-			            	logTextarea.positionCaret(logTextarea.getLength());
-			            }
-			        });
-				} catch (CardException e) {
-					throw new PcscException("pcsc send apdu error", e);
+			if(nfcResultBean.getFullApdu()!=null) {
+				if(!"END".equals(nfcResultBean.getFullApdu()) ) {
+					try {
+						result = PcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
+				        Platform.runLater(new Runnable() {
+				            @Override public void run() {
+				            	logTextarea.appendText(".");
+				            	logTextarea.positionCaret(logTextarea.getLength());
+				            }
+				        });
+					} catch (CardException e) {
+						throw new PcscException("pcsc send apdu error", e);
+					}
+				} else {
+					log.info("Encoding  : OK");
+					return nfcResultBean.getFullApdu();
 				}
 			} else {
-				log.info("Encoding  : OK");
-				return nfcResultBean.getFullApdu();
-			}
-			}else{
-				throw new EncodingException("return is null");
+				throw new EncodingException("NFC APDU gived by nfctag is null ?!");
 			}
 		}
     }

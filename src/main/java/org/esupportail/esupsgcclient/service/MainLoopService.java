@@ -100,9 +100,13 @@ public class MainLoopService extends Service<Void> {
 											mainPane.changeStepEncodageApp("orange");
 											mainPane.addLogTextLn("INFO", "Encoding : Start");
 
-											EncodingTask encodingTask = new EncodingTask(
-													EncodingService.esupNfcTagServerUrl, EncodingService.numeroId,
-													csn, mainPane.logTextarea);
+											EncodingTask encodingTask = new EncodingTask(EncodingService.esupNfcTagServerUrl, EncodingService.numeroId, csn, mainPane.logTextarea);
+											encodingTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
+												@Override
+												public void handle(WorkerStateEvent event) {
+													customLog("ERROR", "Erreur d'encodage, voir les logs", encodingTask.getException());
+												}
+											});	
 											encodingTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 												@Override
 												public void handle(WorkerStateEvent event) {
