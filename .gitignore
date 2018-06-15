@@ -2,6 +2,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 bin_x64/
 esupsgcclient.log
+src/etc/keystore.jks
 
 ### STS ###
 .apt_generated
