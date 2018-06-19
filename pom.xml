@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.esupportail.esupsgcclient</groupId>
@@ -24,97 +25,97 @@
 			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.springframework</groupId>
-		    <artifactId>spring-web</artifactId>
-		    <version>${spring.version}</version>
-		</dependency>		
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpclient</artifactId>
-		    <version>4.3.4</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.4</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.jnasmartcardio</groupId>
 			<artifactId>jnasmartcardio</artifactId>
 			<version>0.2.7</version>
-		</dependency>		
-		<dependency>
-		    <groupId>log4j</groupId>
-		    <artifactId>log4j</artifactId>
-		    <version>1.2.17</version>
-		</dependency>		
-		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-annotations</artifactId>
-		    <version>2.8.8</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-databind</artifactId>
-		    <version>2.8.8</version>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-core</artifactId>
-		    <version>2.8.8</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.8.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.8.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.8.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.sarxos</groupId>
 			<artifactId>webcam-capture</artifactId>
 			<version>0.3.10</version>
-		</dependency> 		
+		</dependency>
 		<dependency>
 			<groupId>com.google.zxing</groupId>
 			<artifactId>javase</artifactId>
 			<version>2.1</version>
 		</dependency>
-	   <dependency>
-	       <groupId>org.slf4j</groupId>
-	       <artifactId>slf4j-api</artifactId>
-	       <version>1.7.5</version>
-	   </dependency>
 		<dependency>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-log4j12</artifactId>
-		    <version>1.7.5</version>
-		</dependency>	
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.5</version>
+		</dependency>
 		<dependency>
-		    <groupId>commons-io</groupId>
-		    <artifactId>commons-io</artifactId>
-		    <version>2.5</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
 		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-compiler-plugin</artifactId>
-		        <version>3.1</version>
-		        <configuration>
-		          <source>${java.version}</source>
-		          <target>${java.version}</target>
-		        </configuration>
-	      	</plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
 			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-jar-plugin</artifactId>
-			    <version>2.2</version>
-   		        <configuration>
-		          <source>${java.version}</source>
-		          <target>${java.version}</target>
-		        </configuration>
-			  </plugin>
-			  <plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-assembly-plugin</artifactId>
-			    <version>2.2-beta-4</version>
-			    <configuration>
-   		          <source>${java.version}</source>
-		          <target>${java.version}</target>
-	    		  <additionalClasspathElement>${basedir}/src/images/</additionalClasspathElement>
-		    	  <additionalClasspathElement>${basedir}/src/font/</additionalClasspathElement>
-			      <descriptorRefs>
-			        <descriptorRef>jar-with-dependencies</descriptorRef>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-4</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<additionalClasspathElement>${basedir}/src/images/</additionalClasspathElement>
+					<additionalClasspathElement>${basedir}/src/font/</additionalClasspathElement>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<archive>
 						<manifest>
@@ -124,38 +125,38 @@
 						<manifestEntries>
 							<Application-Name>ESUP-SGC-Client - JWS</Application-Name>
 							<Trusted-Library>true</Trusted-Library>
-							<Permissions>all-permissions</Permissions>					
-						</manifestEntries>	
+							<Permissions>all-permissions</Permissions>
+						</manifestEntries>
 					</archive>
-			    </configuration>
-			    <executions>
-			      <execution>
-			        <phase>package</phase>
-			        <goals>
-			          <goal>single</goal>
-			        </goals>
-			      </execution>
-			    </executions>
-			  </plugin>
-			  <plugin>
-	              <groupId>org.apache.maven.plugins</groupId>
-	              <artifactId>maven-jarsigner-plugin</artifactId>
-	              <version>1.2</version>
-	              <executions>
-	                  <execution>
-	                      <id>sign</id>
-	                      <goals>
-	                      	<goal>sign</goal>
-	                      </goals>
-	                  </execution>
-	              </executions>
-	              <configuration>
-			  <keystore>src/etc/keystore.jks</keystore>
-	                  <alias>server</alias>
-	                  <storepass>leocarte</storepass>
-	                  <keypass>leocarte</keypass>
-	              </configuration>
-	      	</plugin>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<id>sign</id>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>src/etc/keystore.jks</keystore>
+					<alias>server</alias>
+					<storepass>leocarte</storepass>
+					<keypass>leocarte</keypass>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>

@@ -28,6 +28,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
@@ -43,6 +44,8 @@ public class MainPane extends Pane {
 
 	private final static Logger log = Logger.getLogger(MainPane.class);
 
+	private Thread threadWebcamStream = null;
+	
 	private static int fontSize = 24;
 	private static int centerPaneHeight = 250;
 	private static int padding = 10;
@@ -58,10 +61,11 @@ public class MainPane extends Pane {
 	private Label stepEncodageCnous = new Label("Encodage CNOUS");
 	private Label stepSendCSV = new Label("Envoi du CSV");
 
+	public ComboBox<Webcam> comboBox = new ComboBox<Webcam>();
+	
 	private BorderPane webCamPane = new BorderPane();
 	private ImageView webcamImageView;
 	
-
 	private Button buttonLogs = new Button("Masquer les logs");
 	private Pane logPane = new Pane();
 
@@ -99,7 +103,23 @@ public class MainPane extends Pane {
 		titlePane.setPadding(new Insets(0, 0, 0, padding));
 		titlePane.getChildren().add(title);
 		titlePane.getChildren().add(textPrincipal);
-
+		
+		for(Webcam webcam : Webcam.getWebcams()) {
+			comboBox.getItems().add(webcam);
+		}
+		
+		comboBox.setOnAction((event) -> {
+			webcam.close();
+		    webcam = (Webcam) comboBox.getSelectionModel().getSelectedItem();
+		    threadWebcamStream.interrupt();
+		    initializeWebCam();
+		    startWebCamStream();
+		    
+		});
+		
+		comboBox.getSelectionModel().select(Webcam.getDefault());
+		webcam = Webcam.getDefault();
+		
 		VBox processPane = new VBox();
 		processPane.setMinSize(500, centerPaneHeight);
 		processPane.setPadding(new Insets(0, 0, 0, padding));
@@ -154,6 +174,7 @@ public class MainPane extends Pane {
 		mainPane.setMinSize(width, height);
 		mainPane.setSpacing(10);
 		mainPane.getChildren().add(logosPane);
+		mainPane.getChildren().add(comboBox);		
 		mainPane.getChildren().add(titlePane);
 		mainPane.getChildren().add(centerPane);
 		mainPane.getChildren().add(logPane);
@@ -184,13 +205,9 @@ public class MainPane extends Pane {
 				Dimension[] nonStandardResolutions = new Dimension[] { WebcamResolution.PAL.getSize(),
 						WebcamResolution.HD720.getSize(), new Dimension(720, 480), new Dimension(1920, 1080), };
 
-				Dimension size = WebcamResolution.HD720.getSize();
-
+				Dimension size = WebcamResolution.VGA.getSize();
 				if (webcam != null) {
 					webcam.close();
-				}
-				webcam = Webcam.getDefault();
-				if (webcam != null) {
 					webcam.setCustomViewSizes(nonStandardResolutions);
 					webcam.setViewSize(size);
 					webcam.setImageTransformer(new WebcamImageTransformer() {
@@ -242,9 +259,9 @@ public class MainPane extends Pane {
 			}
 		};
 
-		Thread th = new Thread(task);
-		th.setDaemon(true);
-		th.start();
+		threadWebcamStream = new Thread(task);
+		threadWebcamStream.setDaemon(true);
+		threadWebcamStream.start();
 		webcamImageView.imageProperty().bind(imageProperty);
 
 	}
