@@ -38,7 +38,7 @@ public class ClientCheckService extends Service<Void> {
 	protected Task<Void> createTask() {
 
 		mainPane.changeStepClientReady("Client en cours de démarrage", "orange");
-
+/*
 		try {
 			URL urlImage1 = new URL(EncodingService.getSgcUrl() + "/resources/images/logo1.png");
 			mainPane.setLogo1(urlImage1);
@@ -48,7 +48,7 @@ public class ClientCheckService extends Service<Void> {
 		} catch (MalformedURLException e) {
 			log.error("images load error", e);
 		}
-
+*/
 		try {
 			mainPane.changeStepClientReady("Ouverture de la webcam", "orange");
 
