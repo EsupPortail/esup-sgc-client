@@ -3,6 +3,7 @@ package org.esupportail.esupsgcclient.utils;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.EsupSGCClientApplication;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
@@ -12,7 +13,9 @@ import javafx.util.Duration;
 
 @SuppressWarnings("restriction")
 public class Utils {
-	
+
+	private final static Logger log = Logger.getLogger(Utils.class);
+
     public static void sleep(long time) {
 		try {
 			Thread.sleep(time);
@@ -35,10 +38,14 @@ public class Utils {
 	}
 	
 	public static void playSound(String soundFile) {
-		Media media = new Media( EsupSGCClientApplication.class.getResource("/sound/" + soundFile).toExternalForm());
-		MediaPlayer player = new MediaPlayer(media);
-		player.setStopTime(Duration.seconds(2));
-		player.setAutoPlay(true);
+		try {
+			Media media = new Media( EsupSGCClientApplication.class.getResource("/sound/" + soundFile).toExternalForm());
+			MediaPlayer player = new MediaPlayer(media);
+			player.setStopTime(Duration.seconds(2));
+			player.setAutoPlay(true);
+		} catch (Exception e) {
+			log.error("error on playSound", e);
+		}
 	}
 	
 }
