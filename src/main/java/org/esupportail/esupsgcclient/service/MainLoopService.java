@@ -37,14 +37,15 @@ public class MainLoopService extends Service<Void> {
 		
 		mainPane.buttonRestart.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent e) {
+			public void handle(ActionEvent ae) {
 				log.info("Restart push, try to restart");
 				mainPane.addLogTextLn("INFO", "try to restart");
 				mainPane.initUi();
 				try {
 					ZebraPrinterService.cancelJobs();
-				} catch (ConnectionException | ZebraCardException e1) {
-					log.error("enable to cancel jobs : " + e1.getMessage());
+					EncodingService.pcscDisconnect();
+				} catch (ConnectionException | ZebraCardException | PcscException e) {
+					log.error("enable to cancel jobs : " + e.getMessage());
 				}
 				setNbCard(0);
 				restart();
@@ -56,8 +57,6 @@ public class MainLoopService extends Service<Void> {
 	protected Task<Void> createTask() {
 		mainPane.addLogTextLn("INFO", getState().toString());
 		mainPane.initUi();
-		mainPane.addLogTextLn("INFO", "printer status : " + ZebraPrinterService.getStatus());
-
 		WaitPrinterReadyCardTask waitPrinterReadyCardTask = new WaitPrinterReadyCardTask();
 		waitPrinterReadyCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
@@ -135,7 +134,6 @@ public class MainLoopService extends Service<Void> {
 																		mainPane.changeStepSendCSV("green");
 																		mainPane.addLogTextLn("INFO", "Cnous csv send :  OK");
 																		mainPane.changeTextPrincipal("Encodage terminé", "green");
-																		Utils.playSound("success.wav");
 																	} else {
 																		customLog("WARN", "Cnous csv send :  Failed", null);
 																		mainPane.changeStepSendCSV("red");
@@ -147,7 +145,6 @@ public class MainLoopService extends Service<Void> {
 															} else {
 																mainPane.addLogTextLn("INFO", "Cnous Encoding :  Skipped");
 																mainPane.changeTextPrincipal("Encodage terminé", "green");
-																Utils.playSound("success.wav");
 															}
 														} catch (EncodingException e) {
 															customLog("ERROR", "Erreur d'encodage, voir les logs", e);
@@ -175,7 +172,7 @@ public class MainLoopService extends Service<Void> {
 											mainPane.changeStepReadCSN("red");
 
 										} catch (SgcCheckException e) {
-											customLog("ERROR", "Erreur SGC, voir les logs", e);
+											customLog("WARN", "Erreur SGC " + e.getMessage(), e);
 											mainPane.changeStepSelectSGC("red");
 										}
 									} else {
@@ -226,7 +223,7 @@ public class MainLoopService extends Service<Void> {
 			if(throwable != null) {
 				log.warn(message, throwable);
 			} else {
-				log.warn(message, throwable);
+				log.warn(message);
 			}
 			mainPane.changeTextPrincipal(message, "orange");
 			mainPane.addLogTextLn(level, message);

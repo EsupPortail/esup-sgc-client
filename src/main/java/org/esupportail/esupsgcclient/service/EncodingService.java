@@ -118,7 +118,7 @@ public class EncodingService {
 			throw new SgcCheckException("SGC select error : Web Server Error " + e.getResponseBodyAsString());
 		} catch (Exception e){
 			log.error(e);
-			throw new SgcCheckException("SGC select error", e);
+			throw new SgcCheckException("SGC select error " + e.getMessage(), e);
 		}
 	}
 	

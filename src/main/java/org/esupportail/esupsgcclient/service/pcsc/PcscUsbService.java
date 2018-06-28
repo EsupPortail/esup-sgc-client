@@ -49,11 +49,12 @@ public class PcscUsbService {
 		for (CardTerminal terminal : terminals.list()) {
 			if(!terminal.getName().contains("6121") && terminal.isCardPresent()){
 				cardTerminal = terminal;
+				log.info("try read csn on : " + cardTerminal);
 				try{
 					card = cardTerminal.connect("*");
 					return cardTerminal.getName();
 				}catch(JnaPCSCException e){
-					log.error("pcsc connection error", e);
+					log.error("pcsc connection error on " + cardTerminal);
 				}
 			}
 		}
