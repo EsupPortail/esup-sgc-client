@@ -69,7 +69,6 @@ public class ClientCheckService extends Service<Void> {
 									mainPane.hideCnousSteps();
 								}
 
-								mainPane.addLogTextLn("INFO", "zebra : OK");
 								mainPane.buttonRestart.setVisible(false);
 								mainPane.addLogTextLn("INFO", "numeroId = " + EncodingService.getNumeroId());
 								mainPane.addLogTextLn("INFO", "eppnInit = " + EncodingService.getEppnInit());
