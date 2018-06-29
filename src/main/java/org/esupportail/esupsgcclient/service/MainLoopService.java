@@ -166,7 +166,7 @@ public class MainLoopService extends Service<Void> {
 					sleepThread.setDaemon(true);
 					sleepThread.start();
 				} catch (SgcCheckException e) {
-					customLog("ERROR", "Erreur SGC, voir les logs", e);
+					customLog("WARN", "Erreur SGC " + e.getMessage(), e);
 					mainPane.changeStepSelectSGC("red");
 					WaitRemoveCardTask waitRemoveCardTask = new WaitRemoveCardTask();
 					waitRemoveCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -208,7 +208,7 @@ public class MainLoopService extends Service<Void> {
 			if(throwable != null) {
 				log.warn(message, throwable);
 			} else {
-				log.warn(message, throwable);
+				log.warn(message);
 			}
 			mainPane.changeTextPrincipal(message, "orange");
 			mainPane.addLogTextLn(level, message);
