@@ -43,7 +43,7 @@ public class MainLoopService extends Service<Void> {
 				mainPane.initUi();
 				try {
 					ZebraPrinterService.cancelJobs();
-				} catch (ConnectionException | ZebraCardException | PcscException e) {
+				} catch (ConnectionException | ZebraCardException e) {
 					log.error("enable to cancel jobs : " + e.getMessage());
 				}
 				setNbCard(0);
