@@ -14,6 +14,7 @@ import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.utils.Utils;
 
 import jnasmartcardio.Smartcardio;
 import jnasmartcardio.Smartcardio.JnaPCSCException;
@@ -23,6 +24,7 @@ public class PcscUsbService {
 
 	private final static Logger log = Logger.getLogger(PcscUsbService.class);
 	
+	public static int defaultNbRetry = 3;
 	private static Card card;
 	private static CardTerminal cardTerminal;
 	private static TerminalFactory context;
@@ -46,17 +48,23 @@ public class PcscUsbService {
 	}
 	
 	public static String connection() throws CardException{
-		for (CardTerminal terminal : terminals.list()) {
-			if(!terminal.getName().contains("6121") && terminal.isCardPresent()){
-				cardTerminal = terminal;
-				log.info("try read csn on : " + cardTerminal);
-				try{
-					card = cardTerminal.connect("*");
-					return cardTerminal.getName();
-				}catch(JnaPCSCException e){
-					log.error("pcsc connection error on " + cardTerminal);
+		int nbRetry = defaultNbRetry;
+		while(nbRetry > 0) {
+			for (CardTerminal terminal : terminals.list()) {
+				if(!terminal.getName().contains("6121") && terminal.isCardPresent()){
+					System.err.println("OK : " + terminal);
+					cardTerminal = terminal;
+					log.info("try read csn on : " + cardTerminal);
+					try{
+						card = cardTerminal.connect("*");
+						return cardTerminal.getName();
+					}catch(Exception e){
+						log.error("pcsc connection error on " + cardTerminal);
+					}
 				}
 			}
+			Utils.sleep(1000);
+			nbRetry--;
 		}
 		throw new CardException("No NFC reader found with card on it - NFC reader found : " + getNamesOfTerminals(terminals));
 	}
