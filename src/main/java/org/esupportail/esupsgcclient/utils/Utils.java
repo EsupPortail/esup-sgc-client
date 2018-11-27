@@ -7,9 +7,8 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.EsupSGCClientApplication;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
 
 @SuppressWarnings("restriction")
 public class Utils {
@@ -39,10 +38,8 @@ public class Utils {
 	
 	public static void playSound(String soundFile) {
 		try {
-			Media media = new Media( EsupSGCClientApplication.class.getResource("/sound/" + soundFile).toExternalForm());
-			MediaPlayer player = new MediaPlayer(media);
-			player.setStopTime(Duration.seconds(2));
-			player.setAutoPlay(true);
+		    AudioStream audioStream = new AudioStream(EsupSGCClientApplication.class.getResourceAsStream("/sound/" + soundFile));
+		    AudioPlayer.player.start(audioStream);
 		} catch (Exception e) {
 			log.error("error on playSound", e);
 		}
