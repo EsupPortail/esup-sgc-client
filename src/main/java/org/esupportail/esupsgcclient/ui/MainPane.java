@@ -68,7 +68,10 @@ public class MainPane extends Pane {
 	
 	private Button buttonLogs = new Button("Masquer les logs");
 	private Pane logPane = new Pane();
-
+	private int nfcTagSize = 500;
+	private Button buttonNfcTag = new Button("Masquer EsupNfcTag");
+	public Pane nfcTagPane = new Pane();
+	
 	public Button buttonExit = new Button("Quitter");
 	public Button buttonRestart = new Button("Restart");
 
@@ -85,10 +88,12 @@ public class MainPane extends Pane {
 	public SimpleBooleanProperty webCamReady = new SimpleBooleanProperty(false);
 
 	public MainPane(int width, int height) {
+		
+		
 		BorderPane logosPane = new BorderPane();
 		logosPane.setStyle("-fx-background-color: #e0e0e0");
 		logosPane.setPadding(new Insets(padding, padding, 0, padding));
-		logosPane.setMaxSize(width - padding * 2, 100);
+		logosPane.setMaxSize(width - nfcTagSize - padding * 2, 100);
 		logosPane.setLeft(image1JPanel);
 		logosPane.setRight(image2JPanel);
 
@@ -138,24 +143,23 @@ public class MainPane extends Pane {
 		setImageViewSize();
 
 		BorderPane centerPane = new BorderPane();
-		centerPane.setMinSize(1000, centerPaneHeight);
+		centerPane.setMinSize(width - nfcTagSize, centerPaneHeight);
 		centerPane.setLeft(processPane);
 		centerPane.setRight(webCamPane);
 
 		HBox buttonsPane = new HBox();
 		buttonsPane.setAlignment(Pos.BASELINE_RIGHT);
-		buttonsPane.setMaxSize(width - padding * 2, 50);
+		buttonsPane.setMaxSize(width - nfcTagSize - padding * 2, 50);
 		buttonsPane.setPadding(new Insets(0, padding, 0, 0));
 		buttonsPane.setSpacing(10);
 		buttonsPane.getChildren().add(buttonRestart);
 		buttonsPane.getChildren().add(buttonLogs);
 		buttonsPane.getChildren().add(buttonExit);
 
-		logPane.setMaxSize(width , 250);
+		logPane.setMaxSize(width - nfcTagSize , 250);
 		logTextarea.setEditable(false);
-		logTextarea.setMinSize(width, 230);
+		logTextarea.setMinSize(width - nfcTagSize, 230);
 		logPane.getChildren().add(logTextarea);
-
 		buttonLogs.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -169,9 +173,23 @@ public class MainPane extends Pane {
 			}
 		});
 
+		nfcTagPane.setMaxSize(nfcTagSize , height);
+		buttonNfcTag.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				if (nfcTagPane.isVisible()) {
+					nfcTagPane.setVisible(false);
+					buttonNfcTag.setText("Afficher EsupNfcTag");
+				} else {
+					nfcTagPane.setVisible(true);
+					buttonNfcTag.setText("Masquer EsupNfcTag");
+				}
+			}
+		});
+		
 		VBox mainPane = new VBox();
 		mainPane.setStyle("-fx-background-color: #e0e0e0");
-		mainPane.setMinSize(width, height);
+		mainPane.setMinSize(width - nfcTagSize, height);
 		mainPane.setSpacing(10);
 		mainPane.getChildren().add(logosPane);
 		mainPane.getChildren().add(comboBox);		
@@ -180,7 +198,13 @@ public class MainPane extends Pane {
 		mainPane.getChildren().add(logPane);
 		mainPane.getChildren().add(buttonsPane);
 
-		getChildren().add(mainPane);
+		HBox allPane = new HBox();
+		allPane.setStyle("-fx-background-color: #e0e0e0");
+		allPane.setMinSize(width, height);
+		allPane.getChildren().add(nfcTagPane);
+		allPane.getChildren().add(mainPane);
+		
+		getChildren().add(allPane);
 
 		initializeWebCam();
 
