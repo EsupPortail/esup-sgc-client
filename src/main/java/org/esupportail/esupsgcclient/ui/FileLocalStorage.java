@@ -16,10 +16,12 @@ public class FileLocalStorage {
 
 	private final static Logger log = Logger.getLogger(FileLocalStorage.class);
 
+	private static String localStorageName = "esupSgcLocalStorage";
+	
 	public static String getItem(String key) {
 		log.info("get key : " + key);
 		String value = "";
-		File file = new File("localStorage");
+		File file = new File(localStorageName);
 		try {
 			file.createNewFile();
 			FileInputStream fis = new FileInputStream(file);
@@ -38,7 +40,7 @@ public class FileLocalStorage {
 
 	public static void setItem(String key, String value) {
 		Map<String, String> item = new HashMap<String, String>();
-		File file = new File("localStorage");
+		File file = new File(localStorageName);
 		try {
 			file.createNewFile();
 			FileInputStream fis = new FileInputStream(file);
@@ -66,7 +68,7 @@ public class FileLocalStorage {
 	public static void removeItem(String key) {
 		log.info("remove : " + key);
 		Map<String, String> item = new HashMap<String, String>();
-		File file = new File("localStorage");
+		File file = new File(localStorageName);
 		try {
 			try {
 				FileInputStream fis = new FileInputStream(file);
@@ -90,7 +92,7 @@ public class FileLocalStorage {
 	}
 
 	public void clear() {
-		File file = new File("localStorage");
+		File file = new File(localStorageName);
 		file.delete();
 	}
 
