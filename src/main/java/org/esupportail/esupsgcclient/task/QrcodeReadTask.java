@@ -13,7 +13,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 
-@SuppressWarnings("restriction")
 public class QrcodeReadTask extends Task<String> {
 
 	private ObjectProperty<Image> imageProperty = new SimpleObjectProperty<Image>();

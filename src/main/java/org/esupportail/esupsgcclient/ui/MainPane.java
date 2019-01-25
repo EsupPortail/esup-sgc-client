@@ -39,7 +39,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-@SuppressWarnings("restriction")
 public class MainPane extends Pane {
 
 	private final static Logger log = Logger.getLogger(MainPane.class);
@@ -103,6 +102,7 @@ public class MainPane extends Pane {
 		title.setMinSize(200, 50);
 
 		textPrincipal.setMinSize(500, 50);
+		textPrincipal.setMaxSize(500, 50);
 
 		HBox titlePane = new HBox();
 		titlePane.setPadding(new Insets(0, 0, 0, padding));
@@ -155,7 +155,13 @@ public class MainPane extends Pane {
 		buttonsPane.getChildren().add(buttonRestart);
 		buttonsPane.getChildren().add(buttonLogs);
 		buttonsPane.getChildren().add(buttonExit);
-
+		buttonExit.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		
 		logPane.setMaxSize(width - nfcTagSize , 250);
 		logTextarea.setEditable(false);
 		logTextarea.setMinSize(width - nfcTagSize, 230);
@@ -360,10 +366,13 @@ public class MainPane extends Pane {
 		stepEncodageApp.setStyle("-fx-text-fill: gray;-fx-font-size: " + fontSize + ";");
 		stepEncodageCnous.setStyle("-fx-text-fill: gray;-fx-font-size: " + fontSize + ";");
 		stepSendCSV.setStyle("-fx-text-fill: gray;-fx-font-size: " + fontSize + ";");
+	}
+
+	public void setOk() {
 		changeStepClientReady("Client prêt", "green");
 		changeTextPrincipal("En attente d'une carte...", "green");
 	}
-
+	
 	public void addLogTextLn(String type, String text) {
 		if (!text.equals(lastText)) {
 			String date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());

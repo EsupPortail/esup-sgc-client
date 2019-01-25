@@ -19,8 +19,6 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 
-
-@SuppressWarnings("restriction")
 public class ClientCheckService extends Service<Void> {
 
 	private final static Logger log = Logger.getLogger(ClientCheckService.class);

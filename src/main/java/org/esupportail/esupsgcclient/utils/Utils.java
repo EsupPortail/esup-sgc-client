@@ -10,7 +10,6 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
-@SuppressWarnings("restriction")
 public class Utils {
 
 	private final static Logger log = Logger.getLogger(Utils.class);

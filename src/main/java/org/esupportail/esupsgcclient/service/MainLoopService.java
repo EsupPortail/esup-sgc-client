@@ -6,10 +6,10 @@ import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteExceptio
 import org.esupportail.esupsgcclient.service.pcsc.PcscException;
 import org.esupportail.esupsgcclient.service.printer.ZebraPrinterService;
 import org.esupportail.esupsgcclient.task.EncodingTask;
-import org.esupportail.esupsgcclient.task.VoidTask;
 import org.esupportail.esupsgcclient.task.PollPrinterJobStatusTask;
 import org.esupportail.esupsgcclient.task.QrcodeReadTask;
 import org.esupportail.esupsgcclient.task.ReverseCardTask;
+import org.esupportail.esupsgcclient.task.VoidTask;
 import org.esupportail.esupsgcclient.task.WaitPrinterReadyCardTask;
 import org.esupportail.esupsgcclient.ui.MainPane;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -23,7 +23,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-@SuppressWarnings("restriction")
 public class MainLoopService extends Service<Void> {
 
 	private final static Logger log = Logger.getLogger(EsupSGCClientApplication.class);
@@ -56,6 +55,7 @@ public class MainLoopService extends Service<Void> {
 	protected Task<Void> createTask() {
 		mainPane.addLogTextLn("INFO", getState().toString());
 		mainPane.initUi();
+		mainPane.setOk();
 		WaitPrinterReadyCardTask waitPrinterReadyCardTask = new WaitPrinterReadyCardTask();
 		waitPrinterReadyCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override

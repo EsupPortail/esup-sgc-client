@@ -1,11 +1,8 @@
 package org.esupportail.esupsgcclient.service;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.smartcardio.CardException;
 
@@ -43,22 +40,16 @@ public class EncodingService {
 	private static boolean cnousOK = false;
 		
 	public static String esupNfcTagServerUrl = "https://esup-nfc-tag.univ-ville.fr";
-	private static String sgcUrl = "https://esup-sgc.univ-ville.fr";
+	private static String esupSgcUrl = "https://esup-sgc.univ-ville.fr";
 	public static String numeroId = "0000000000000000000";
 	
 	public static void init() throws EncodingException, PcscException, CnousFournisseurCarteException {
 		
 		PcscUsbService.init();
-		Properties prop = new Properties();
-		InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("esupsgcclient.properties");
-		try {
-			prop.load(in);
-		} catch (IOException e1) {
-			log.error("sgcUrl not found");
-		}
-		esupNfcTagServerUrl = prop.getProperty("esupNfcTagServerUrl");
-		sgcUrl = prop.getProperty("esupSgcUrl");
-		encodeCnous = Boolean.valueOf(prop.getProperty("encodeCrous"));
+
+		esupNfcTagServerUrl = EsupSGCClientApplication.esupNfcTagServerUrl;
+		esupSgcUrl = EsupSGCClientApplication.esupSgcUrl;
+		encodeCnous = EsupSGCClientApplication.encodeCnous;
 		numeroId = EsupSGCClientApplication.numeroId;
 	
 		
@@ -103,7 +94,7 @@ public class EncodingService {
 		requestBody.put("qrcode", qrcode);
 		requestBody.put("csn", csn);
 		HttpEntity<Map<String, String>> httpEntity = new HttpEntity<Map<String, String>>(requestBody, httpHeaders);
-		String selectUrl = sgcUrl + "/wsrest/nfc/check4encode";	
+		String selectUrl = esupSgcUrl + "/wsrest/nfc/check4encode";	
 		
 		try {
 			restTemplate.postForObject(selectUrl, httpEntity, String.class);
@@ -126,7 +117,7 @@ public class EncodingService {
 	}
 	
 	public static boolean cnousEncoding(String cardId) throws CnousFournisseurCarteException {
-		String cnousUrl = sgcUrl + "/wsrest/nfc/cnousCardId?csn="+cardId;
+		String cnousUrl = esupSgcUrl + "/wsrest/nfc/cnousCardId?csn="+cardId;
 		try{
 			ResponseEntity<String> response = restTemplate.exchange(cnousUrl, HttpMethod.GET, null, String.class);
 			log.debug("cnous id : " + response.getBody());
@@ -156,7 +147,7 @@ public class EncodingService {
 					map, headers);
 
 			ResponseEntity<String> fileSendResult = restTemplate.exchange(
-				sgcUrl + "/wsrest/nfc/addCrousCsvFile?csn=" + csn,
+				esupSgcUrl + "/wsrest/nfc/addCrousCsvFile?csn=" + csn,
 				HttpMethod.POST, requestEntity,
 				String.class);
 			log.debug("csv send : " + fileSendResult.getBody());
@@ -199,7 +190,7 @@ public class EncodingService {
 	}
 
 	public static String getSgcUrl() {
-		return sgcUrl;
+		return esupSgcUrl;
 	}
 
 	public static String getNumeroId() {

@@ -6,7 +6,6 @@ import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.concurrent.Task;
 
-@SuppressWarnings("restriction")
 public class WaitPrinterReadyCardTask extends Task<Void> {
 
 	private final static Logger log = Logger.getLogger(WaitPrinterReadyCardTask.class);

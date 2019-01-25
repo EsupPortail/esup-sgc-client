@@ -5,6 +5,7 @@ esupsgcclient.log
 src/etc/keystore.jks
 src/lib/com/zebra/sdk/comm/ZSDK_API/2.12.3968/ZSDK_API-2.12.3968.jar
 src/lib/com/zebra/sdk/common/card/ZSDK_CARD_API/2.12.3968/ZSDK_CARD_API-2.12.3968.jar
+esupSgcLocalStorage
 
 ### STS ###
 .apt_generated

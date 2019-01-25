@@ -141,7 +141,6 @@
 			<artifactId>usb4java</artifactId>
 			<version>1.2.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.zebra.sdk.comm</groupId>
 			<artifactId>ZSDK_API</artifactId>

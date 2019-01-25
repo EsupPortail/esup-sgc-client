@@ -4,7 +4,6 @@ import org.esupportail.esupsgcclient.service.printer.ZebraPrinterService;
 
 import javafx.concurrent.Task;
 
-@SuppressWarnings("restriction")
 public class PollPrinterJobStatusTask extends Task<Boolean> {
 
 	@Override

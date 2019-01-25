@@ -1,7 +1,6 @@
 package org.esupportail.esupsgcclient;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -16,6 +15,8 @@ import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.ui.MainPane;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import javafx.application.Application;
 import javafx.concurrent.Task;
@@ -29,8 +30,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import netscape.javascript.JSObject;
 
-
-@SuppressWarnings("restriction")
 public class EsupSGCClientApplication extends Application {
 
 	private final static Logger log = Logger.getLogger(EsupSGCClientApplication.class);
@@ -41,6 +40,8 @@ public class EsupSGCClientApplication extends Application {
 	private static MainPane mainPane = new MainPane(width, height);
 	private static MainLoopService mainService = new MainLoopService(mainPane);
 	public static String esupNfcTagServerUrl;
+	public static String esupSgcUrl;
+	public static boolean encodeCnous;
 	public static String numeroId;
 	public static String eppnInit;
 	public static JSObject window;
@@ -54,14 +55,16 @@ public class EsupSGCClientApplication extends Application {
 	public void start(final Stage primaryStage) {
 
 		Properties prop = new Properties();
-		InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("esupsgcclient.properties");
+		Resource resource = new ClassPathResource("esupsgcclient.properties");
 		try {
-			prop.load(in);
+			prop.load(resource.getInputStream());
 			log.info("load props");
 		} catch (IOException e) {
 			log.error("props not found");
 		} 
 		esupNfcTagServerUrl = prop.getProperty("esupNfcTagServerUrl");
+		esupSgcUrl = prop.getProperty("esupSgcUrl");
+		encodeCnous = Boolean.valueOf(prop.getProperty("encodeCrous"));
 		
 		primaryStage.setTitle("Esup-SGC-Client");
 		primaryStage.setMinWidth(width);
@@ -73,20 +76,35 @@ public class EsupSGCClientApplication extends Application {
 				System.exit(0);
 			}
 		});
-		authentification(primaryStage);
-
-
 		
-	}
+		mainPane.initUi();
+		mainPane.changeTextPrincipal("Chargement...", "orange");
+		mainPane.buttonRestart.setVisible(false);
+		mainPane.buttonExit.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				stop();
+			}
+		});
 
-	public void authentification(final Stage primaryStage) {
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+	          public void handle(WindowEvent we) {
+	        	  stop();
+	          }
+	      });  
+		
 		mainPane.nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, getMacAddress()));
 		Group root = new Group();
 		root.getChildren().add(mainPane);
 		final Scene scene = new Scene(root, width, height, backgroundColor);
 		primaryStage.setScene(scene);
 		primaryStage.show();
+		
+		authentification(primaryStage);
+	}
 
+	public void authentification(final Stage primaryStage) {
+		
 		Task<Void> task = new Task<Void>() {
 		    @Override 
 		    public Void call() {
@@ -96,7 +114,7 @@ public class EsupSGCClientApplication extends Application {
 				    	eppnInit = FileLocalStorage.getItem("eppnInit");
 				    	break;
 				    }
-		    		Utils.sleep(1000);
+		    		Utils.sleep(2000);
 		    	}
 		    	return null;
 		    }
@@ -123,29 +141,6 @@ public class EsupSGCClientApplication extends Application {
 
 	
 	public void launchClient(final Stage primaryStage) {
-		
-		Group root = new Group();
-		root.getChildren().add(mainPane);
-		Color backgroundColor = Color.web("#e0e0e0");
-		final Scene scene = new Scene(root, width, height, backgroundColor);
-		primaryStage.setScene(scene);
-		primaryStage.show();
-
-		mainPane.initUi();
-		mainPane.changeTextPrincipal("Chargement...", "orange");
-		mainPane.buttonRestart.setVisible(false);
-		mainPane.buttonExit.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				stop();
-			}
-		});
-
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-	          public void handle(WindowEvent we) {
-	        	  stop();
-	          }
-	      });  
 		
 		ClientCheckService clientCheckService = new ClientCheckService(mainPane);
 		clientCheckService.start();
