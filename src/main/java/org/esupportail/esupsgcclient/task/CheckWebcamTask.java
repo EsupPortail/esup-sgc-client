@@ -1,13 +1,16 @@
 package org.esupportail.esupsgcclient.task;
 
+import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 
-@SuppressWarnings("restriction")
 public class CheckWebcamTask extends Task<Boolean> {
 
+	private final static Logger log = Logger.getLogger(CheckWebcamTask.class);
+
+	
 	private SimpleBooleanProperty webCamReady = new SimpleBooleanProperty(false);
 	
 	public CheckWebcamTask(SimpleBooleanProperty webCamReady) {
@@ -24,6 +27,7 @@ public class CheckWebcamTask extends Task<Boolean> {
 			webcamRetryCount++;
 			Utils.sleep(1000);
 		}
+		log.info("webcam is ready");
 		return webCamReady.get();
 	}
 

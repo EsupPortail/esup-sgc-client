@@ -18,7 +18,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
 
-@SuppressWarnings("restriction")
 public class EsupNfcClientStackPane extends StackPane {
 
 	private final static Logger log = Logger.getLogger(EsupNfcClientStackPane.class);

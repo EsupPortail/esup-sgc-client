@@ -15,7 +15,6 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.TextArea;
 
-@SuppressWarnings("restriction")
 public class EncodingTask extends Task<String> {
 
 	private final static Logger log = Logger.getLogger(EncodingTask.class);

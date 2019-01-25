@@ -3,7 +3,8 @@ target/
 bin_x64/
 esupsgcclient.log
 src/etc/keystore.jks
-localStorage
+esupSgcLocalStorage
+
 ### STS ###
 .apt_generated
 .classpath

@@ -1,7 +1,6 @@
 package org.esupportail.esupsgcclient;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -15,6 +14,8 @@ import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.ui.MainPane;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import javafx.application.Application;
 import javafx.concurrent.Task;
@@ -28,7 +29,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import netscape.javascript.JSObject;
 
-@SuppressWarnings("restriction")
 public class EsupSGCClientApplication extends Application {
 
 	private final static Logger log = Logger.getLogger(EsupSGCClientApplication.class);
@@ -36,9 +36,11 @@ public class EsupSGCClientApplication extends Application {
 	private static Color backgroundColor = Color.web("#e0e0e0");
 	private static int width = 1500;
 	private static int height = 750;
-	private static MainPane mainPane = new MainPane(width, height);
+	public static MainPane mainPane = new MainPane(width, height);
 	private static MainLoopService mainService = new MainLoopService(mainPane);
 	public static String esupNfcTagServerUrl;
+	public static String esupSgcUrl;
+	public static boolean encodeCnous;
 	public static String numeroId;
 	public static String eppnInit;
 	public static JSObject window;
@@ -47,14 +49,16 @@ public class EsupSGCClientApplication extends Application {
 	public void start(final Stage primaryStage) {
 		
 		Properties prop = new Properties();
-		InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("esupsgcclient.properties");
+		Resource resource = new ClassPathResource("esupsgcclient.properties");
 		try {
-			prop.load(in);
+			prop.load(resource.getInputStream());
 			log.info("load props");
 		} catch (IOException e1) {
 			log.error("props not found");
 		} 
 		esupNfcTagServerUrl = prop.getProperty("esupNfcTagServerUrl");
+		esupSgcUrl = prop.getProperty("esupSgcUrl");
+		encodeCnous = Boolean.valueOf(prop.getProperty("encodeCrous"));
 		
 		primaryStage.setTitle("Esup-SGC-Client");
 		primaryStage.setMinWidth(width);
@@ -66,11 +70,28 @@ public class EsupSGCClientApplication extends Application {
 				System.exit(0);
 			}
 		});
+		mainPane.initUi();
+		mainPane.changeTextPrincipal("Chargement...", "orange");
+		mainPane.buttonRestart.setVisible(false);
+		mainPane.buttonExit.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				stop();
+			}
+		});
+
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+	          public void handle(WindowEvent we) {
+	        	  stop();
+	          }
+	      });  
+		
+		mainPane.nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, getMacAddress()));
+
 		authentification(primaryStage);
 	}
 	
 	public void authentification(final Stage primaryStage) {
-		mainPane.nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, getMacAddress()));
 		Group root = new Group();
 		root.getChildren().add(mainPane);
 		final Scene scene = new Scene(root, width, height, backgroundColor);
@@ -112,46 +133,30 @@ public class EsupSGCClientApplication extends Application {
 	 	}
 	
 	public void launchClient(final Stage primaryStage) {
-
-		Group root = new Group();
-		root.getChildren().add(mainPane);
-		final Scene scene = new Scene(root, width, height, backgroundColor);
-		primaryStage.setScene(scene);
-		primaryStage.show();
-
-		mainPane.initUi();
-		mainPane.changeTextPrincipal("Chargement...", "orange");
-		mainPane.buttonRestart.setVisible(false);
-		mainPane.buttonExit.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				stop();
-			}
-		});
-
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-	          public void handle(WindowEvent we) {
-	        	  stop();
-	          }
-	      });        
-		
+	
 		ClientCheckService clientCheckService = new ClientCheckService(mainPane);
-		clientCheckService.start();
+		Thread clientCheckThread = new Thread(clientCheckService);
+		clientCheckThread.setDaemon(true);
+		clientCheckThread.start();		
+		
 
 		WaitClientReadyTask waitClientReadyTask = new WaitClientReadyTask();
 		waitClientReadyTask.clientReady.bind(clientCheckService.clientReady);
 		waitClientReadyTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent t) {
-				mainService.start();
+				mainPane.setOk();
+				mainService.start();				
 			}
 		});
+		
 		clientCheckService.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
 			@Override
 			public void handle(WorkerStateEvent event) {
+				log.info("client check ended");
 				Thread waitClientReadyThread = new Thread(waitClientReadyTask);
 				waitClientReadyThread.setDaemon(true);
-				waitClientReadyThread.start();			  
+				waitClientReadyThread.start();		
 			}
 		});
 	}

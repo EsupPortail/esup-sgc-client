@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import jnasmartcardio.Smartcardio;
 import jnasmartcardio.Smartcardio.JnaPCSCException;
 
-@SuppressWarnings("restriction")
 public class PcscUsbService {
 
 	private final static Logger log = Logger.getLogger(PcscUsbService.class);

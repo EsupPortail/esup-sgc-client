@@ -2,7 +2,6 @@ package org.esupportail.esupsgcclient.task;
 
 import javafx.concurrent.Task;
 
-@SuppressWarnings("restriction")
 public class SleepTask extends Task<Void> {
 
 	private long millis;

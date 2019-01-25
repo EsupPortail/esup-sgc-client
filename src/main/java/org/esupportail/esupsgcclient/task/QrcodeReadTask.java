@@ -13,7 +13,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 
-@SuppressWarnings("restriction")
 public class QrcodeReadTask extends Task<String> {
 
 	private ObjectProperty<Image> imageProperty = new SimpleObjectProperty<Image>();
@@ -30,9 +29,7 @@ public class QrcodeReadTask extends Task<String> {
 	@Override
 	protected String call() throws Exception {
 		String qrcode;
-		int nbReadRetry = 0;
 		while (true) {
-			nbReadRetry++;
 			BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(imageProperty.get(), null);
 			qrcode = QRCodeReader.readQrCode(webcamBufferedImage);
 			if (webcamBufferedImage != null) {
