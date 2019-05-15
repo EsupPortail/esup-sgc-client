@@ -134,7 +134,6 @@ public class EsupSGCClientApplication extends Application {
 
 	@Override
 	public void stop(){
-		FileLocalStorage.removeItem("numeroId");
 		mainPane.exit();
 		System.exit(0);
 	 	}
