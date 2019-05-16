@@ -7,7 +7,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 
 
-@SuppressWarnings("restriction")
 public class WaitClientReadyTask extends Task<Void> {
 
 	public BooleanProperty clientReady = new SimpleBooleanProperty(false);

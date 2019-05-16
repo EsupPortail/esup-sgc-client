@@ -5,7 +5,6 @@ import org.esupportail.esupsgcclient.utils.Utils;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 
-@SuppressWarnings("restriction")
 public class CheckWebcamTask extends Task<Boolean> {
 
 	private SimpleBooleanProperty webCamReady = new SimpleBooleanProperty(false);

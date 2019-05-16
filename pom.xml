@@ -141,7 +141,6 @@
 			<artifactId>usb4java</artifactId>
 			<version>1.2.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.zebra.sdk.comm</groupId>
 			<artifactId>ZSDK_API</artifactId>
@@ -194,7 +193,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2-beta-4</version>
+				<version>3.1.1</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
@@ -224,25 +223,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jarsigner-plugin</artifactId>
-				<version>1.2</version>
-				<executions>
-					<execution>
-						<id>sign</id>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<keystore>src/etc/keystore.jks</keystore>
-					<alias>server</alias>
-					<storepass>leocarte</storepass>
-					<keypass>leocarte</keypass>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
