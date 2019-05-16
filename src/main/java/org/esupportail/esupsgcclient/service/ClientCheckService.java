@@ -1,30 +1,23 @@
 package org.esupportail.esupsgcclient.service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.pcsc.PcscException;
 import org.esupportail.esupsgcclient.task.CheckWebcamTask;
-import org.esupportail.esupsgcclient.task.VoidTask;
 import org.esupportail.esupsgcclient.ui.MainPane;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 
-
-@SuppressWarnings("restriction")
-public class ClientCheckService extends Service<Void> {
+public class ClientCheckService extends Task<Void> {
 
 	private final static Logger log = Logger.getLogger(ClientCheckService.class);
 
-	private String[] args;
+	//private String[] args;
 
 	public BooleanProperty clientReady = new SimpleBooleanProperty(false);
 
@@ -35,32 +28,19 @@ public class ClientCheckService extends Service<Void> {
 	}
 
 	@Override
-	protected Task<Void> createTask() {
+	protected Void call() {
 
-		mainPane.changeStepClientReady("Client en cours de démarrage", "orange");
-/*
 		try {
-			URL urlImage1 = new URL(EncodingService.getSgcUrl() + "/resources/images/logo1.png");
-			mainPane.setLogo1(urlImage1);
-			URL urlImage2 = new URL(EncodingService.getSgcUrl() + "/resources/images/logo2.png");
-			mainPane.setLogo2(urlImage2);
-
-		} catch (MalformedURLException e) {
-			log.error("images load error", e);
-		}
-*/
-		try {
-			mainPane.changeStepClientReady("Ouverture de la webcam", "orange");
-
 			if (mainPane.webcam != null) {
 				CheckWebcamTask checkWebcamTask = new CheckWebcamTask(mainPane.webCamReady);
 				checkWebcamTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 					@Override
 					public void handle(WorkerStateEvent t) {
 						if (checkWebcamTask.getValue()) {
+							mainPane.changeStepClientReady("Ouverture de la webcam", "orange");
 							mainPane.addLogTextLn("INFO", "webcam : OK");
 							try {
-								EncodingService.init(args);
+								EncodingService.init();
 								mainPane.addLogTextLn("INFO", "pc/sc : OK");
 
 								if (EncodingService.isEncodeCnous()) {
@@ -71,12 +51,10 @@ public class ClientCheckService extends Service<Void> {
 
 								mainPane.buttonRestart.setVisible(false);
 								mainPane.addLogTextLn("INFO", "numeroId = " + EncodingService.getNumeroId());
-								mainPane.addLogTextLn("INFO", "eppnInit = " + EncodingService.getEppnInit());
 								mainPane.addLogTextLn("INFO", "esupNfcTagServerUrl = " + EncodingService.getEsupNfcTagServerUrl());
 								mainPane.addLogTextLn("INFO", "sgcUrl = " + EncodingService.getSgcUrl());
-
 								clientReady.setValue(true);
-
+								
 							} catch (CnousFournisseurCarteException e) {
 								customLog("ERROR", "Erreur de configuration cnous", e);
 							} catch (EncodingException | PcscException e) {
@@ -85,7 +63,6 @@ public class ClientCheckService extends Service<Void> {
 						} else {
 							customLog("WARN", "Erreur webcam", null);
 						}
-						checkWebcamTask.cancel();
 					}
 				});
 
@@ -99,7 +76,7 @@ public class ClientCheckService extends Service<Void> {
 		} catch (Exception e) {
 			customLog("ERROR", "Erreur inconnue", e);
 		}
-		return new VoidTask();
+		return null;
 	}
 
 	private void customLog(String level, String message, Throwable throwable) {
@@ -125,10 +102,6 @@ public class ClientCheckService extends Service<Void> {
 			mainPane.addLogTextLn(level, message);
 		}
 		Utils.playSound("fail.wav");
-	}
-
-	public void setArgs(String[] args) {
-		this.args = args;
 	}
 
 }

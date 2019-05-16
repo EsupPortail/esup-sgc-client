@@ -5,7 +5,6 @@ import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.concurrent.Task;
 
-@SuppressWarnings("restriction")
 public class WaitRemoveCardTask extends Task<Void> {
 
 	@Override

@@ -17,7 +17,6 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 
-@SuppressWarnings("restriction")
 public class MainLoopService extends Service<Void> {
 
 	private final static Logger log = Logger.getLogger(EsupSGCClientApplication.class);
@@ -34,6 +33,7 @@ public class MainLoopService extends Service<Void> {
 	protected Task<Void> createTask() {
 		mainPane.addLogTextLn("INFO", getState().toString());
 		mainPane.initUi();
+		mainPane.setOk();
 		mainPane.changeStepReadQR("orange");
 		QrcodeReadTask qrcodeReadTask = new QrcodeReadTask(mainPane.imageProperty);
 		qrcodeReadTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
