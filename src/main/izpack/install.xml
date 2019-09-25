@@ -3,7 +3,7 @@
 <installation version="5.0">
 	<info>
 		<appname>EsupSgcClient</appname>
-		<appversion>2.0</appversion>
+		<appversion>$version</appversion>
 		<authors>
 			<author name="DSI Université Rouen Normandie"
 				email="givenname.lastname@hello-world.org" />
@@ -40,13 +40,13 @@
 	<packs>
 		<pack name="esupSgcClient" required="yes">
 			<description>The core files needed for the application</description>
-			<singlefile src="../esupsgcclient-2.0-jar-with-dependencies.jar"
-				target="$INSTALL_PATH/esupsgcclient-shib.jar" />
+			<singlefile src="../esupsgcclient-$version-jar-with-dependencies.jar"
+				target="$INSTALL_PATH/$version/esupsgcclient-shib.jar" />
 			<singlefile src="logo.ico"
-				target="$INSTALL_PATH/logo.ico" />
+				target="$INSTALL_PATH/$version/logo.ico" />
 			<fileset dir="../../target/jfx"
-				targetdir="$INSTALL_PATH\javafx" />
-			<fileset dir="../../target/jdk" targetdir="$INSTALL_PATH\java" />
+				targetdir="$INSTALL_PATH\$version/javafx" />
+			<fileset dir="../../target/jdk" targetdir="$INSTALL_PATH\$version/java" />
 		</pack>
 	</packs>
 
