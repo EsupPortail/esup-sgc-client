@@ -9,19 +9,46 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 public class FileLocalStorage {
 
 	private final static Logger log = Logger.getLogger(FileLocalStorage.class);
-
-	private static String localStorageName = "esupSgcLocalStorage";
+ 
+	private static File file = initLocalStorageFile();
+	
+	private static File initLocalStorageFile() {
+		String localStorageName = "esupSgcLocalStorage";
+		Properties prop = new Properties();
+		Resource resource = new ClassPathResource("esupsgcclient.properties");
+		try {
+			prop.load(resource.getInputStream());
+			log.info("load props");
+		} catch (IOException e1) {
+			log.error("props not found");
+		} 
+		String localStorageDir = System.getProperty("localStorageDir", prop.getProperty("localStorageDir"));
+		String OS = System.getProperty("os.name").toLowerCase();
+		File file;
+		File directory = new File(String.valueOf(System.getProperty("user.home")+ localStorageDir));
+		if(!directory.exists()){
+			directory.mkdir();
+		}
+		if (OS.indexOf("win") >= 0) {
+			file = new File(System.getProperty("user.home")+ localStorageDir + localStorageName);
+		} else {
+			file = new File(localStorageName);
+		}
+		return file;
+	}
 	
 	public static String getItem(String key) {
 		log.info("get key : " + key);
 		String value = "";
-		File file = new File(localStorageName);
 		try {
 			file.createNewFile();
 			FileInputStream fis = new FileInputStream(file);
@@ -40,7 +67,6 @@ public class FileLocalStorage {
 
 	public static void setItem(String key, String value) {
 		Map<String, String> item = new HashMap<String, String>();
-		File file = new File(localStorageName);
 		try {
 			file.createNewFile();
 			FileInputStream fis = new FileInputStream(file);
@@ -68,7 +94,6 @@ public class FileLocalStorage {
 	public static void removeItem(String key) {
 		log.info("remove : " + key);
 		Map<String, String> item = new HashMap<String, String>();
-		File file = new File(localStorageName);
 		try {
 			try {
 				FileInputStream fis = new FileInputStream(file);
@@ -92,7 +117,6 @@ public class FileLocalStorage {
 	}
 
 	public void clear() {
-		File file = new File(localStorageName);
 		file.delete();
 	}
 
