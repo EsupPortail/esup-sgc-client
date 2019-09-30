@@ -305,6 +305,7 @@
 						<configuration>
 							<tasks>
 								<replace file="target/staging/install.xml" token="$version" value="${project.version}" />
+								<replace file="target/staging/default_shortcut_spec.xml" token="$version" value="${project.version}" />
 							</tasks>
 						</configuration>
 						<goals>
