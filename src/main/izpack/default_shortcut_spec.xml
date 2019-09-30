@@ -4,9 +4,9 @@
 	here. -->
 <shortcuts>
 	<shortcut name="esupSgcClient"
-		target="$INSTALL_PATH\java\bin\javaw.exe" commandLine="--module-path javafx\lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.media,javafx.graphics,javafx.swing,javafx.web -jar esupsgcclient-shib.jar"
-		workingDirectory="$INSTALL_PATH" description="esupsgclient"
-		iconFile="$INSTALL_PATH\logo.ico" iconIndex="0"
+		target="$INSTALL_PATH\$version\java\bin\javaw.exe" commandLine="--module-path javafx\lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.media,javafx.graphics,javafx.swing,javafx.web -jar esupsgcclient-shib.jar"
+		workingDirectory="$INSTALL_PATH\$version" description="esupsgclient"
+		iconFile="$INSTALL_PATH\$version\logo.ico" iconIndex="0"
 		initialState="maximized" desktop="yes"
 		applications="yes" startMenu="yes" />
 </shortcuts>
