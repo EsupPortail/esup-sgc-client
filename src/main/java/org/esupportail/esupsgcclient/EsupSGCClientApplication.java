@@ -56,9 +56,9 @@ public class EsupSGCClientApplication extends Application {
 		} catch (IOException e1) {
 			log.error("props not found");
 		} 
-		esupNfcTagServerUrl = prop.getProperty("esupNfcTagServerUrl");
-		esupSgcUrl = prop.getProperty("esupSgcUrl");
-		encodeCnous = Boolean.valueOf(prop.getProperty("encodeCrous"));
+		esupNfcTagServerUrl = System.getProperty("esupNfcTagServerUrl", prop.getProperty("esupNfcTagServerUrl"));
+		esupSgcUrl = System.getProperty("esupSgcUrl", prop.getProperty("esupSgcUrl"));
+		encodeCnous = Boolean.valueOf(System.getProperty("encodeCnous", prop.getProperty("encodeCrous")));
 		
 		primaryStage.setTitle("Esup-SGC-Client");
 		primaryStage.setMinWidth(width);
