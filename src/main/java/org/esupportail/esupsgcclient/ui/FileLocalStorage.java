@@ -34,11 +34,11 @@ public class FileLocalStorage {
 		String localStorageDir = System.getProperty("localStorageDir", prop.getProperty("localStorageDir"));
 		String OS = System.getProperty("os.name").toLowerCase();
 		File file;
-		File directory = new File(String.valueOf(System.getProperty("user.home")+ localStorageDir));
-		if(!directory.exists()){
-			directory.mkdir();
-		}
 		if (OS.indexOf("win") >= 0) {
+			File directory = new File(String.valueOf(System.getProperty("user.home")+ localStorageDir));
+			if(!directory.exists()){
+				directory.mkdir();
+			}
 			file = new File(System.getProperty("user.home")+ localStorageDir + localStorageName);
 		} else {
 			file = new File(localStorageName);
