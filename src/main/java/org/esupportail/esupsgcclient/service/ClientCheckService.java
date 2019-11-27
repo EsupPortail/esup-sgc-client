@@ -51,6 +51,7 @@ public class ClientCheckService extends Task<Void> {
 
 								mainPane.buttonRestart.setVisible(false);
 								mainPane.addLogTextLn("INFO", "numeroId = " + EncodingService.getNumeroId());
+								mainPane.addLogTextLn("INFO", "sgcAuthToken = " + EncodingService.getSgcAuthToken());
 								mainPane.addLogTextLn("INFO", "esupNfcTagServerUrl = " + EncodingService.getEsupNfcTagServerUrl());
 								mainPane.addLogTextLn("INFO", "sgcUrl = " + EncodingService.getSgcUrl());
 								clientReady.setValue(true);

@@ -41,6 +41,7 @@ public class EncodingService {
 	public static String esupNfcTagServerUrl = "https://esup-nfc-tag.univ-ville.fr";
 	private static String esupSgcUrl = "https://esup-sgc.univ-ville.fr";
 	public static String numeroId = "0000000000000000000";
+	public static String sgcAuthToken = "0000000000000000000";
 	
 	public static void init() throws EncodingException, PcscException, CnousFournisseurCarteException {
 
@@ -51,6 +52,8 @@ public class EncodingService {
 		encodeCnous = EsupSGCClientApplication.encodeCnous;
 		
 		numeroId = EsupSGCClientApplication.numeroId;
+
+		sgcAuthToken = EsupSGCClientApplication.sgcAuthToken;
 			
 		if(encodeCnous){
 			try{
@@ -116,7 +119,8 @@ public class EncodingService {
 	}
 	
 	public static boolean cnousEncoding(String cardId) throws CnousFournisseurCarteException {
-		String cnousUrl = esupSgcUrl + "/wsrest/nfc/cnousCardId?&csn="+cardId;
+		String cnousUrl = esupSgcUrl + "/wsrest/nfc/cnousCardId?csn=" + cardId + "&authToken=" + sgcAuthToken;
+		log.info("get cnousId : " + cnousUrl);
 		try{
 			ResponseEntity<String> response = restTemplate.exchange(cnousUrl, HttpMethod.GET, null, String.class);
 			log.debug("cnous id : " + response.getBody());
@@ -145,7 +149,7 @@ public class EncodingService {
 					map, headers);
 			try {
 				ResponseEntity<String> fileSendResult = restTemplate.exchange(
-						esupSgcUrl + "/wsrest/nfc/addCrousCsvFile?&csn=" + csn,
+						esupSgcUrl + "/wsrest/nfc/addCrousCsvFile?&csn=" + csn + "&authToken=" + sgcAuthToken,
 					HttpMethod.POST, requestEntity,
 					String.class);
 				log.debug("csv send : " + fileSendResult.getBody());
@@ -196,6 +200,10 @@ public class EncodingService {
 
 	public static String getNumeroId() {
 		return numeroId;
+	}
+
+	public static String getSgcAuthToken() {
+		return sgcAuthToken;
 	}
 
 	public static boolean isEncodeCnous() {

@@ -27,7 +27,6 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import netscape.javascript.JSObject;
 
 public class EsupSGCClientApplication extends Application {
 
@@ -42,9 +41,7 @@ public class EsupSGCClientApplication extends Application {
 	public static String esupSgcUrl;
 	public static boolean encodeCnous;
 	public static String numeroId;
-	public static String eppnInit;
-	public static JSObject window;
-	
+	public static String sgcAuthToken;
 
 	public void start(final Stage primaryStage) {
 		
@@ -58,33 +55,22 @@ public class EsupSGCClientApplication extends Application {
 		} 
 		esupNfcTagServerUrl = System.getProperty("esupNfcTagServerUrl", prop.getProperty("esupNfcTagServerUrl"));
 		esupSgcUrl = System.getProperty("esupSgcUrl", prop.getProperty("esupSgcUrl"));
-		encodeCnous = Boolean.valueOf(System.getProperty("encodeCnous", prop.getProperty("encodeCrous")));
+		encodeCnous = Boolean.valueOf(System.getProperty("encodeCnous", prop.getProperty("encodeCnous")));
 		
 		primaryStage.setTitle("Esup-SGC-Client");
 		primaryStage.setMinWidth(width);
 		primaryStage.setMinHeight(height + 20);
 
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			public void handle(WindowEvent event) {
-				mainPane.exit();
-				System.exit(0);
-			}
+		primaryStage.setOnCloseRequest(event -> {
+			mainPane.exit();
+			System.exit(0);
 		});
 		mainPane.initUi();
 		mainPane.changeTextPrincipal("Chargement...", "orange");
 		mainPane.buttonRestart.setVisible(false);
-		mainPane.buttonExit.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				stop();
-			}
-		});
+		mainPane.buttonExit.setOnAction(e -> stop());
 
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-	          public void handle(WindowEvent we) {
-	        	  stop();
-	          }
-	      });  
+		primaryStage.setOnCloseRequest(we -> stop());
 		
 		mainPane.nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, getMacAddress()));
 
@@ -99,29 +85,33 @@ public class EsupSGCClientApplication extends Application {
 		primaryStage.show();
 
 		Task<Void> task = new Task<Void>() {
-		    @Override 
-		    public Void call() {
-		    	while(true) {
-		    		numeroId = FileLocalStorage.getItem("numeroId");
-				    if(numeroId != null && !numeroId.toString().equals("") && !"undefined".equals(numeroId) && !"null".equals(numeroId)){
-				    	eppnInit = FileLocalStorage.getItem("eppnInit");
-				    	break;
-				    }
-		    		Utils.sleep(1000);
-		    	}
-		    	return null;
-		    }
+			@Override
+			public Void call() {
+				while (true) {
+					numeroId = FileLocalStorage.getItem("numeroId");
+					if (numeroId != null && !numeroId.toString().equals("") && !"undefined".equals(numeroId) && !"null".equals(numeroId)) {
+						break;
+					}
+					Utils.sleep(1000);
+				}
+				if(encodeCnous) {
+					while (true) {
+						sgcAuthToken = EsupNfcClientStackPane.sgcAuthToken;
+						if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken)) {
+							break;
+						}
+						EsupNfcClientStackPane.readLocalStorage();
+						Utils.sleep(1000);
+					}
+				}
+				return null;
+			}
 		};
 		Thread th = new Thread(task);
         th.setDaemon(true);
         th.start();
         
-		task.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
-			@Override
-			public void handle(WorkerStateEvent event) {
-				launchClient(primaryStage);
-			}
-		});
+		task.setOnSucceeded(event -> launchClient());
 		
 	}
 	
@@ -131,7 +121,7 @@ public class EsupSGCClientApplication extends Application {
 		System.exit(0);
 	 	}
 	
-	public void launchClient(final Stage primaryStage) {
+	public void launchClient() {
 	
 		ClientCheckService clientCheckService = new ClientCheckService(mainPane);
 		Thread clientCheckThread = new Thread(clientCheckService);
@@ -141,22 +131,16 @@ public class EsupSGCClientApplication extends Application {
 
 		WaitClientReadyTask waitClientReadyTask = new WaitClientReadyTask();
 		waitClientReadyTask.clientReady.bind(clientCheckService.clientReady);
-		waitClientReadyTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-			@Override
-			public void handle(WorkerStateEvent t) {
-				mainPane.setOk();
-				mainService.start();				
-			}
+		waitClientReadyTask.setOnSucceeded(t -> {
+			mainPane.setOk();
+			mainService.start();
 		});
 		
-		clientCheckService.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
-			@Override
-			public void handle(WorkerStateEvent event) {
-				log.info("client check ended");
-				Thread waitClientReadyThread = new Thread(waitClientReadyTask);
-				waitClientReadyThread.setDaemon(true);
-				waitClientReadyThread.start();		
-			}
+		clientCheckService.setOnSucceeded(event -> {
+			log.info("client check ended");
+			Thread waitClientReadyThread = new Thread(waitClientReadyTask);
+			waitClientReadyThread.setDaemon(true);
+			waitClientReadyThread.start();
 		});
 	}
 
