@@ -227,7 +227,7 @@ public class MainPane extends Pane {
 			@Override
 			protected Void call() throws Exception {
 				Dimension[] nonStandardResolutions = new Dimension[] { WebcamResolution.PAL.getSize(),
-						WebcamResolution.HD720.getSize(), new Dimension(720, 480), new Dimension(1920, 1080), };
+						WebcamResolution.HD.getSize(), new Dimension(720, 480), new Dimension(1920, 1080), };
 
 				Dimension size = WebcamResolution.VGA.getSize();
 				if (webcam != null) {
