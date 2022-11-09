@@ -18,9 +18,7 @@ import javafx.scene.control.TextArea;
 public class EncodingTask extends Task<String> {
 
 	private final static Logger log = Logger.getLogger(EncodingTask.class);
-	
 	private static RestTemplate restTemplate =  new RestTemplate(Utils.clientHttpRequestFactory());
-
 	private String esupNfcTagServerUrl;
 	private String numeroId;
 	private String cardId;

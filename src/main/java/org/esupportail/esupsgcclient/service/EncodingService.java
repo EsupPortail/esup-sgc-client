@@ -29,17 +29,14 @@ import org.springframework.web.client.RestTemplate;
 public class EncodingService {
 
 	private final static Logger log = Logger.getLogger(EncodingService.class);
-	
 	private static RestTemplate restTemplate =  new RestTemplate(Utils.clientHttpRequestFactory());
-	
 	private static boolean encodeCnous = false;
 	private static String pathToExe = "c:\\cnousApi\\";
 	private static String csvPath = "c:\\cnousApi\\csv_out.csv";
 	private static CnousFournisseurCarteRunExe cnousFournisseurCarteRunExe;
 	private static boolean cnousOK = false;
-
 	public static String esupNfcTagServerUrl = "https://esup-nfc-tag.univ-ville.fr";
-	private static String esupSgcUrl = "https://esup-sgc.univ-ville.fr";
+	public static String esupSgcUrl = "https://esup-sgc.univ-ville.fr";
 	public static String numeroId = "0000000000000000000";
 	public static String sgcAuthToken = "0000000000000000000";
 	
@@ -116,6 +113,18 @@ public class EncodingService {
 			log.error(e);
 			throw new SgcCheckException("SGC select error", e);
 		}
+	}
+
+	public static String gatBmpColorAsBase64(String qrcode) {
+		String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=color", esupSgcUrl, sgcAuthToken, qrcode);
+		String bmpAsBase64 = restTemplate.getForObject(bpmEsupSgcUrl, String.class);
+		return bmpAsBase64;
+	}
+
+	public static String gatBmpBlackAsBase64(String qrcode) {
+		String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=black", esupSgcUrl, sgcAuthToken, qrcode);
+		String bmpAsBase64 = restTemplate.getForObject(bpmEsupSgcUrl, String.class);
+		return bmpAsBase64;
 	}
 	
 	public static boolean cnousEncoding(String cardId) throws CnousFournisseurCarteException {

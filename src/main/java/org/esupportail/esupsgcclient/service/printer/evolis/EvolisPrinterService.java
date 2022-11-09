@@ -19,17 +19,17 @@ import java.net.Socket;
  */
 public class EvolisPrinterService {
 	
-	final Logger log = LoggerFactory.getLogger(getClass());
+	final static Logger log = LoggerFactory.getLogger(EvolisPrinterService.class);
 
-	String ip = "127.0.0.1";
+	static String ip = "127.0.0.1";
 
-	int port = 18000;
+	static int port = 18000;
 
-	Socket socket;
+	static Socket socket;
 
-	ObjectMapper objectMapper = new ObjectMapper();
+	static ObjectMapper objectMapper = new ObjectMapper();
 
-	boolean initSocket() {
+	static boolean initSocket() {
 		try {
 			socket = new Socket(ip,port);
 			return true;
@@ -49,7 +49,7 @@ public class EvolisPrinterService {
 		}
 	}
 
-	EvolisResponse sendRequest(EvolisRequest req) {
+	static EvolisResponse sendRequest(EvolisRequest req) {
 		try {
 			if(socket == null || !socket.isConnected() || socket.isClosed()) {
 				initSocket();
@@ -71,13 +71,13 @@ public class EvolisPrinterService {
 		}
 		return null;
 	}
-	void sendRequestAndLog(EvolisRequest evolisRequest) {
+	static void sendRequestAndLog(EvolisRequest evolisRequest) {
 		log.debug("Request : {}", evolisRequest);
 		EvolisResponse response = sendRequest(evolisRequest);
 		log.debug("Response : {}", response);
 	}
 
-	void print(String bmpColorAsBase64, String bmpBlackAsBase64, String bmpVarnishAsBase64) {
+	public static void print(String bmpColorAsBase64, String bmpBlackAsBase64, String bmpVarnishAsBase64) {
 		sendRequestAndLog(EvolisPrinterCommands.insertCard());
 		sendRequestAndLog(EvolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
 		sendRequestAndLog(EvolisPrinterCommands.printFrontBlackBmp(bmpBlackAsBase64));
@@ -86,7 +86,7 @@ public class EvolisPrinterService {
 		sendRequestAndLog(EvolisPrinterCommands.insertCardToContactLessStation());
 	}
 
-	void eject() {
+	public static void eject() {
 		sendRequestAndLog(EvolisPrinterCommands.eject());
 	}
 
