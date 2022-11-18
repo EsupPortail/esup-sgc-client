@@ -28,4 +28,21 @@ public class EvolisResponse {
         this.id = id;
     }
 
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    @Override
+    public String toString() {
+        return "EvolisResponse{" +
+                "jsonrpc='" + jsonrpc + '\'' +
+                ", id='" + id + '\'' +
+                ", result='" + result + '\'' +
+                '}';
+    }
+
 }

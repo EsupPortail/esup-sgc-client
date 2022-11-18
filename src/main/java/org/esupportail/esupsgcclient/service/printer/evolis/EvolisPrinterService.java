@@ -7,9 +7,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 
@@ -29,14 +33,21 @@ public class EvolisPrinterService {
 
 	static ObjectMapper objectMapper = new ObjectMapper();
 
-	static boolean initSocket() {
-		try {
-			socket = new Socket(ip,port);
-			return true;
-		} catch (IOException e) {
-			log.debug("Can't connect to evolis printer on {}:{}", ip, port);
+	public static boolean initSocket(boolean exceptionIfFailed) {
+		if(socket == null || socket.isClosed() || !socket.isConnected() || socket.isClosed() || !socket.isBound()) {
+			try {
+				socket = new Socket(ip, port);
+				return true;
+			} catch (IOException e) {
+				if (exceptionIfFailed) {
+					throw new RuntimeException("Can't connect to evolis printer on " + ip + ":" + port);
+				} else{
+					log.info("Can't connect to evolis printer on {}:{}", ip, port);
+				}
+			}
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	public void closeSocket() {
@@ -51,25 +62,21 @@ public class EvolisPrinterService {
 
 	static EvolisResponse sendRequest(EvolisRequest req) {
 		try {
-			if(socket == null || !socket.isConnected() || socket.isClosed()) {
-				initSocket();
-			}
-			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-			byte[] byteRequest = objectMapper.writeValueAsBytes(req);
-			out.write(byteRequest);
-			out.flush();
-			char[] data = new char[1024];
-			String responseValue = "";
-			while( (br.read(data)) != -1 ) {
-				responseValue += data;
-			}
+			initSocket(true);
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+			String cmdString = objectMapper.writeValueAsString(req) ;
+			cmdString = cmdString.replaceAll("\n", "");
+			writer.write(cmdString);
+			writer.newLine();
+			writer.flush();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			String responseValue = reader.readLine();
 			EvolisResponse response = objectMapper.readValue(responseValue, EvolisResponse.class);
+			socket.close();
 			return response;
 		} catch (IOException e) {
-			log.debug("Can't close socket");
+			throw new RuntimeException("IOException seding Request to evolis : " + req, e);
 		}
-		return null;
 	}
 	static void sendRequestAndLog(EvolisRequest evolisRequest) {
 		log.debug("Request : {}", evolisRequest);
@@ -90,4 +97,7 @@ public class EvolisPrinterService {
 		sendRequestAndLog(EvolisPrinterCommands.eject());
 	}
 
+	public static void reject() {
+		sendRequestAndLog(EvolisPrinterCommands.reject());
+	}
 }

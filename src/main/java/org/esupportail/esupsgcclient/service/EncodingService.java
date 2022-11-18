@@ -115,7 +115,7 @@ public class EncodingService {
 		}
 	}
 
-	public static String gatBmpColorAsBase64(String qrcode) {
+	public static String getBmpColorAsBase64(String qrcode) {
 		String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=color", esupSgcUrl, sgcAuthToken, qrcode);
 		String bmpAsBase64 = restTemplate.getForObject(bpmEsupSgcUrl, String.class);
 		return bmpAsBase64;

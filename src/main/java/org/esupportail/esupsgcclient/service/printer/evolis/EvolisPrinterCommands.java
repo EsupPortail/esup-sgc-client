@@ -108,4 +108,10 @@ public class EvolisPrinterCommands {
 		return req;
 	}
 
+	static EvolisRequest reject() {
+		EvolisRequest req = new EvolisRequest();
+		req.getParams().put("command", "Ser");
+		return req;
+	}
+
 }

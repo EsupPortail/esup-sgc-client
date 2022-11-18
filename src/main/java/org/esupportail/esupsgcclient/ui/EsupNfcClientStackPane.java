@@ -17,6 +17,7 @@ import javafx.concurrent.Worker.State;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
+import org.esupportail.esupsgcclient.EsupSGCClientApplication;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 public class EsupNfcClientStackPane extends StackPane {
@@ -99,6 +100,7 @@ public class EsupNfcClientStackPane extends StackPane {
             }
             if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken)) {
                 FileLocalStorage.setItem("sgcAuthToken", sgcAuthToken);
+                EsupSGCClientApplication.sgcAuthToken = sgcAuthToken;
             }
         });
     }

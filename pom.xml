@@ -13,6 +13,7 @@
 		<spring.version>5.3.23</spring.version>
 		<jackson.version>2.14.0</jackson.version>
 		<java.version>11</java.version>
+		<openjfx.version>19</openjfx.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -88,22 +89,22 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
-			<version>12.0.1</version>
+			<version>${openjfx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-web</artifactId>
-			<version>12.0.1</version>
+			<version>${openjfx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-media</artifactId>
-			<version>12.0.1</version>
+			<version>${openjfx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-swing</artifactId>
-			<version>12.0.1</version>
+			<version>${openjfx.version}</version>
 		</dependency>	
 		
 	</dependencies>
@@ -153,6 +154,14 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.openjfx</groupId>
+				<artifactId>javafx-maven-plugin</artifactId>
+				<version>0.0.8</version>
+				<configuration>
+					<mainClass>org.esupportail.esupsgcclient.EsupSGCClientApplication</mainClass>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -9,7 +9,9 @@ import javafx.scene.image.Image;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.EsupSGCClientApplication;
 import org.esupportail.esupsgcclient.service.EncodingService;
+import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.QRCodeReader;
+import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.ResourceAccessException;
@@ -38,12 +40,20 @@ public class EsupSgcLongPollTask extends Task<String> {
 	@Override
 	protected String call() throws Exception {
 		while (true) {
-			try {
-				String qrcode = restTemplate.getForObject(EncodingService.esupSgcUrl + "/wsrest/nfc/qrcode2edit?authToken=" + EncodingService.sgcAuthToken, String.class);
-				log.debug("Card with qrcode " +  qrcode + " should be edited with printer");
-				return qrcode;
-			} catch (ResourceAccessException e) {
-				log.debug("timeout ... we recall esup-sgc");
+			String sgcAuthToken = EsupNfcClientStackPane.sgcAuthToken;
+			if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken) && EvolisPrinterService.initSocket(false)) {
+				try {
+					log.debug("Call " + EncodingService.esupSgcUrl + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken);
+					String qrcode = restTemplate.getForObject(EncodingService.esupSgcUrl + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken, String.class);
+					if(qrcode!=null) {
+						return qrcode;
+					}
+				} catch (ResourceAccessException e) {
+					log.debug("timeout ... we recall esup-sgc in 2 sec");
+					Utils.sleep(2000);
+				}
+			} else {
+				Utils.sleep(1000);
 			}
 		}
 	}

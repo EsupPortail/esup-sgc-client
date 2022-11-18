@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.service;
 
+import javafx.scene.image.Image;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.EsupSGCClientApplication;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
@@ -7,6 +8,7 @@ import org.esupportail.esupsgcclient.service.pcsc.PcscException;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.task.EncodingTask;
 import org.esupportail.esupsgcclient.task.EsupSgcLongPollTask;
+import org.esupportail.esupsgcclient.task.EvolisTask;
 import org.esupportail.esupsgcclient.task.QrcodeReadTask;
 import org.esupportail.esupsgcclient.task.SleepTask;
 import org.esupportail.esupsgcclient.task.VoidTask;
@@ -18,6 +20,14 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import org.springframework.web.client.RestClientException;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
 
 public class MainLoopService extends Service<Void> {
 
@@ -39,46 +49,96 @@ public class MainLoopService extends Service<Void> {
 
 		mainPane.changeStepReadQR("orange");
 
+		// mainPane.webCamPane.setLeft(null);
+		// mainPane.webCamPane.setCenter(mainPane.webcamImageView);
+
 		QrcodeReadTask qrcodeReadTask = new QrcodeReadTask(mainPane.imageProperty);
+		EsupSgcLongPollTask esupSgcLongPollTask = new EsupSgcLongPollTask();
+
 		qrcodeReadTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent t) {
 				String qrcode = qrcodeReadTask.getValue();
 				qrcodeReadTask.cancel();
-				encode(qrcode);
+				esupSgcLongPollTask.cancel();
+				encode(qrcode, false);
 			}
 		});
-		Thread qrcodeReadThread = new Thread(qrcodeReadTask);
-		qrcodeReadThread.setDaemon(true);
 
-		EsupSgcLongPollTask esupSgcLongPollTask = new EsupSgcLongPollTask();
 		esupSgcLongPollTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent t) {
 				String qrcode = esupSgcLongPollTask.getValue();
+				qrcodeReadTask.cancel();
 				esupSgcLongPollTask.cancel();
+				mainPane.addLogTextLn("INFO", "Card with qrcode " + qrcode + " should be edited with printer");
 				printAndEncode(qrcode);
 			}
 		});
+
+		Thread qrcodeReadThread = new Thread(qrcodeReadTask);
+		qrcodeReadThread.setDaemon(true);
+		qrcodeReadThread.start();
+
 		Thread esupSgcLongPollThread = new Thread(esupSgcLongPollTask);
 		esupSgcLongPollThread.setDaemon(true);
+		esupSgcLongPollThread.start();
 
 		while (mainPane.imageProperty.get() == null) {
 			Utils.sleep(1000);
 		}
-		qrcodeReadThread.start();
 		return new VoidTask();
 	}
 
 	private void printAndEncode(String qrcode) {
-		String bmpColorAsBase64 = EncodingService.gatBmpColorAsBase64(qrcode);
-		String bmpBlackAsBase64 = EncodingService.gatBmpBlackAsBase64(qrcode);
-		EvolisPrinterService.print(bmpColorAsBase64, bmpBlackAsBase64, "todo");
-		encode(qrcode);
-		EvolisPrinterService.eject();
+		String bmpColorAsBase64 = null;
+		String bmpBlackAsBase64 = null;
+		try {
+			bmpColorAsBase64 = EncodingService.getBmpColorAsBase64(qrcode);
+			bmpBlackAsBase64 = EncodingService.gatBmpBlackAsBase64(qrcode);
+			try {
+				byte[] bmpColor = Base64.getDecoder().decode(bmpColorAsBase64.getBytes());
+				BufferedImage input_image = ImageIO.read(new ByteArrayInputStream(bmpColor)); //
+				ByteArrayOutputStream out = new ByteArrayOutputStream();// read bmp into input_image object
+				ImageIO.write(input_image, "PNG", out);
+				mainPane.bmpColorImageView.setImage(new Image(new ByteArrayInputStream( out.toByteArray()), 200, 200, true, true));
+				byte[] bmpBlack = Base64.getDecoder().decode(bmpBlackAsBase64.getBytes());
+				input_image = ImageIO.read(new ByteArrayInputStream(bmpBlack)); //
+				out = new ByteArrayOutputStream();// read bmp into input_image object
+				ImageIO.write(input_image, "PNG", out);
+				mainPane.bmpBlackImageView.setImage(new Image(new ByteArrayInputStream( out.toByteArray()), 200, 200, true, true));
+				mainPane.webCamPane.setLeft(mainPane.bmpBlackImageView);
+				mainPane.webCamPane.setCenter(mainPane.bmpColorImageView);
+			} catch (IOException e) {
+				log.warn("Can't display bmp", e);
+			}
+		} catch(RestClientException ex) {
+			throw new RuntimeException("Can't get BMP from esup-sgc for this qrcode " + qrcode, ex);
+		}
+		EvolisTask evolisTask = new EvolisTask(bmpColorAsBase64, bmpBlackAsBase64);
+		evolisTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				customLog("ERROR", "Erreur d'encodage, voir les logs", evolisTask.getException());
+				EvolisPrinterService.reject();
+				restart();
+			}
+		});
+		evolisTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				encode(qrcode, true);
+				// Utils.sleep(5000);
+				// EvolisPrinterService.eject();
+				// restart();
+			}
+		});
+		Thread evolisThread = new Thread(evolisTask);
+		evolisThread.setDaemon(true);
+		evolisThread.start();
 	}
 
-	void encode(String qrcode) {
+	void encode(String qrcode, boolean encodeWithPrinter) {
 		mainPane.changeTextPrincipal("Traitement en cours...", "orange");
 		mainPane.changeStepReadQR("green");
 		mainPane.addLogTextLn("INFO", qrcode + " detected");
@@ -104,17 +164,22 @@ public class MainLoopService extends Service<Void> {
 				public void handle(WorkerStateEvent event) {
 					customLog("ERROR", "Erreur d'encodage, voir les logs", encodingTask.getException());
 					mainPane.changeStepEncodageApp("red");
-					WaitRemoveCardTask waitRemoveCardTask = new WaitRemoveCardTask();
-					waitRemoveCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-						@Override
-						public void handle(WorkerStateEvent t) {
-							restart();
-						}
-					});
-					mainPane.addLogTextLn("INFO", "please change card");
-					Thread waitRemoveCardThread = new Thread(waitRemoveCardTask);
-					waitRemoveCardThread.setDaemon(true);
-					waitRemoveCardThread.start();
+					if(!encodeWithPrinter) {
+						WaitRemoveCardTask waitRemoveCardTask = new WaitRemoveCardTask();
+						waitRemoveCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+							@Override
+							public void handle(WorkerStateEvent t) {
+								restart();
+							}
+						});
+						mainPane.addLogTextLn("INFO", "please change card");
+						Thread waitRemoveCardThread = new Thread(waitRemoveCardTask);
+						waitRemoveCardThread.setDaemon(true);
+						waitRemoveCardThread.start();
+					} else {
+						EvolisPrinterService.reject();
+						restart();
+					}
 				}
 			});
 			encodingTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -171,18 +236,22 @@ public class MainLoopService extends Service<Void> {
 						customLog("WARN", "Nothing to do - message from server : " + encodingResult, null);
 					}
 
-					WaitRemoveCardTask waitRemoveCardTask = new WaitRemoveCardTask();
-
-					waitRemoveCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-						@Override
-						public void handle(WorkerStateEvent t) {
-							restart();
-						}
-					});
-					mainPane.addLogTextLn("INFO", "please change card");
-					Thread waitRemoveCardThread = new Thread(waitRemoveCardTask);
-					waitRemoveCardThread.setDaemon(true);
-					waitRemoveCardThread.start();
+					if(!encodeWithPrinter) {
+						WaitRemoveCardTask waitRemoveCardTask = new WaitRemoveCardTask();
+						waitRemoveCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+							@Override
+							public void handle(WorkerStateEvent t) {
+								restart();
+							}
+						});
+						mainPane.addLogTextLn("INFO", "please change card");
+						Thread waitRemoveCardThread = new Thread(waitRemoveCardTask);
+						waitRemoveCardThread.setDaemon(true);
+						waitRemoveCardThread.start();
+					} else {
+						EvolisPrinterService.eject();
+						restart();
+					}
 				}
 			});
 			Thread encodingThread = new Thread(encodingTask);
@@ -206,17 +275,22 @@ public class MainLoopService extends Service<Void> {
 		} catch (SgcCheckException e) {
 			customLog("WARN", "Erreur SGC " + e.getMessage(), e);
 			mainPane.changeStepSelectSGC("red");
-			WaitRemoveCardTask waitRemoveCardTask = new WaitRemoveCardTask();
-			waitRemoveCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-				@Override
-				public void handle(WorkerStateEvent t) {
-					restart();
-				}
-			});
-			mainPane.addLogTextLn("INFO", "please change card");
-			Thread waitRemoveCardThread = new Thread(waitRemoveCardTask);
-			waitRemoveCardThread.setDaemon(true);
-			waitRemoveCardThread.start();
+			if(!encodeWithPrinter) {
+				WaitRemoveCardTask waitRemoveCardTask = new WaitRemoveCardTask();
+				waitRemoveCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent t) {
+						restart();
+					}
+				});
+				mainPane.addLogTextLn("INFO", "please change card");
+				Thread waitRemoveCardThread = new Thread(waitRemoveCardTask);
+				waitRemoveCardThread.setDaemon(true);
+				waitRemoveCardThread.start();
+			} else {
+				EvolisPrinterService.reject();
+				restart();
+			}
 		}
 	}
 

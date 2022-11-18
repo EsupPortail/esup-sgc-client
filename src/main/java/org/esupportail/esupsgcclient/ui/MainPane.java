@@ -62,8 +62,12 @@ public class MainPane extends Pane {
 
 	public ComboBox<Webcam> comboBox = new ComboBox<Webcam>();
 	
-	private BorderPane webCamPane = new BorderPane();
-	private ImageView webcamImageView;
+	public BorderPane webCamPane = new BorderPane();
+	public ImageView webcamImageView;
+
+	public ImageView bmpBlackImageView = new ImageView();;
+
+	public ImageView bmpColorImageView = new ImageView();;
 	
 	private Button buttonLogs = new Button("Masquer les logs");
 	private Pane logPane = new Pane();
@@ -153,8 +157,8 @@ public class MainPane extends Pane {
 		buttonsPane.setPadding(new Insets(0, padding, 0, 0));
 		buttonsPane.setSpacing(10);
 		buttonsPane.getChildren().add(buttonRestart);
+		buttonsPane.getChildren().add(buttonNfcTag);
 		buttonsPane.getChildren().add(buttonLogs);
-		buttonsPane.getChildren().add(buttonExit);
 
 		logPane.setMaxSize(width - nfcTagSize , 250);
 		logTextarea.setEditable(false);
@@ -214,7 +218,7 @@ public class MainPane extends Pane {
 		return webcamBufferedImage;
 	}
 
-	private void setImageViewSize() {
+	public void setImageViewSize() {
 		double height = centerPaneHeight;
 		webcamImageView.maxHeight(height);
 		webcamImageView.setFitHeight(height);
