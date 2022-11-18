@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.pcsc.PcscException;
 import org.esupportail.esupsgcclient.task.CheckWebcamTask;
-import org.esupportail.esupsgcclient.ui.MainPane;
+import org.esupportail.esupsgcclient.ui.MainController;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.beans.property.BooleanProperty;
@@ -21,9 +21,9 @@ public class ClientCheckService extends Task<Void> {
 
 	public BooleanProperty clientReady = new SimpleBooleanProperty(false);
 
-	private MainPane mainPane;
+	private MainController mainPane;
 
-	public ClientCheckService(MainPane mainPane) {
+	public ClientCheckService(MainController mainPane) {
 		this.mainPane = mainPane;
 	}
 

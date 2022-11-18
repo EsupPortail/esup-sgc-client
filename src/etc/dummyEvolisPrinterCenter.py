@@ -9,7 +9,7 @@ async def handle_echo(reader, writer):
     if(len(message)>200):
         message = message[0:200]
     print(f"Received {message!r}")
-    time.sleep(3)
+    time.sleep(2)
     
     message = b'{"id":"1","jsonrpc":"2.0","result":"OK"}'
     print(f"Send: {message!r}")

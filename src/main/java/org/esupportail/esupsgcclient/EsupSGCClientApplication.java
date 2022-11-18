@@ -3,48 +3,42 @@ package org.esupportail.esupsgcclient;
 import java.io.IOException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.VBox;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.ClientCheckService;
 import org.esupportail.esupsgcclient.service.MainLoopService;
 import org.esupportail.esupsgcclient.task.WaitClientReadyTask;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
-import org.esupportail.esupsgcclient.ui.MainPane;
+import org.esupportail.esupsgcclient.ui.MainController;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import javafx.application.Application;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class EsupSGCClientApplication extends Application {
 
 	private final static Logger log = Logger.getLogger(EsupSGCClientApplication.class);
 
-	private static Color backgroundColor = Color.web("#e0e0e0");
-	private static int width = 1500;
-	private static int height = 750;
-	public static MainPane mainPane = new MainPane(width, height);
-	private static MainLoopService mainService = new MainLoopService(mainPane);
+	public static MainController mainPane;
+	private static MainLoopService mainService;
 	public static String esupNfcTagServerUrl;
 	public static String esupSgcUrl;
 	public static boolean encodeCnous;
 	public static String numeroId;
 	public static String sgcAuthToken;
 
-	public void start(final Stage primaryStage) {
-		
+	public void start(final Stage primaryStage) throws IOException {
+
 		Properties prop = new Properties();
 		Resource resource = new ClassPathResource("esupsgcclient.properties");
 		try {
@@ -58,13 +52,23 @@ public class EsupSGCClientApplication extends Application {
 		encodeCnous = Boolean.valueOf(System.getProperty("encodeCnous", prop.getProperty("encodeCnous")));
 		
 		primaryStage.setTitle("Esup-SGC-Client");
-		primaryStage.setMinWidth(width);
-		primaryStage.setMinHeight(height + 20);
 
 		primaryStage.setOnCloseRequest(event -> {
 			mainPane.exit();
 			System.exit(0);
 		});
+
+		URL fxmlUrl = this.getClass().getClassLoader().getResource("esup-sgc-client.fxml");
+		FXMLLoader fxmlLoader = new FXMLLoader(fxmlUrl);
+		mainPane = fxmlLoader.getController();
+		VBox root = fxmlLoader.load();
+		Scene scene = new Scene(root);
+		primaryStage.setScene(scene);
+		primaryStage.show();
+
+		mainPane = fxmlLoader.getController();
+
+		mainPane.init();
 		mainPane.initUi();
 		mainPane.changeTextPrincipal("Chargement...", "orange");
 		mainPane.buttonRestart.setVisible(false);
@@ -74,15 +78,12 @@ public class EsupSGCClientApplication extends Application {
 		
 		mainPane.nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, getMacAddress()));
 
-		authentification(primaryStage);
+		mainService = new MainLoopService(mainPane);
+
+		authentification();
 	}
 	
-	public void authentification(final Stage primaryStage) {
-		Group root = new Group();
-		root.getChildren().add(mainPane);
-		final Scene scene = new Scene(root, width, height, backgroundColor);
-		primaryStage.setScene(scene);
-		primaryStage.show();
+	public void authentification() {
 
 		Task<Void> task = new Task<Void>() {
 			@Override

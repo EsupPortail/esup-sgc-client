@@ -13,7 +13,7 @@ import org.esupportail.esupsgcclient.task.QrcodeReadTask;
 import org.esupportail.esupsgcclient.task.SleepTask;
 import org.esupportail.esupsgcclient.task.VoidTask;
 import org.esupportail.esupsgcclient.task.WaitRemoveCardTask;
-import org.esupportail.esupsgcclient.ui.MainPane;
+import org.esupportail.esupsgcclient.ui.MainController;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.concurrent.Service;
@@ -35,9 +35,9 @@ public class MainLoopService extends Service<Void> {
 
 	private static long restartDelay = 4000;
 
-	private MainPane mainPane;
+	private MainController mainPane;
 
-	public MainLoopService(MainPane mainPane) {
+	public MainLoopService(MainController mainPane) {
 		this.mainPane = mainPane;
 	}
 
@@ -107,8 +107,9 @@ public class MainLoopService extends Service<Void> {
 				out = new ByteArrayOutputStream();// read bmp into input_image object
 				ImageIO.write(input_image, "PNG", out);
 				mainPane.bmpBlackImageView.setImage(new Image(new ByteArrayInputStream( out.toByteArray()), 200, 200, true, true));
-				mainPane.webCamPane.setLeft(mainPane.bmpBlackImageView);
-				mainPane.webCamPane.setCenter(mainPane.bmpColorImageView);
+				// TODO
+				//mainPane.webCamPane.setLeft(mainPane.bmpBlackImageView);
+				//mainPane.webCamPane.setCenter(mainPane.bmpColorImageView);
 			} catch (IOException e) {
 				log.warn("Can't display bmp", e);
 			}
@@ -128,9 +129,9 @@ public class MainLoopService extends Service<Void> {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				encode(qrcode, true);
-				// Utils.sleep(5000);
-				// EvolisPrinterService.eject();
-				// restart();
+				//Utils.sleep(3000);
+				//EvolisPrinterService.eject();
+				//restart();
 			}
 		});
 		Thread evolisThread = new Thread(evolisTask);
