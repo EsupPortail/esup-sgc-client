@@ -44,10 +44,9 @@ public class MainLoopService extends Service<Void> {
 	@Override
 	protected Task<Void> createTask() {
 		mainPane.addLogTextLn("INFO", getState().toString());
-		mainPane.initUi();
 		mainPane.setOk();
 
-		mainPane.changeStepReadQR("orange");
+		mainPane.changeStepReadQR(MainController.StyleLevel.warning);
 
 		// mainPane.webCamPane.setLeft(null);
 		// mainPane.webCamPane.setCenter(mainPane.webcamImageView);
@@ -107,9 +106,9 @@ public class MainLoopService extends Service<Void> {
 				out = new ByteArrayOutputStream();// read bmp into input_image object
 				ImageIO.write(input_image, "PNG", out);
 				mainPane.bmpBlackImageView.setImage(new Image(new ByteArrayInputStream( out.toByteArray()), 200, 200, true, true));
-				// TODO
-				//mainPane.webCamPane.setLeft(mainPane.bmpBlackImageView);
-				//mainPane.webCamPane.setCenter(mainPane.bmpColorImageView);
+				mainPane.webcamImageView.setVisible(false);
+				mainPane.bmpBlackImageView.setVisible(true);
+				mainPane.bmpColorImageView.setVisible(true);
 			} catch (IOException e) {
 				log.warn("Can't display bmp", e);
 			}
@@ -140,23 +139,23 @@ public class MainLoopService extends Service<Void> {
 	}
 
 	void encode(String qrcode, boolean encodeWithPrinter) {
-		mainPane.changeTextPrincipal("Traitement en cours...", "orange");
-		mainPane.changeStepReadQR("green");
+		mainPane.changeTextPrincipal("Traitement en cours...", MainController.StyleLevel.warning);
+		mainPane.changeStepReadQR(MainController.StyleLevel.success);
 		mainPane.addLogTextLn("INFO", qrcode + " detected");
 		log.info("qrcode detected : " + qrcode);
-		mainPane.changeStepReadCSN("orange");
+		mainPane.changeStepReadCSN(MainController.StyleLevel.warning);
 		try {
 			EncodingService.pcscConnection();
 			String csn = EncodingService.readCsn();
-			mainPane.changeStepReadCSN("green");
+			mainPane.changeStepReadCSN(MainController.StyleLevel.success);
 			mainPane.addLogTextLn("INFO", "csn : " + csn);
 
-			mainPane.changeStepSelectSGC("orange");
+			mainPane.changeStepSelectSGC(MainController.StyleLevel.warning);
 			EncodingService.checkBeforeEncoding(qrcode, csn);
-			mainPane.changeStepSelectSGC("green");
+			mainPane.changeStepSelectSGC(MainController.StyleLevel.success);
 			mainPane.addLogTextLn("INFO", qrcode + " checked in SGC");
 
-			mainPane.changeStepEncodageApp("orange");
+			mainPane.changeStepEncodageApp(MainController.StyleLevel.warning);
 			mainPane.addLogTextLn("INFO", "Encoding : Start");
 
 			EncodingTask encodingTask = new EncodingTask(EncodingService.esupNfcTagServerUrl, EncodingService.numeroId, csn, mainPane.logTextarea);
@@ -164,7 +163,7 @@ public class MainLoopService extends Service<Void> {
 				@Override
 				public void handle(WorkerStateEvent event) {
 					customLog("ERROR", "Erreur d'encodage, voir les logs", encodingTask.getException());
-					mainPane.changeStepEncodageApp("red");
+					mainPane.changeStepEncodageApp(MainController.StyleLevel.danger);
 					if(!encodeWithPrinter) {
 						WaitRemoveCardTask waitRemoveCardTask = new WaitRemoveCardTask();
 						waitRemoveCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -191,47 +190,47 @@ public class MainLoopService extends Service<Void> {
 					if ("END".equals(encodingResult)) {
 						log.info("encoding ok for : " + qrcode + " - csn : " + csn);
 						mainPane.addLogTextLn("INFO", "Encoding :  OK");
-						mainPane.changeStepEncodageApp("green");
+						mainPane.changeStepEncodageApp(MainController.StyleLevel.success);
 						try {
 							EncodingService.pcscDisconnect();
 							if (EncodingService.isCnousOK() && EncodingService.isEncodeCnous()) {
-								mainPane.changeStepEncodageCnous("orange");
+								mainPane.changeStepEncodageCnous(MainController.StyleLevel.warning);
 								mainPane.addLogTextLn("INFO", "Cnous Encoding :  Start");
 								EncodingService.delCnousCsv();
 								if (EncodingService.cnousEncoding(csn)) {
 									log.info("cnous encoding : OK");
-									mainPane.changeStepEncodageCnous("green");
+									mainPane.changeStepEncodageCnous(MainController.StyleLevel.success);
 									mainPane.addLogTextLn("INFO", "Cnous Encoding :  OK");
-									mainPane.changeStepSendCSV("orange");
+									mainPane.changeStepSendCSV(MainController.StyleLevel.warning);
 									mainPane.addLogTextLn("INFO", "Cnous csv start :  OK");
 									if (EncodingService.sendCnousCsv(csn)) {
 										log.info("cnous csv send : OK");
-										mainPane.changeStepSendCSV("green");
+										mainPane.changeStepSendCSV(MainController.StyleLevel.success);
 										mainPane.addLogTextLn("INFO", "Cnous csv send :  OK");
-										mainPane.changeTextPrincipal("Encodage terminé", "green");
+										mainPane.changeTextPrincipal("Encodage terminé", MainController.StyleLevel.success);
 										Utils.playSound("success.wav");
 									} else {
 										customLog("WARN", "Cnous csv send :  Failed", null);
-										mainPane.changeStepSendCSV("red");
+										mainPane.changeStepSendCSV(MainController.StyleLevel.danger);
 									}
 								} else {
 									customLog("WARN", "cnous csv send : Failed for qrcode " + qrcode + ", csn " + csn, null);
-									mainPane.changeStepEncodageCnous("red;");
+									mainPane.changeStepEncodageCnous(MainController.StyleLevel.danger);
 								}
 							} else {
 								mainPane.addLogTextLn("INFO", "Cnous Encoding :  Skipped");
-								mainPane.changeTextPrincipal("Encodage terminé", "green");
+								mainPane.changeTextPrincipal("Encodage terminé", MainController.StyleLevel.success);
 								Utils.playSound("success.wav");
 							}
 						} catch (EncodingException e) {
 							customLog("ERROR", "Erreur d'encodage, voir les logs", e);
-							mainPane.changeStepEncodageApp("red");
+							mainPane.changeStepEncodageApp(MainController.StyleLevel.danger);
 						} catch (CnousFournisseurCarteException e) {
 							customLog("ERROR", "Erreur CROUS, voir les logs", e);
-							mainPane.changeStepEncodageCnous("red");
+							mainPane.changeStepEncodageCnous(MainController.StyleLevel.danger);
 						} catch (PcscException e) {
 							customLog("ERROR", "Erreur lecteur de carte, voir les logs", e);
-							mainPane.changeStepReadCSN("red");
+							mainPane.changeStepReadCSN(MainController.StyleLevel.danger);
 						}
 					} else {
 						customLog("WARN", "Nothing to do - message from server : " + encodingResult, null);
@@ -261,7 +260,7 @@ public class MainLoopService extends Service<Void> {
 
 		} catch (PcscException e) {
 			customLog("ERROR", "Erreur lecteur de carte, voir les logs", e);
-			mainPane.changeStepReadCSN("red");
+			mainPane.changeStepReadCSN(MainController.StyleLevel.danger);
 			SleepTask sleepTask = new SleepTask(restartDelay);
 			sleepTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 				@Override
@@ -275,7 +274,7 @@ public class MainLoopService extends Service<Void> {
 			sleepThread.start();
 		} catch (SgcCheckException e) {
 			customLog("WARN", "Erreur SGC " + e.getMessage(), e);
-			mainPane.changeStepSelectSGC("red");
+			mainPane.changeStepSelectSGC(MainController.StyleLevel.danger);
 			if(!encodeWithPrinter) {
 				WaitRemoveCardTask waitRemoveCardTask = new WaitRemoveCardTask();
 				waitRemoveCardTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -306,15 +305,15 @@ public class MainLoopService extends Service<Void> {
 				log.error(message);
 				mainPane.addLogTextLn(level, message);
 			}
-			mainPane.changeTextPrincipal(message, "red");
-			mainPane.changeStepClientReady("Client non prêt", "red");
+			mainPane.changeTextPrincipal(message, MainController.StyleLevel.danger);
+			mainPane.changeStepClientReady("Client non prêt", MainController.StyleLevel.danger);
 		} else if ("WARN".equals(level)) {
 			if(throwable != null) {
 				log.warn(message, throwable);
 			} else {
 				log.warn(message);
 			}
-			mainPane.changeTextPrincipal(message, "orange");
+			mainPane.changeTextPrincipal(message, MainController.StyleLevel.warning);
 			mainPane.addLogTextLn(level, message);
 		}
 		Utils.playSound("fail.wav");

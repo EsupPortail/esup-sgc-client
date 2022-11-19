@@ -37,7 +37,7 @@ public class ClientCheckService extends Task<Void> {
 					@Override
 					public void handle(WorkerStateEvent t) {
 						if (checkWebcamTask.getValue()) {
-							mainPane.changeStepClientReady("Ouverture de la webcam", "orange");
+							mainPane.changeStepClientReady("Ouverture de la webcam", MainController.StyleLevel.warning);
 							mainPane.addLogTextLn("INFO", "webcam : OK");
 							try {
 								EncodingService.init();
@@ -49,7 +49,6 @@ public class ClientCheckService extends Task<Void> {
 									mainPane.hideCnousSteps();
 								}
 
-								mainPane.buttonRestart.setVisible(false);
 								mainPane.addLogTextLn("INFO", "numeroId = " + EncodingService.getNumeroId());
 								mainPane.addLogTextLn("INFO", "sgcAuthToken = " + EncodingService.getSgcAuthToken());
 								mainPane.addLogTextLn("INFO", "esupNfcTagServerUrl = " + EncodingService.getEsupNfcTagServerUrl());
@@ -91,15 +90,15 @@ public class ClientCheckService extends Task<Void> {
 				log.error(message);
 				mainPane.addLogTextLn(level, message);
 			}
-			mainPane.changeTextPrincipal(message, "red");
-			mainPane.changeStepClientReady("Client non prêt", "red");
+			mainPane.changeTextPrincipal(message, MainController.StyleLevel.danger);
+			mainPane.changeStepClientReady("Client non prêt", MainController.StyleLevel.danger);
 		} else if ("WARN".equals(level)) {
 			if(throwable != null) {
 				log.warn(message, throwable);
 			} else {
 				log.warn(message, throwable);
 			}
-			mainPane.changeTextPrincipal(message, "orange");
+			mainPane.changeTextPrincipal(message, MainController.StyleLevel.warning);
 			mainPane.addLogTextLn(level, message);
 		}
 		Utils.playSound("fail.wav");

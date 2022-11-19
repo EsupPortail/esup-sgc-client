@@ -69,10 +69,7 @@ public class EsupSGCClientApplication extends Application {
 		mainPane = fxmlLoader.getController();
 
 		mainPane.init();
-		mainPane.initUi();
-		mainPane.changeTextPrincipal("Chargement...", "orange");
-		mainPane.buttonRestart.setVisible(false);
-		mainPane.buttonExit.setOnAction(e -> stop());
+		mainPane.changeTextPrincipal("Chargement...", MainController.StyleLevel.warning);
 
 		primaryStage.setOnCloseRequest(we -> stop());
 		

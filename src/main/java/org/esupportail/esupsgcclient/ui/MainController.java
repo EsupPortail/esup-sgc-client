@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.layout.FlowPane;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.utils.Utils;
 
@@ -37,7 +38,7 @@ public class MainController {
 
 	private final static Logger log = Logger.getLogger(MainController.class);
 
-	private static int fontSize = 24;
+	public enum StyleLevel {success, danger, warning, info};
 
 	private Thread threadWebcamStream = null;
 
@@ -75,13 +76,16 @@ public class MainController {
 	private Label stepEncodageApp;
 
 	@FXML
+	private FlowPane panePrincipal;
+
+	@FXML
 	private Label textPrincipal;
 
 	@FXML
 	private Label title;
 
 	@FXML
-	private ImageView webcamImageView;
+	public ImageView webcamImageView;
 
 	@FXML
 	private Label stepEncodageCnous;
@@ -89,12 +93,11 @@ public class MainController {
 	@FXML
 	private Label stepSendCSV;
 
-	public ImageView bmpBlackImageView = new ImageView();;
+	@FXML
+	public ImageView bmpBlackImageView;
 
-	public ImageView bmpColorImageView = new ImageView();;
-	
-	public Button buttonExit = new Button("Quitter");
-	public Button buttonRestart = new Button("Restart");
+	@FXML
+	public ImageView bmpColorImageView;
 
 	private String lastText = null;
 	
@@ -225,38 +228,46 @@ public class MainController {
 
 	}
 
-	public void changeTextPrincipal(String text, String color) {
+	public void changeTextPrincipal(String text, StyleLevel styleLevel) {
 		textPrincipal.setText(text);
-		textPrincipal.setStyle("-fx-text-fill: " + color + "; -fx-font-size: 32;");
+		panePrincipal.getStyleClass().clear();
+		panePrincipal.getStyleClass().add("panel-" + styleLevel);
 	}
 
-	public void changeStepClientReady(String text, String color) {
+	public void changeStepClientReady(String text, StyleLevel styleLevel) {
 		stepClientReady.setText(text);
-		stepClientReady.setStyle("-fx-text-fill: " + color + ";-fx-font-size: " + fontSize + ";");
+		stepClientReady.getParent().getStyleClass().clear();
+		stepClientReady.getParent().getStyleClass().add("alert-" + styleLevel);
 	}
 
-	public void changeStepReadQR(String color) {
-		stepReadQR.setStyle("-fx-text-fill: " + color + ";-fx-font-size: " + fontSize + ";");
+	public void changeStepReadQR(StyleLevel styleLevel) {
+		stepReadQR.getParent().getStyleClass().clear();
+		stepReadQR.getParent().getStyleClass().add("alert-" + styleLevel);
 	}
 
-	public void changeStepReadCSN(String color) {
-		stepReadCSN.setStyle("-fx-text-fill: " + color + ";-fx-font-size: " + fontSize + ";");
+	public void changeStepReadCSN(StyleLevel styleLevel) {
+		stepReadCSN.getParent().getStyleClass().clear();
+		stepReadCSN.getParent().getStyleClass().add("alert-" + styleLevel);
 	}
 
-	public void changeStepSelectSGC(String color) {
-		stepSelectSGC.setStyle("-fx-text-fill: " + color + ";-fx-font-size: " + fontSize + ";");
+	public void changeStepSelectSGC(StyleLevel styleLevel) {
+		stepSelectSGC.getParent().getStyleClass().clear();
+		stepSelectSGC.getParent().getStyleClass().add("alert-" + styleLevel);
 	}
 
-	public void changeStepEncodageApp(String color) {
-		stepEncodageApp.setStyle("-fx-text-fill: " + color + ";-fx-font-size: " + fontSize + ";");
+	public void changeStepEncodageApp(StyleLevel styleLevel) {
+		stepEncodageApp.getParent().getStyleClass().clear();
+		stepEncodageApp.getParent().getStyleClass().add("alert-" + styleLevel);
 	}
 
-	public void changeStepEncodageCnous(String color) {
-		stepEncodageCnous.setStyle("-fx-text-fill: " + color + ";-fx-font-size: " + fontSize + ";");
+	public void changeStepEncodageCnous(StyleLevel styleLevel) {
+		stepEncodageCnous.getParent().getStyleClass().clear();
+		stepEncodageCnous.getParent().getStyleClass().add("alert-" + styleLevel);
 	}
 
-	public void changeStepSendCSV(String color) {
-		stepSendCSV.setStyle("-fx-text-fill: " + color + ";-fx-font-size: " + fontSize + ";");
+	public void changeStepSendCSV(StyleLevel styleLevel) {
+		stepSendCSV.getParent().getStyleClass().clear();
+		stepSendCSV.getParent().getStyleClass().add("alert-" + styleLevel);
 	}
 
 	public void hideCnousSteps() {
@@ -264,19 +275,9 @@ public class MainController {
 		stepSendCSV.setVisible(false);
 	}
 
-	public void initUi() {
-		stepClientReady.setStyle("-fx-text-fill: gray;-fx-font-size: " + fontSize + ";");
-		stepReadQR.setStyle("-fx-text-fill: gray;-fx-font-size: " + fontSize + ";");
-		stepReadCSN.setStyle("-fx-text-fill: gray;-fx-font-size: " + fontSize + ";");
-		stepSelectSGC.setStyle("-fx-text-fill: gray;-fx-font-size: " + fontSize + ";");
-		stepEncodageApp.setStyle("-fx-text-fill: gray;-fx-font-size: " + fontSize + ";");
-		stepEncodageCnous.setStyle("-fx-text-fill: gray;-fx-font-size: " + fontSize + ";");
-		stepSendCSV.setStyle("-fx-text-fill: gray;-fx-font-size: " + fontSize + ";");
-	}
-
 	public void setOk() {
-		changeStepClientReady("Client prêt", "green");
-		changeTextPrincipal("En attente d'une carte...", "green");
+		changeStepClientReady("Client prêt", MainController.StyleLevel.success);
+		changeTextPrincipal("En attente d'une carte...", MainController.StyleLevel.success);
 	}
 	
 	public void addLogTextLn(String type, String text) {
