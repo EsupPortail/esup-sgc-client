@@ -43,7 +43,7 @@ public class EvolisPrinterService {
 				if (exceptionIfFailed) {
 					throw new RuntimeException("Can't connect to evolis printer on " + ip + ":" + port);
 				} else{
-					log.info("Can't connect to evolis printer on {}:{}", ip, port);
+					log.debug("Can't connect to evolis printer on {}:{}", ip, port);
 				}
 			}
 			return false;

@@ -11,6 +11,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -53,16 +54,16 @@ public class MainController {
 	private Button buttonNfcTag;
 
 	@FXML
-	private Region checkAuth;
+	private Button checkAuth;
 
 	@FXML
-	private Region checkCamera;
+	private Button checkCamera;
 
 	@FXML
-	private Region checkNfc;
+	private Button checkNfc;
 
 	@FXML
-	private Region checkPrinter;
+	private Button checkPrinter;
 
 	@FXML
 	private ComboBox<Webcam> comboBox;
@@ -138,6 +139,7 @@ public class MainController {
 					webcam.close();
 					webcam = newWebcam;
 					threadWebcamStream.interrupt();
+					checkCamera.getTooltip().setText(webcam.getName());
 					startWebCamStream();
 				} else {
 					comboBox.getSelectionModel().select(webcam);
@@ -176,9 +178,12 @@ public class MainController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
-					checkNfc.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+					checkNfc.getStyleClass().clear();
+					checkNfc.getStyleClass().add("btn-success");
+					addLogTextLn("INFO", "PC/SC OK");
 				} else {
-					checkNfc.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+					checkNfc.getStyleClass().clear();
+					checkNfc.getStyleClass().add("btn-danger");
 				}
 			}
 		});
@@ -187,9 +192,12 @@ public class MainController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
-					checkAuth.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+					checkAuth.getStyleClass().clear();
+					checkAuth.getStyleClass().add("btn-success");
+					addLogTextLn("INFO", "Authentification OK");
 				} else {
-					checkAuth.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+					checkAuth.getStyleClass().clear();
+					checkAuth.getStyleClass().add("btn-danger");
 				}
 			}
 		});
@@ -198,11 +206,12 @@ public class MainController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
-					changeStepClientReady("Ouverture de la webcam", MainController.StyleLevel.warning);
-					addLogTextLn("INFO", "webcam OK : " + webcam);
-					checkPrinter.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+					checkPrinter.getStyleClass().clear();
+					checkPrinter.getStyleClass().add("btn-success");
+					addLogTextLn("INFO", "imprimante evolis OK");
 				} else {
-					checkPrinter.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+					checkPrinter.getStyleClass().clear();
+					checkPrinter.getStyleClass().add("btn-danger");
 				}
 			}
 		});
@@ -219,15 +228,20 @@ public class MainController {
 								threadWebcamStream.interrupt();
 							}
 							log.info("restart with webcam " + webcam);
+							checkCamera.getTooltip().setText(webcam.getName());
 							startWebCamStream();
-							checkCamera.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+							checkCamera.getStyleClass().clear();
+							checkCamera.getStyleClass().add("btn-success");
+							addLogTextLn("INFO", "Caméra OK : " + webcam);
 						}
 					});
 				} else {
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
-							checkCamera.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+							checkCamera.getStyleClass().clear();
+							checkCamera.getStyleClass().add("btn-danger");
+							addLogTextLn("ERROR", "Caméra déconnectée ?!");
 						}
 					});
 				}
