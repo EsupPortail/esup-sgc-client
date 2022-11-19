@@ -15,9 +15,6 @@ public class ClientCheckService extends Task<Void> {
 
 	private final static Logger log = Logger.getLogger(ClientCheckService.class);
 
-	//private String[] args;
-
-	public BooleanProperty clientReady = new SimpleBooleanProperty(false);
 
 	private MainController mainPane;
 
@@ -30,7 +27,6 @@ public class ClientCheckService extends Task<Void> {
 
 							try {
 								EncodingService.init();
-								mainPane.nfcReady.setValue(true);
 								mainPane.addLogTextLn("INFO", "pc/sc : OK");
 
 								if (EncodingService.isEncodeCnous()) {
@@ -43,7 +39,7 @@ public class ClientCheckService extends Task<Void> {
 								mainPane.addLogTextLn("INFO", "sgcAuthToken = " + EncodingService.getSgcAuthToken());
 								mainPane.addLogTextLn("INFO", "esupNfcTagServerUrl = " + EncodingService.getEsupNfcTagServerUrl());
 								mainPane.addLogTextLn("INFO", "sgcUrl = " + EncodingService.getSgcUrl());
-								clientReady.setValue(true);
+								mainPane.nfcReady.setValue(true);
 								
 							} catch (CnousFournisseurCarteException e) {
 								customLog("ERROR", "Erreur de configuration cnous", e);

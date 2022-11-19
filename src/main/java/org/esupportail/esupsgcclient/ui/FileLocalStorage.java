@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -20,6 +21,16 @@ public class FileLocalStorage {
 	private final static Logger log = Logger.getLogger(FileLocalStorage.class);
 
 	private static File file = initLocalStorageFile();
+
+	static SimpleBooleanProperty authReady;
+
+	static String numeroId;
+
+	static String sgcAuthToken;
+
+	public static void setAuthReady(SimpleBooleanProperty ar) {
+		authReady = ar;
+	}
 
 	private static File initLocalStorageFile() {
 		String localStorageName = "esupSgcLocalStorage";
@@ -92,6 +103,15 @@ public class FileLocalStorage {
 			oos.close();
 			fos.close();
 			log.info(key + "=" + value + " write to localstorage");
+			if(key.equals("numeroId")) {
+				numeroId = value;
+			}
+			if(key.equals("sgcAuthToken")) {
+				sgcAuthToken = value;
+			}
+			if(numeroId!=null && sgcAuthToken!=null) {
+				authReady.setValue(true);
+			}
 		} catch (IOException e) {
 			log.error("error on write to localstorage", e);
 		}

@@ -7,8 +7,16 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.ClientCheckService;
 import org.esupportail.esupsgcclient.service.MainLoopService;
@@ -77,40 +85,22 @@ public class EsupSGCClientApplication extends Application {
 
 		mainService = new MainLoopService(mainPane);
 
-		authentification();
-	}
-	
-	public void authentification() {
+		FileLocalStorage.setAuthReady(mainPane.authReady);
 
-		Task<Void> task = new Task<Void>() {
+		mainPane.nfcReady.addListener(new ChangeListener<Boolean>() {
 			@Override
-			public Void call() {
-				while (true) {
-					numeroId = FileLocalStorage.getItem("numeroId");
-					if (numeroId != null && !numeroId.toString().equals("") && !"undefined".equals(numeroId) && !"null".equals(numeroId)) {
-						break;
-					}
-					Utils.sleep(1000);
+			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
+				if(newValue) {
+					mainPane.setOk();
+					mainService.start();
 				}
-				if(encodeCnous) {
-					while (true) {
-						sgcAuthToken = EsupNfcClientStackPane.sgcAuthToken;
-						if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken)) {
-							break;
-						}
-						EsupNfcClientStackPane.readLocalStorage();
-						Utils.sleep(1000);
-					}
-				}
-				mainPane.authReady.set(true);
-				return null;
 			}
-		};
-		Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
-        
-		task.setOnSucceeded(event -> launchClient());
+		});
+
+		ClientCheckService clientCheckService = new ClientCheckService(mainPane);
+		Thread clientCheckThread = new Thread(clientCheckService);
+		clientCheckThread.setDaemon(true);
+		clientCheckThread.start();
 		
 	}
 	
@@ -118,29 +108,6 @@ public class EsupSGCClientApplication extends Application {
 	public void stop(){
 		mainPane.exit();
 		System.exit(0);
-	 	}
-	
-	public void launchClient() {
-	
-		ClientCheckService clientCheckService = new ClientCheckService(mainPane);
-		Thread clientCheckThread = new Thread(clientCheckService);
-		clientCheckThread.setDaemon(true);
-		clientCheckThread.start();		
-		
-
-		WaitClientReadyTask waitClientReadyTask = new WaitClientReadyTask();
-		waitClientReadyTask.clientReady.bind(clientCheckService.clientReady);
-		waitClientReadyTask.setOnSucceeded(t -> {
-			mainPane.setOk();
-			mainService.start();
-		});
-		
-		clientCheckService.setOnSucceeded(event -> {
-			log.info("client check ended");
-			Thread waitClientReadyThread = new Thread(waitClientReadyTask);
-			waitClientReadyThread.setDaemon(true);
-			waitClientReadyThread.start();
-		});
 	}
 
     private static String getMacAddress() {

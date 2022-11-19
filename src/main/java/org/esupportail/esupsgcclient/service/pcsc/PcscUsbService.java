@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import jnasmartcardio.Smartcardio;
 import jnasmartcardio.Smartcardio.JnaPCSCException;
+import org.esupportail.esupsgcclient.utils.Utils;
 
 public class PcscUsbService {
 
@@ -32,8 +33,10 @@ public class PcscUsbService {
 		try {
 			context = TerminalFactory.getInstance("PC/SC", null, Smartcardio.PROVIDER_NAME);
 			terminals = context.terminals();
-			if(terminals.list().isEmpty()) {
-				throw new PcscException("no PC/SC reader found");
+			while(terminals.list().isEmpty()) {
+				log.info("no PC/SC reader found");
+				Utils.sleep(1000);
+				terminals = context.terminals();
 			}
 		} catch (Exception e) {
 			throw new PcscException("Exception retrieving context", e);

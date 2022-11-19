@@ -130,7 +130,7 @@ public class MainController {
 
 	public SimpleBooleanProperty nfcReady = new SimpleBooleanProperty();
 
-	public SimpleBooleanProperty authReady = new SimpleBooleanProperty();
+	public static SimpleBooleanProperty authReady = new SimpleBooleanProperty();
 
 	public SimpleBooleanProperty printerReady = new SimpleBooleanProperty();
 
