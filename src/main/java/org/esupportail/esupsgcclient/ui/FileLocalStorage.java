@@ -28,6 +28,8 @@ public class FileLocalStorage {
 
 	static String sgcAuthToken;
 
+	public static String eppnInit;
+
 	public static void setAuthReady(SimpleBooleanProperty ar) {
 		authReady = ar;
 	}
@@ -109,7 +111,10 @@ public class FileLocalStorage {
 			if(key.equals("sgcAuthToken")) {
 				sgcAuthToken = value;
 			}
-			if(numeroId!=null && sgcAuthToken!=null) {
+			if(key.equals("eppnInit")) {
+				eppnInit = value;
+			}
+			if(numeroId!=null && sgcAuthToken!=null && eppnInit!=null) {
 				authReady.setValue(true);
 			}
 		} catch (IOException e) {

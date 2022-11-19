@@ -194,10 +194,12 @@ public class MainController {
 				if(newValue) {
 					checkAuth.getStyleClass().clear();
 					checkAuth.getStyleClass().add("btn-success");
-					addLogTextLn("INFO", "Authentification OK");
+					checkAuth.getTooltip().setText(FileLocalStorage.eppnInit);
+					addLogTextLn("INFO", "Authentification OK : " + FileLocalStorage.eppnInit);
 				} else {
 					checkAuth.getStyleClass().clear();
 					checkAuth.getStyleClass().add("btn-danger");
+					checkAuth.getTooltip().setText("...");
 				}
 			}
 		});

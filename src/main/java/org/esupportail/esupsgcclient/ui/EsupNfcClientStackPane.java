@@ -102,6 +102,9 @@ public class EsupNfcClientStackPane extends StackPane {
                 FileLocalStorage.setItem("sgcAuthToken", sgcAuthToken);
                 EsupSGCClientApplication.sgcAuthToken = sgcAuthToken;
             }
+            if (eppnInit != null && !eppnInit.equals("") && !"undefined".equals(eppnInit)) {
+                FileLocalStorage.setItem("eppnInit", eppnInit);
+            }
         });
     }
 
