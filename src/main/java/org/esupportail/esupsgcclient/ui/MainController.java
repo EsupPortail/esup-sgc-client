@@ -11,6 +11,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -18,6 +19,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
@@ -43,15 +45,17 @@ public class MainController {
 
 	final static Logger log = Logger.getLogger(MainController.class);
 
-	public enum StyleLevel {success, danger, warning, info};
+	public enum StyleLevel {success, danger, warning, primary, info};
 
 	private Thread threadWebcamStream = null;
 
-	@FXML
-	private Button buttonLogs;
+	public Stage primaryStage;
 
 	@FXML
-	private Button buttonNfcTag;
+	private MenuItem buttonLogs;
+
+	@FXML
+	private MenuItem buttonNfcTag;
 
 	@FXML
 	private Button checkAuth;
@@ -152,11 +156,14 @@ public class MainController {
 			public void handle(ActionEvent e) {
 				if (logTextarea.isVisible()) {
 					logTextarea.setVisible(false);
+					logTextarea.setManaged(false);
 					buttonLogs.setText("Afficher les logs");
 				} else {
 					logTextarea.setVisible(true);
+					logTextarea.setManaged(true);
 					buttonLogs.setText("Masquer les logs");
 				}
+				primaryStage.sizeToScene();
 			}
 		});
 
@@ -165,11 +172,14 @@ public class MainController {
 			public void handle(ActionEvent e) {
 				if (nfcTagPane.isVisible()) {
 					nfcTagPane.setVisible(false);
+					nfcTagPane.setManaged(false);
 					buttonNfcTag.setText("Afficher EsupNfcTag");
 				} else {
 					nfcTagPane.setVisible(true);
+					nfcTagPane.setManaged(true);
 					buttonNfcTag.setText("Masquer EsupNfcTag");
 				}
+				primaryStage.sizeToScene();
 			}
 		});
 
@@ -211,6 +221,13 @@ public class MainController {
 					checkPrinter.getStyleClass().clear();
 					checkPrinter.getStyleClass().add("btn-success");
 					addLogTextLn("INFO", "imprimante evolis OK");
+					bmpBlackImageView.setVisible(true);
+					bmpBlackImageView.setManaged(true);
+					bmpColorImageView.setVisible(true);
+					bmpColorImageView.setManaged(true);
+					webcamImageView.setVisible(false);
+					webcamImageView.setManaged(false);
+					primaryStage.sizeToScene();
 				} else {
 					checkPrinter.getStyleClass().clear();
 					checkPrinter.getStyleClass().add("btn-danger");
@@ -235,6 +252,13 @@ public class MainController {
 							checkCamera.getStyleClass().clear();
 							checkCamera.getStyleClass().add("btn-success");
 							addLogTextLn("INFO", "Caméra OK : " + webcam);
+							webcamImageView.setVisible(true);
+							webcamImageView.setManaged(true);
+							bmpBlackImageView.setVisible(false);
+							bmpBlackImageView.setManaged(false);
+							bmpColorImageView.setVisible(false);
+							bmpColorImageView.setManaged(false);
+							primaryStage.sizeToScene();
 						}
 					});
 				} else {

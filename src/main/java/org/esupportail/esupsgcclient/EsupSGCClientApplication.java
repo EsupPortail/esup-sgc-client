@@ -60,16 +60,15 @@ public class EsupSGCClientApplication extends Application {
 
 		URL fxmlUrl = this.getClass().getClassLoader().getResource("esup-sgc-client.fxml");
 		FXMLLoader fxmlLoader = new FXMLLoader(fxmlUrl);
-		mainPane = fxmlLoader.getController();
 		VBox root = fxmlLoader.load();
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
 		mainPane = fxmlLoader.getController();
-
+		mainPane.primaryStage = primaryStage;
 		mainPane.init();
-		mainPane.changeTextPrincipal("Chargement...", MainController.StyleLevel.warning);
+		mainPane.changeTextPrincipal("Chargement...", MainController.StyleLevel.primary);
 
 		primaryStage.setOnCloseRequest(we -> stop());
 		
