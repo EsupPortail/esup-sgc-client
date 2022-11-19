@@ -1,16 +1,16 @@
 package org.esupportail.esupsgcclient.ui;
 
-import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
@@ -20,11 +20,10 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamImageTransformer;
-import com.github.sarxos.webcam.WebcamResolution;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -44,7 +43,7 @@ import javafx.scene.layout.Pane;
 
 public class MainController {
 
-	private final static Logger log = Logger.getLogger(MainController.class);
+	final static Logger log = Logger.getLogger(MainController.class);
 
 	public enum StyleLevel {success, danger, warning, info};
 
@@ -127,7 +126,7 @@ public class MainController {
 
 	private BufferedImage webcamBufferedImage;
 
-	public SimpleBooleanProperty webcamReady = new SimpleBooleanProperty();
+	public SimpleBooleanProperty webcamReady = new SimpleBooleanProperty(false);
 
 	public SimpleBooleanProperty nfcReady = new SimpleBooleanProperty();
 
@@ -136,23 +135,22 @@ public class MainController {
 	public SimpleBooleanProperty printerReady = new SimpleBooleanProperty();
 
 	public void init() {
-
-		comboBox.setItems(FXCollections.observableList(new ArrayList<Webcam>()));
-		for(Webcam webcam : Webcam.getWebcams()) {
-			comboBox.getItems().add(webcam);
-		}
 		
 		comboBox.setOnAction((event) -> {
-			webcam.close();
-		    webcam = (Webcam) comboBox.getSelectionModel().getSelectedItem();
-		    threadWebcamStream.interrupt();
-		    initializeWebCam();
-		    startWebCamStream();
-		    
+		    Webcam newWebcam = (Webcam) comboBox.getSelectionModel().getSelectedItem();
+			if(newWebcam!=null) {
+				newWebcam.open();
+				if (newWebcam.getImage() != null && webcam != newWebcam) {
+					webcam.close();
+					webcam = newWebcam;
+					threadWebcamStream.interrupt();
+					startWebCamStream();
+				} else {
+					comboBox.getSelectionModel().select(webcam);
+				}
+			}
 		});
-		
-		// comboBox.getSelectionModel().select(Webcam.getDefault());
-		webcam = Webcam.getDefault();
+
 
 		buttonLogs.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -166,6 +164,7 @@ public class MainController {
 				}
 			}
 		});
+
 		buttonNfcTag.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -179,7 +178,6 @@ public class MainController {
 			}
 		});
 
-		initializeWebCam();
 
 		nfcReady.addListener(new ChangeListener<Boolean>() {
 			@Override
@@ -207,6 +205,8 @@ public class MainController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
+					changeStepClientReady("Ouverture de la webcam", MainController.StyleLevel.warning);
+					addLogTextLn("INFO", "webcam OK : " + webcam);
 					checkPrinter.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 				} else {
 					checkPrinter.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -214,60 +214,40 @@ public class MainController {
 			}
 		});
 
-	}
-
-	public BufferedImage getWebcamBufferedImage() {
-		return webcamBufferedImage;
-	}
-
-	private void initializeWebCam() {
 
 		webcamReady.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
-					checkCamera.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							log.debug("start webcam ...");
+							startWebCamStream();
+							checkCamera.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+						}
+					});
 				} else {
-					checkCamera.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							checkCamera.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+						}
+					});
 				}
 			}
 		});
 
-		Task<Void> webCamTask = new Task<Void>() {
+		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 
-			@Override
-			protected Void call() throws Exception {
-				Dimension[] nonStandardResolutions = new Dimension[] { WebcamResolution.PAL.getSize(),
-						WebcamResolution.HD.getSize(), new Dimension(720, 480), new Dimension(1920, 1080), };
+		comboBox.setItems(FXCollections.observableList(new ArrayList<Webcam>()));
+		for(Webcam webcam : Webcam.getWebcams()) {
+			comboBox.getItems().add(webcam);
+		}
 
-				Dimension size = WebcamResolution.VGA.getSize();
-				if (webcam != null) {
-					webcam.close();
-					webcam.setCustomViewSizes(nonStandardResolutions);
-					webcam.setViewSize(size);
-					webcam.setImageTransformer(new WebcamImageTransformer() {
-						public BufferedImage transform(BufferedImage image) {
-							BufferedImage bi = new BufferedImage(image.getWidth(), image.getHeight(),
-									BufferedImage.TYPE_INT_BGR);
-							Graphics2D g2 = bi.createGraphics();
-							g2.rotate(Math.PI, image.getWidth() / 2.0, image.getHeight() / 2.0);
-							g2.drawImage(image, 0, 0, null);
-							g2.dispose();
-							bi.flush();
-							return bi;
-						}
-					});
+		webcam = Webcam.getDefault();
+		comboBox.getSelectionModel().select(webcam);
 
-					webcam.open();
-					webcamReady.set(true);
-				}
-				startWebCamStream();
-				return null;
-			}
-		};
-		Thread webCamThread = new Thread(webCamTask);
-		webCamThread.setDaemon(true);
-		webCamThread.start();
 	}
 
 	private void startWebCamStream() {
@@ -276,7 +256,6 @@ public class MainController {
 
 			@Override
 			protected Void call() throws Exception {
-
 				final AtomicReference<WritableImage> ref = new AtomicReference<>();
 				while (true) {
 					try {
@@ -286,9 +265,9 @@ public class MainController {
 							imageProperty.set(ref.get());
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						log.warn("pb", e);
 					}
-					Utils.sleep(250);
+					Utils.sleep(100);
 				}
 			}
 		};
@@ -297,6 +276,7 @@ public class MainController {
 		threadWebcamStream.setDaemon(true);
 		threadWebcamStream.start();
 		webcamImageView.imageProperty().bind(imageProperty);
+		webcamImageView.setRotate(180);
 
 	}
 

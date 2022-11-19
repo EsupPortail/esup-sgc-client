@@ -1,17 +1,15 @@
 package org.esupportail.esupsgcclient.service;
 
+import javafx.application.Platform;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.pcsc.PcscException;
-import org.esupportail.esupsgcclient.task.CheckWebcamTask;
 import org.esupportail.esupsgcclient.ui.MainController;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 
 public class ClientCheckService extends Task<Void> {
 
@@ -30,15 +28,6 @@ public class ClientCheckService extends Task<Void> {
 	@Override
 	protected Void call() {
 
-		try {
-			if (mainPane.webcam != null) {
-				CheckWebcamTask checkWebcamTask = new CheckWebcamTask(mainPane.webcamReady);
-				checkWebcamTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent t) {
-						if (checkWebcamTask.getValue()) {
-							mainPane.changeStepClientReady("Ouverture de la webcam", MainController.StyleLevel.warning);
-							mainPane.addLogTextLn("INFO", "webcam : OK");
 							try {
 								EncodingService.init();
 								mainPane.nfcReady.setValue(true);
@@ -62,48 +51,37 @@ public class ClientCheckService extends Task<Void> {
 								mainPane.nfcReady.setValue(false);
 								customLog("ERROR", "Erreur lecteur PC/SC", e);
 							}
-						} else {
-							customLog("WARN", "Erreur webcam", null);
-						}
+							return null;
 					}
-				});
 
-				Thread checkWebcamThread = new Thread(checkWebcamTask);
-				checkWebcamThread.setDaemon(true);
-				checkWebcamThread.start();
-
-			} else {
-				customLog("ERROR", "Erreur de webcam", null);
-			}
-		} catch (Exception e) {
-			customLog("ERROR", "Erreur inconnue", e);
-		}
-		return null;
-	}
 
 	private void customLog(String level, String message, Throwable throwable) {
-
-		if ("ERROR".equals(level)) {
-			if(throwable != null) {
-				log.error(message, throwable);
-				mainPane.addLogTextLn(level, throwable.getMessage());
-				mainPane.addLogTextLn(level, Utils.getExceptionString(throwable));
-			}else {
-				log.error(message);
-				mainPane.addLogTextLn(level, message);
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				if ("ERROR".equals(level)) {
+					if (throwable != null) {
+						log.error(message, throwable);
+						mainPane.addLogTextLn(level, throwable.getMessage());
+						mainPane.addLogTextLn(level, Utils.getExceptionString(throwable));
+					} else {
+						log.error(message);
+						mainPane.addLogTextLn(level, message);
+					}
+					mainPane.changeTextPrincipal(message, MainController.StyleLevel.danger);
+					mainPane.changeStepClientReady("Client non prêt", MainController.StyleLevel.danger);
+				} else if ("WARN".equals(level)) {
+					if (throwable != null) {
+						log.warn(message, throwable);
+					} else {
+						log.warn(message, throwable);
+					}
+					mainPane.changeTextPrincipal(message, MainController.StyleLevel.warning);
+					mainPane.addLogTextLn(level, message);
+				}
+				Utils.playSound("fail.wav");
 			}
-			mainPane.changeTextPrincipal(message, MainController.StyleLevel.danger);
-			mainPane.changeStepClientReady("Client non prêt", MainController.StyleLevel.danger);
-		} else if ("WARN".equals(level)) {
-			if(throwable != null) {
-				log.warn(message, throwable);
-			} else {
-				log.warn(message, throwable);
-			}
-			mainPane.changeTextPrincipal(message, MainController.StyleLevel.warning);
-			mainPane.addLogTextLn(level, message);
-		}
-		Utils.playSound("fail.wav");
+		});
 	}
 
 }
