@@ -32,7 +32,7 @@ public class ClientCheckService extends Task<Void> {
 
 		try {
 			if (mainPane.webcam != null) {
-				CheckWebcamTask checkWebcamTask = new CheckWebcamTask(mainPane.webCamReady);
+				CheckWebcamTask checkWebcamTask = new CheckWebcamTask(mainPane.webcamReady);
 				checkWebcamTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 					@Override
 					public void handle(WorkerStateEvent t) {
@@ -41,6 +41,7 @@ public class ClientCheckService extends Task<Void> {
 							mainPane.addLogTextLn("INFO", "webcam : OK");
 							try {
 								EncodingService.init();
+								mainPane.nfcReady.setValue(true);
 								mainPane.addLogTextLn("INFO", "pc/sc : OK");
 
 								if (EncodingService.isEncodeCnous()) {
@@ -58,6 +59,7 @@ public class ClientCheckService extends Task<Void> {
 							} catch (CnousFournisseurCarteException e) {
 								customLog("ERROR", "Erreur de configuration cnous", e);
 							} catch (EncodingException | PcscException e) {
+								mainPane.nfcReady.setValue(false);
 								customLog("ERROR", "Erreur lecteur PC/SC", e);
 							}
 						} else {

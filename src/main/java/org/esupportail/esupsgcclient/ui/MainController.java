@@ -8,9 +8,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.utils.Utils;
 
@@ -47,6 +55,18 @@ public class MainController {
 
 	@FXML
 	private Button buttonNfcTag;
+
+	@FXML
+	private Region checkAuth;
+
+	@FXML
+	private Region checkCamera;
+
+	@FXML
+	private Region checkNfc;
+
+	@FXML
+	private Region checkPrinter;
 
 	@FXML
 	private ComboBox<Webcam> comboBox;
@@ -103,10 +123,17 @@ public class MainController {
 	
 	public ObjectProperty<Image> imageProperty = new SimpleObjectProperty<Image>();
 	
-	public Webcam webcam = null;	
+	public Webcam webcam = null;
+
 	private BufferedImage webcamBufferedImage;
 
-	public SimpleBooleanProperty webCamReady = new SimpleBooleanProperty(false);
+	public SimpleBooleanProperty webcamReady = new SimpleBooleanProperty();
+
+	public SimpleBooleanProperty nfcReady = new SimpleBooleanProperty();
+
+	public SimpleBooleanProperty authReady = new SimpleBooleanProperty();
+
+	public SimpleBooleanProperty printerReady = new SimpleBooleanProperty();
 
 	public void init() {
 
@@ -124,7 +151,7 @@ public class MainController {
 		    
 		});
 		
-		comboBox.getSelectionModel().select(Webcam.getDefault());
+		// comboBox.getSelectionModel().select(Webcam.getDefault());
 		webcam = Webcam.getDefault();
 
 		buttonLogs.setOnAction(new EventHandler<ActionEvent>() {
@@ -154,6 +181,39 @@ public class MainController {
 
 		initializeWebCam();
 
+		nfcReady.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
+				if(newValue) {
+					checkNfc.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+				} else {
+					checkNfc.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+				}
+			}
+		});
+
+		authReady.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
+				if(newValue) {
+					checkAuth.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+				} else {
+					checkAuth.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+				}
+			}
+		});
+
+		printerReady.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
+				if(newValue) {
+					checkPrinter.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+				} else {
+					checkPrinter.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+				}
+			}
+		});
+
 	}
 
 	public BufferedImage getWebcamBufferedImage() {
@@ -161,6 +221,18 @@ public class MainController {
 	}
 
 	private void initializeWebCam() {
+
+		webcamReady.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
+				if(newValue) {
+					checkCamera.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+				} else {
+					checkCamera.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+				}
+			}
+		});
+
 		Task<Void> webCamTask = new Task<Void>() {
 
 			@Override
@@ -187,7 +259,7 @@ public class MainController {
 					});
 
 					webcam.open();
-					webCamReady.set(true);
+					webcamReady.set(true);
 				}
 				startWebCamStream();
 				return null;
@@ -294,5 +366,6 @@ public class MainController {
 			webcam.close();
 		}
 	}
+
 
 }

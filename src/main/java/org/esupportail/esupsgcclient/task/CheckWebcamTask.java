@@ -11,7 +11,7 @@ public class CheckWebcamTask extends Task<Boolean> {
 	private final static Logger log = Logger.getLogger(CheckWebcamTask.class);
 
 	
-	private SimpleBooleanProperty webCamReady = new SimpleBooleanProperty(false);
+	private SimpleBooleanProperty webCamReady;
 	
 	public CheckWebcamTask(SimpleBooleanProperty webCamReady) {
 		super();

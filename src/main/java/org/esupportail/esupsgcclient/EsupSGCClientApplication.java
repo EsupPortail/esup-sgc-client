@@ -102,6 +102,7 @@ public class EsupSGCClientApplication extends Application {
 						Utils.sleep(1000);
 					}
 				}
+				mainPane.authReady.set(true);
 				return null;
 			}
 		};
