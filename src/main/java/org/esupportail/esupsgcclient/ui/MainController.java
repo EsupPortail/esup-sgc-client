@@ -4,13 +4,11 @@ import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
@@ -20,10 +18,9 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.service.printer.evolis.InitEvolisServiceTask;
+import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.task.WebcamUiTask;
-import org.esupportail.esupsgcclient.utils.Utils;
 
 import com.github.sarxos.webcam.Webcam;
 
@@ -31,7 +28,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -40,7 +36,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 
 public class MainController {
@@ -121,8 +116,8 @@ public class MainController {
 	public ImageView bmpColorImageView;
 
 	private String lastText = null;
-	
-	public ObjectProperty<Image> imageProperty = new SimpleObjectProperty<Image>();
+
+	public ObjectProperty<Image> imageProperty;
 	
 	public Webcam webcam = null;
 
@@ -135,7 +130,6 @@ public class MainController {
 	public static SimpleBooleanProperty authReady = new SimpleBooleanProperty();
 
 	public void init() {
-		
 		comboBox.setOnAction((event) -> {
 		    Webcam newWebcam = (Webcam) comboBox.getSelectionModel().getSelectedItem();
 			if(newWebcam!=null) {
@@ -150,7 +144,6 @@ public class MainController {
 				}
 			}
 		});
-
 
 		buttonLogs.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -201,7 +194,7 @@ public class MainController {
 			}
 		});
 
-		InitEvolisServiceTask.printerReady.addListener(new ChangeListener<Boolean>() {
+		EvolisHeartbeatTask.printerReady.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
@@ -222,7 +215,10 @@ public class MainController {
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
-							log.debug("start webcam ...");
+							if(threadWebcamStream!=null && threadWebcamStream.isAlive()) {
+								threadWebcamStream.interrupt();
+							}
+							log.info("restart with webcam " + webcam);
 							startWebCamStream();
 							checkCamera.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 						}
@@ -251,8 +247,9 @@ public class MainController {
 	}
 
 	private void startWebCamStream() {
-		Task<Void> task = new WebcamUiTask(webcam, webcamBufferedImage, imageProperty);
-		threadWebcamStream = new Thread(task);
+		imageProperty = new SimpleObjectProperty<Image>();
+		Task<Void> webcamUiTask = new WebcamUiTask(webcam, imageProperty);
+		threadWebcamStream = new Thread(webcamUiTask);
 		threadWebcamStream.setDaemon(true);
 		threadWebcamStream.start();
 		webcamImageView.imageProperty().bind(imageProperty);

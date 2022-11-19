@@ -18,18 +18,17 @@ public class WebcamUiTask extends Task<Void> {
     final static Logger log = Logger.getLogger(WebcamUiTask.class);
 
     Webcam webcam;
-    BufferedImage webcamBufferedImage;
     ObjectProperty<Image> imageProperty;
 
-    public WebcamUiTask(Webcam webcam, BufferedImage webcamBufferedImage, ObjectProperty<Image> imageProperty) {
+    public WebcamUiTask(Webcam webcam, ObjectProperty<Image> imageProperty) {
         this.webcam = webcam;
-        this.webcamBufferedImage = webcamBufferedImage;
         this.imageProperty = imageProperty;
     }
 
     @Override
     protected Void call() throws Exception {
         final AtomicReference<WritableImage> ref = new AtomicReference<>();
+        BufferedImage webcamBufferedImage;
         while (true) {
             try {
                 if (webcam != null && (webcamBufferedImage = webcam.getImage()) != null) {

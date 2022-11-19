@@ -21,8 +21,8 @@ public class EsupWebcamDiscoveryListener implements WebcamDiscoveryListener {
     public void webcamFound(WebcamDiscoveryEvent webcamDiscoveryEvent) {
         log.info("webcam found");
         if(mainController.webcam != webcamDiscoveryEvent.getWebcam()) {
+            webcamDiscoveryEvent.getWebcam().open();
             mainController.webcam = webcamDiscoveryEvent.getWebcam();
-            mainController.webcam.open();
             mainController.webcamReady.set(true);
         }
     }
