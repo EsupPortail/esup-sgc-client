@@ -1,6 +1,6 @@
 package org.esupportail.esupsgcclient.task;
 
-import org.esupportail.esupsgcclient.service.EncodingService;
+import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.concurrent.Task;

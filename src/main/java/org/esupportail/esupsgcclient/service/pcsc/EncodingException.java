@@ -1,4 +1,4 @@
-package org.esupportail.esupsgcclient.service;
+package org.esupportail.esupsgcclient.service.pcsc;
 
 public class EncodingException extends Exception {
 

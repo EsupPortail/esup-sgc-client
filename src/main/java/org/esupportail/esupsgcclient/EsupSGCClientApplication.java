@@ -7,29 +7,21 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.service.ClientCheckService;
+import org.esupportail.esupsgcclient.service.pcsc.InitEncodingServiceTask;
 import org.esupportail.esupsgcclient.service.MainLoopService;
-import org.esupportail.esupsgcclient.task.WaitClientReadyTask;
+import org.esupportail.esupsgcclient.service.printer.evolis.InitEvolisServiceTask;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.ui.MainController;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import javafx.application.Application;
-import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -97,10 +89,15 @@ public class EsupSGCClientApplication extends Application {
 			}
 		});
 
-		ClientCheckService clientCheckService = new ClientCheckService(mainPane);
+		InitEncodingServiceTask clientCheckService = new InitEncodingServiceTask(mainPane);
 		Thread clientCheckThread = new Thread(clientCheckService);
 		clientCheckThread.setDaemon(true);
 		clientCheckThread.start();
+
+		InitEvolisServiceTask initEvolisServiceTask = new InitEvolisServiceTask();
+		Thread evolisCheckThread = new Thread(initEvolisServiceTask);
+		evolisCheckThread.setDaemon(true);
+		evolisCheckThread.start();
 		
 	}
 	

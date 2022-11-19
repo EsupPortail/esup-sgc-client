@@ -4,7 +4,7 @@ import javax.smartcardio.CardException;
 
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.domain.NfcResultBean;
-import org.esupportail.esupsgcclient.service.EncodingException;
+import org.esupportail.esupsgcclient.service.pcsc.EncodingException;
 import org.esupportail.esupsgcclient.service.pcsc.PcscException;
 import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 import org.esupportail.esupsgcclient.utils.Utils;

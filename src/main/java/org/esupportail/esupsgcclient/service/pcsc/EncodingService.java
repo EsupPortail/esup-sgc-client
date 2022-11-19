@@ -1,4 +1,4 @@
-package org.esupportail.esupsgcclient.service;
+package org.esupportail.esupsgcclient.service.pcsc;
 
 import java.io.File;
 import java.util.HashMap;
@@ -8,10 +8,9 @@ import javax.smartcardio.CardException;
 
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.EsupSGCClientApplication;
+import org.esupportail.esupsgcclient.service.SgcCheckException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteRunExe;
-import org.esupportail.esupsgcclient.service.pcsc.PcscException;
-import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
@@ -86,7 +85,7 @@ public class EncodingService {
 		}
 	}
 	
-	public static void checkBeforeEncoding(String qrcode, String csn) throws SgcCheckException{
+	public static void checkBeforeEncoding(String qrcode, String csn) throws SgcCheckException {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.add("Content-Type", MediaType.APPLICATION_JSON.toString());
 		Map<String, String> requestBody = new HashMap<String, String>();

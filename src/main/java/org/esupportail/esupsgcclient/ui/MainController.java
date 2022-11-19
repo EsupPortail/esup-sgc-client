@@ -20,7 +20,9 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.service.printer.evolis.InitEvolisServiceTask;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
+import org.esupportail.esupsgcclient.task.WebcamUiTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import com.github.sarxos.webcam.Webcam;
@@ -132,8 +134,6 @@ public class MainController {
 
 	public static SimpleBooleanProperty authReady = new SimpleBooleanProperty();
 
-	public SimpleBooleanProperty printerReady = new SimpleBooleanProperty();
-
 	public void init() {
 		
 		comboBox.setOnAction((event) -> {
@@ -201,7 +201,7 @@ public class MainController {
 			}
 		});
 
-		printerReady.addListener(new ChangeListener<Boolean>() {
+		InitEvolisServiceTask.printerReady.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
@@ -251,33 +251,12 @@ public class MainController {
 	}
 
 	private void startWebCamStream() {
-
-		Task<Void> task = new Task<Void>() {
-
-			@Override
-			protected Void call() throws Exception {
-				final AtomicReference<WritableImage> ref = new AtomicReference<>();
-				while (true) {
-					try {
-						if (webcam != null && (webcamBufferedImage = webcam.getImage()) != null) {
-							ref.set(SwingFXUtils.toFXImage(webcamBufferedImage, ref.get()));
-							webcamBufferedImage.flush();
-							imageProperty.set(ref.get());
-						}
-					} catch (Exception e) {
-						log.warn("pb", e);
-					}
-					Utils.sleep(100);
-				}
-			}
-		};
-
+		Task<Void> task = new WebcamUiTask(webcam, webcamBufferedImage, imageProperty);
 		threadWebcamStream = new Thread(task);
 		threadWebcamStream.setDaemon(true);
 		threadWebcamStream.start();
 		webcamImageView.imageProperty().bind(imageProperty);
 		webcamImageView.setRotate(180);
-
 	}
 
 	public void changeTextPrincipal(String text, StyleLevel styleLevel) {

@@ -4,14 +4,14 @@ import javafx.scene.image.Image;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.EsupSGCClientApplication;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
+import org.esupportail.esupsgcclient.service.pcsc.EncodingException;
+import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.pcsc.PcscException;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.task.EncodingTask;
 import org.esupportail.esupsgcclient.task.EsupSgcLongPollTask;
 import org.esupportail.esupsgcclient.task.EvolisTask;
 import org.esupportail.esupsgcclient.task.QrcodeReadTask;
-import org.esupportail.esupsgcclient.task.SleepTask;
-import org.esupportail.esupsgcclient.task.VoidTask;
 import org.esupportail.esupsgcclient.task.WaitRemoveCardTask;
 import org.esupportail.esupsgcclient.ui.MainController;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -86,7 +86,7 @@ public class MainLoopService extends Service<Void> {
 		while (mainPane.imageProperty.get() == null) {
 			Utils.sleep(1000);
 		}
-		return new VoidTask();
+		return null;
 	}
 
 	private void printAndEncode(String qrcode) {
@@ -261,17 +261,8 @@ public class MainLoopService extends Service<Void> {
 		} catch (PcscException e) {
 			customLog("ERROR", "Erreur lecteur de carte, voir les logs", e);
 			mainPane.changeStepReadCSN(MainController.StyleLevel.danger);
-			SleepTask sleepTask = new SleepTask(restartDelay);
-			sleepTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-				@Override
-				public void handle(WorkerStateEvent t) {
-					restart();
-				}
-			});
-
-			Thread sleepThread = new Thread(sleepTask);
-			sleepThread.setDaemon(true);
-			sleepThread.start();
+			Utils.sleep(1000);
+			restart();
 		} catch (SgcCheckException e) {
 			customLog("WARN", "Erreur SGC " + e.getMessage(), e);
 			mainPane.changeStepSelectSGC(MainController.StyleLevel.danger);
