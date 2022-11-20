@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.github.sarxos.webcam.WebcamUtils;
+import com.github.sarxos.webcam.ds.cgt.WebcamCloseTask;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -136,7 +138,8 @@ public class MainController {
 
 	public void init() {
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldWebcamName, newWebcamName) -> {
-			if(newWebcamName!=null && !newWebcamName.equals(oldWebcamName)) {
+			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldWebcamName + " - " + newWebcamName);
+			if(options.getValue()!=null && newWebcamName!=null && !newWebcamName.equals(oldWebcamName) && (oldWebcamName!=null || webcam==null)) {
 					 Thread t = new Thread(() -> {
 						synchronized (newWebcamName) {
 							Webcam newWebcam = Webcam.getWebcamByName(newWebcamName);
@@ -144,17 +147,21 @@ public class MainController {
 									webcam.close();
 								}
 								if (!newWebcam.isOpen()) {
-									newWebcam.open(true);
+									try {
+										newWebcam.open();
+									} catch(Exception e) {
+										log.warn("can't start camera", e);
+									}
 								}
 								if (!newWebcam.getLock().isLocked()) {
 									newWebcam.getLock().unlock();
 								}
 								webcam = newWebcam;
 								checkCamera.getTooltip().setText(webcam.getName());
+								webcamImageView.imageProperty().unbind();
+								threadWebcamStream.interrupt();
+								webcamReady.set(webcam.isOpen());
 							}
-						 webcamImageView.imageProperty().unbind();
-						 threadWebcamStream.interrupt();
-						 startWebCamStream();
 					});
 					 t.start();
 				try {
@@ -284,7 +291,9 @@ public class MainController {
 					public void run() {
 						comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));
 						for (Webcam webcam : Webcam.getWebcams()) {
-							comboBox.getItems().add(webcam.getName());
+							if(!comboBox.getItems().contains(webcam.getName())) {
+								comboBox.getItems().add(webcam.getName());
+							}
 						}
 						if (webcam != null) {
 							comboBox.getSelectionModel().select(webcam.getName());
@@ -297,7 +306,9 @@ public class MainController {
 
 		comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));
 		for(Webcam webcam : Webcam.getWebcams()) {
-			comboBox.getItems().add(webcam.getName());
+			if(!comboBox.getItems().contains(webcam.getName())) {
+				comboBox.getItems().add(webcam.getName());
+			}
 		}
 
 		webcam = Webcam.getDefault();

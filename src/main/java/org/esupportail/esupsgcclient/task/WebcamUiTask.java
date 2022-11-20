@@ -31,15 +31,19 @@ public class WebcamUiTask extends Task<Void> {
     protected Void call() throws Exception {
         final AtomicReference<WritableImage> ref = new AtomicReference<>();
         BufferedImage webcamBufferedImage = null;
+        BufferedImage newWebcamBufferedImage = null;
         boolean cameraOk = true;
         while (cameraOk) {
             try {
                 cameraOk = false;
-                if (webcam != null && (webcamBufferedImage = webcam.getImage()) != null) {
-                    ref.set(SwingFXUtils.toFXImage(webcamBufferedImage, ref.get()));
-                    webcamBufferedImage.flush();
-                    imageProperty.set(ref.get());
-                    cameraOk = true;
+                if (webcam != null && (newWebcamBufferedImage = webcam.getImage()) != null) {
+                    if (webcamBufferedImage != newWebcamBufferedImage) {
+                        webcamBufferedImage = newWebcamBufferedImage;
+                        ref.set(SwingFXUtils.toFXImage(webcamBufferedImage, ref.get()));
+                        webcamBufferedImage.flush();
+                        imageProperty.set(ref.get());
+                        cameraOk = true;
+                    }
                 }
             } catch (Exception e) {
                 log.warn("pb with camera", e);
