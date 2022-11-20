@@ -70,7 +70,7 @@ public class MainController {
 	private Button checkPrinter;
 
 	@FXML
-	private ComboBox<Webcam> comboBox;
+	private ComboBox<String> comboBox;
 
 	@FXML
 	public TextArea logTextarea;
@@ -128,25 +128,43 @@ public class MainController {
 
 	private BufferedImage webcamBufferedImage;
 
-	public SimpleBooleanProperty webcamReady = new SimpleBooleanProperty(false);
+	public static SimpleBooleanProperty webcamReady = new SimpleBooleanProperty(false);
 
 	public SimpleBooleanProperty nfcReady = new SimpleBooleanProperty();
 
 	public static SimpleBooleanProperty authReady = new SimpleBooleanProperty();
 
 	public void init() {
-		comboBox.setOnAction((event) -> {
-		    Webcam newWebcam = (Webcam) comboBox.getSelectionModel().getSelectedItem();
-			if(newWebcam!=null) {
-				newWebcam.open();
-				if (newWebcam.getImage() != null && webcam != newWebcam) {
-					webcam.close();
-					webcam = newWebcam;
-					threadWebcamStream.interrupt();
-					checkCamera.getTooltip().setText(webcam.getName());
-					startWebCamStream();
-				} else {
-					comboBox.getSelectionModel().select(webcam);
+		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldWebcamName, newWebcamName) -> {
+			if(newWebcamName!=null && !newWebcamName.equals(oldWebcamName)) {
+					 Thread t = new Thread(() -> {
+						synchronized (newWebcamName) {
+							Webcam newWebcam = Webcam.getWebcamByName(newWebcamName);
+								if (webcam != null && webcam.isOpen()) {
+									webcam.close();
+								}
+								if (!newWebcam.isOpen()) {
+									newWebcam.open(true);
+								}
+								if (!newWebcam.getLock().isLocked()) {
+									newWebcam.getLock().unlock();
+								}
+								webcam = newWebcam;
+								checkCamera.getTooltip().setText(webcam.getName());
+							}
+						 webcamImageView.imageProperty().unbind();
+						 threadWebcamStream.interrupt();
+						 startWebCamStream();
+					});
+					 t.start();
+				try {
+					t.join(1000);
+				} catch (InterruptedException e) {
+					log.error(e);
+				}
+				if (t.isAlive()) {
+					log.warn("can't start webcam " + newWebcamName);
+					t.interrupt();
 				}
 			}
 		});
@@ -225,9 +243,9 @@ public class MainController {
 					bmpBlackImageView.setManaged(true);
 					bmpColorImageView.setVisible(true);
 					bmpColorImageView.setManaged(true);
-					webcamImageView.setVisible(false);
-					webcamImageView.setManaged(false);
-					primaryStage.sizeToScene();
+					// webcamImageView.setVisible(false);
+					// webcamImageView.setManaged(false);
+					// primaryStage.sizeToScene();
 				} else {
 					checkPrinter.getStyleClass().clear();
 					checkPrinter.getStyleClass().add("btn-danger");
@@ -239,54 +257,58 @@ public class MainController {
 		webcamReady.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
+				if(threadWebcamStream!=null && threadWebcamStream.isAlive()) {
+					threadWebcamStream.interrupt();
+				}
 				if(newValue) {
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							if(threadWebcamStream!=null && threadWebcamStream.isAlive()) {
-								threadWebcamStream.interrupt();
-							}
 							log.info("restart with webcam " + webcam);
-							checkCamera.getTooltip().setText(webcam.getName());
-							startWebCamStream();
 							checkCamera.getStyleClass().clear();
 							checkCamera.getStyleClass().add("btn-success");
-							addLogTextLn("INFO", "Caméra OK : " + webcam);
 							webcamImageView.setVisible(true);
 							webcamImageView.setManaged(true);
-							bmpBlackImageView.setVisible(false);
-							bmpBlackImageView.setManaged(false);
-							bmpColorImageView.setVisible(false);
-							bmpColorImageView.setManaged(false);
-							primaryStage.sizeToScene();
-						}
-					});
+							// bmpBlackImageView.setVisible(false);
+							// bmpBlackImageView.setManaged(false);
+							// bmpColorImageView.setVisible(false);
+							// bmpColorImageView.setManaged(false);
+							checkCamera.getTooltip().setText(webcam.getName());
+							startWebCamStream();
+							// primaryStage.sizeToScene();
+							addLogTextLn("INFO", "Caméra OK : " + webcam);
 				} else {
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
 							checkCamera.getStyleClass().clear();
 							checkCamera.getStyleClass().add("btn-danger");
 							addLogTextLn("ERROR", "Caméra déconnectée ?!");
-						}
-					});
 				}
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));
+						for (Webcam webcam : Webcam.getWebcams()) {
+							comboBox.getItems().add(webcam.getName());
+						}
+						if (webcam != null) {
+							comboBox.getSelectionModel().select(webcam.getName());
+						}
+					}});
 			}
 		});
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 
-		comboBox.setItems(FXCollections.observableList(new ArrayList<Webcam>()));
+		comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));
 		for(Webcam webcam : Webcam.getWebcams()) {
-			comboBox.getItems().add(webcam);
+			comboBox.getItems().add(webcam.getName());
 		}
 
 		webcam = Webcam.getDefault();
-		comboBox.getSelectionModel().select(webcam);
+		if(webcam!=null) {
+			comboBox.getSelectionModel().select(webcam.getName());
+		}
 
 	}
 
 	private void startWebCamStream() {
+		log.debug("startWebCamStream ...");
 		imageProperty = new SimpleObjectProperty<Image>();
 		Task<Void> webcamUiTask = new WebcamUiTask(webcam, imageProperty);
 		threadWebcamStream = new Thread(webcamUiTask);
@@ -350,10 +372,14 @@ public class MainController {
 	
 	public void addLogTextLn(String type, String text) {
 		if (!text.equals(lastText)) {
-			String date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
-			logTextarea.appendText("[" + type + "] " + date + " - " + text + "\n");
-			lastText = text;
-			logTextarea.positionCaret(logTextarea.getLength());
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					String date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+					logTextarea.appendText("[" + type + "] " + date + " - " + text + "\n");
+					lastText = text;
+					logTextarea.positionCaret(logTextarea.getLength());
+				}});
 		}
 	}
 

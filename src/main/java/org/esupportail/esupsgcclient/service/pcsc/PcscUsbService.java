@@ -34,7 +34,7 @@ public class PcscUsbService {
 			context = TerminalFactory.getInstance("PC/SC", null, Smartcardio.PROVIDER_NAME);
 			terminals = context.terminals();
 			while(terminals.list().isEmpty()) {
-				log.debug("no PC/SC reader found");
+				log.trace("no PC/SC reader found");
 				Utils.sleep(1000);
 				terminals = context.terminals();
 			}
