@@ -25,6 +25,7 @@ import org.esupportail.esupsgcclient.task.EncodingTaskService;
 import org.esupportail.esupsgcclient.task.EsupSgcLongPollTaskService;
 import org.esupportail.esupsgcclient.task.EvolisEjectTaskService;
 import org.esupportail.esupsgcclient.task.EvolisPrintTaskService;
+import org.esupportail.esupsgcclient.task.WaitRemoveCardTaskService;
 import org.esupportail.esupsgcclient.task.WebcamUiTask;
 
 import com.github.sarxos.webcam.Webcam;
@@ -150,6 +151,8 @@ public class MainController {
 	EvolisEjectTaskService evolisEjectTaskService;
 
 	EsupSgcLongPollTaskService esupSgcLongPollTaskService;
+
+	WaitRemoveCardTaskService waitRemoveCardTaskService;
 
 	public void init(String esupNfcTagServerUrl) {
 
@@ -333,12 +336,27 @@ public class MainController {
 				encodeTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
 					@Override
 					public void handle(WorkerStateEvent t) {
-						qrCodeTaskService.restart();
+						waitRemoveCardTaskService.restart();
+					}
+				});
+				encodeTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent t) {
+						waitRemoveCardTaskService.restart();
 					}
 				});
 				encodeTaskService.start();
             }
         });
+
+		waitRemoveCardTaskService = new WaitRemoveCardTaskService();
+		waitRemoveCardTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent t) {
+				log.info("restart qrcode task ...");
+				qrCodeTaskService.restart();
+			}
+		});
 
 		esupSgcLongPollTaskService = new EsupSgcLongPollTaskService();
 		esupSgcLongPollTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -366,6 +384,12 @@ public class MainController {
 											public void handle(WorkerStateEvent t) {
 												evolisEjectTaskService = new EvolisEjectTaskService(true);
 												evolisEjectTaskService.start();
+												evolisEjectTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+													@Override
+													public void handle(WorkerStateEvent t) {
+														esupSgcLongPollTaskService.restart();
+													}
+												});
 											}
 										});
 										encodeTaskService.start();
@@ -381,8 +405,6 @@ public class MainController {
 			}
 		});
 		esupSgcLongPollTaskService.start();
-
-
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 
 		comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));

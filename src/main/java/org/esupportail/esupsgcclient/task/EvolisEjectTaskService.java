@@ -12,6 +12,7 @@ public class EvolisEjectTaskService extends Service<Void> {
 	final boolean eject4success;
 
 	public EvolisEjectTaskService(boolean eject4success) {
+		super();
 		this.eject4success = eject4success;
 	}
 
@@ -28,7 +29,7 @@ public class EvolisEjectTaskService extends Service<Void> {
 				return null;
 			}
 		};
-		return null;
+		return evolisTask;
 	}
 
 }

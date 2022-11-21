@@ -14,6 +14,7 @@ public class EvolisPrintTaskService extends Service<Void> {
 	String bmpBlackAsBase64;
 
 	public EvolisPrintTaskService(String bmpColorAsBase64, String bmpBlackAsBase64) {
+		super();
 		this.bmpColorAsBase64 = bmpColorAsBase64;
 		this.bmpBlackAsBase64 = bmpBlackAsBase64;
 	}
@@ -27,7 +28,7 @@ public class EvolisPrintTaskService extends Service<Void> {
 				return null;
 			}
 		};
-		return null;
+		return evolisTask;
 	}
 
 }
