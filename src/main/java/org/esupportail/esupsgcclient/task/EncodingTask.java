@@ -22,14 +22,12 @@ public class EncodingTask extends Task<String> {
 	private String esupNfcTagServerUrl;
 	private String numeroId;
 	private String cardId;
-	private TextArea logTextarea = new TextArea();
 	
-	public EncodingTask(String esupNfcTagServerUrl, String numeroId, String cardId, TextArea logTextarea) {
+	public EncodingTask(String esupNfcTagServerUrl, String numeroId, String cardId) {
 		super();
 		this.esupNfcTagServerUrl = esupNfcTagServerUrl;
 		this.numeroId = numeroId;
 		this.cardId = cardId;
-		this.logTextarea = logTextarea;
 	}
 
 	@Override
@@ -40,6 +38,7 @@ public class EncodingTask extends Task<String> {
 		while(true){
 			log.info("RAPDU : " + result);
 			String url = String.format("%s/desfire-ws/?result=%s&numeroId=%s&cardId=%s", esupNfcTagServerUrl, result, numeroId, cardId);
+			log.debug(url);
 			try {
 				nfcResultBean = restTemplate.getForObject(url, NfcResultBean.class);
 			} catch(HttpClientErrorException clientEx) {
@@ -52,8 +51,9 @@ public class EncodingTask extends Task<String> {
 						result = PcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
 				        Platform.runLater(new Runnable() {
 				            @Override public void run() {
-				            	logTextarea.appendText(".");
-				            	logTextarea.positionCaret(logTextarea.getLength());
+								log.info("TODO : à mettre dans logTextarea - ou progressionbar");
+				            	// logTextarea.appendText(".");
+				            	// logTextarea.positionCaret(logTextarea.getLength());
 				            }
 				        });
 					} catch (CardException e) {

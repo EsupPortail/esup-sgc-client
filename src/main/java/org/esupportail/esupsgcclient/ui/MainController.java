@@ -8,6 +8,7 @@ import java.util.Date;
 import com.github.sarxos.webcam.WebcamUtils;
 import com.github.sarxos.webcam.ds.cgt.WebcamCloseTask;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -23,6 +24,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.service.PrintEncodeLoopService;
+import org.esupportail.esupsgcclient.service.QrCodeEncodeLoopService;
+import org.esupportail.esupsgcclient.service.SgcLoopService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.task.WebcamUiTask;
@@ -42,6 +46,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import org.esupportail.esupsgcclient.utils.Utils;
 
 public class MainController {
 
@@ -136,7 +141,14 @@ public class MainController {
 
 	public static SimpleBooleanProperty authReady = new SimpleBooleanProperty();
 
-	public void init() {
+	PrintEncodeLoopService printEncodeLoopService;
+
+	QrCodeEncodeLoopService qrCodeEncodeLoopService;
+
+	public void init(String esupNfcTagServerUrl) {
+
+		nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, Utils.getMacAddress()));
+
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldWebcamName, newWebcamName) -> {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldWebcamName + " - " + newWebcamName);
 			if(options.getValue()!=null && newWebcamName!=null && !newWebcamName.equals(oldWebcamName) && (oldWebcamName!=null || webcam==null)) {
@@ -216,6 +228,7 @@ public class MainController {
 					checkNfc.getStyleClass().clear();
 					checkNfc.getStyleClass().add("btn-success");
 					addLogTextLn("INFO", "PC/SC OK");
+					startLoopServiceIfPossible();
 				} else {
 					checkNfc.getStyleClass().clear();
 					checkNfc.getStyleClass().add("btn-danger");
@@ -231,6 +244,7 @@ public class MainController {
 					checkAuth.getStyleClass().add("btn-success");
 					checkAuth.getTooltip().setText(FileLocalStorage.eppnInit);
 					addLogTextLn("INFO", "Authentification OK : " + FileLocalStorage.eppnInit);
+					startLoopServiceIfPossible();
 				} else {
 					checkAuth.getStyleClass().clear();
 					checkAuth.getStyleClass().add("btn-danger");
@@ -253,6 +267,7 @@ public class MainController {
 					// webcamImageView.setVisible(false);
 					// webcamImageView.setManaged(false);
 					// primaryStage.sizeToScene();
+					startLoopServiceIfPossible();
 				} else {
 					checkPrinter.getStyleClass().clear();
 					checkPrinter.getStyleClass().add("btn-danger");
@@ -281,6 +296,7 @@ public class MainController {
 							startWebCamStream();
 							// primaryStage.sizeToScene();
 							addLogTextLn("INFO", "Caméra OK : " + webcam);
+							startLoopServiceIfPossible();
 				} else {
 							checkCamera.getStyleClass().clear();
 							checkCamera.getStyleClass().add("btn-danger");
@@ -302,6 +318,9 @@ public class MainController {
 			}
 		});
 
+		qrCodeEncodeLoopService = new QrCodeEncodeLoopService(webcamImageView.imageProperty());
+		printEncodeLoopService = new PrintEncodeLoopService(bmpColorImageView, bmpBlackImageView);
+
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 
 		comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));
@@ -316,6 +335,25 @@ public class MainController {
 			comboBox.getSelectionModel().select(webcam.getName());
 		}
 
+	}
+
+	private void startLoopServiceIfPossible() {
+		if(authReady.getValue() && nfcReady.getValue() && webcamReady.getValue() && !qrCodeEncodeLoopService.isRunning()) {
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					qrCodeEncodeLoopService.start();
+				}
+			});
+		}
+		if(authReady.getValue() && nfcReady.getValue() && EvolisHeartbeatTask.printerReady.getValue() && !printEncodeLoopService.isRunning()) {
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					printEncodeLoopService.start();
+				}
+			});
+		}
 	}
 
 	private void startWebCamStream() {
@@ -377,8 +415,9 @@ public class MainController {
 	}
 
 	public void setOk() {
-		changeStepClientReady("Client prêt", MainController.StyleLevel.success);
-		changeTextPrincipal("En attente d'une carte...", MainController.StyleLevel.success);
+		//changeStepClientReady("Client prêt", MainController.StyleLevel.success);
+		//changeTextPrincipal("En attente d'une carte...", MainController.StyleLevel.success);
+		log.info("client ok");
 	}
 	
 	public void addLogTextLn(String type, String text) {

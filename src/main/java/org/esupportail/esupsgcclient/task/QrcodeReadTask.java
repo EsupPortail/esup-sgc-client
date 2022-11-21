@@ -15,17 +15,17 @@ import javafx.scene.image.Image;
 
 public class QrcodeReadTask extends Task<String> {
 
-	private ObjectProperty<Image> imageProperty = new SimpleObjectProperty<Image>();
+	private final ObjectProperty<Image> imageProperty;
 
-	public QrcodeReadTask(ObjectProperty<Image> imageProperty) {
-		super();
+	public QrcodeReadTask(final ObjectProperty<Image> imageProperty) {
 		this.imageProperty = imageProperty;
 	}
 
 	@Override
 	protected String call() throws Exception {
-		String qrcode;
+		String qrcode = null;
 		while (true) {
+			if (isCancelled()) break;
 			BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(imageProperty.get(), null);
 			qrcode = QRCodeReader.readQrCode(webcamBufferedImage);
 			if(webcamBufferedImage != null) {

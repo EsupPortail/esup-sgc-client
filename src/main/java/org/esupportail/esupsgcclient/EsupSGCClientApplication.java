@@ -12,8 +12,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.VBox;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.service.QrCodeEncodeLoopService;
+import org.esupportail.esupsgcclient.service.SgcLoopService;
 import org.esupportail.esupsgcclient.service.pcsc.InitEncodingServiceTask;
-import org.esupportail.esupsgcclient.service.MainLoopService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
@@ -28,9 +29,7 @@ import javafx.stage.Stage;
 public class EsupSGCClientApplication extends Application {
 
 	private final static Logger log = Logger.getLogger(EsupSGCClientApplication.class);
-
 	public static MainController mainPane;
-	private static MainLoopService mainService;
 	public static String esupNfcTagServerUrl;
 	public static String esupSgcUrl;
 	public static boolean encodeCnous;
@@ -67,26 +66,12 @@ public class EsupSGCClientApplication extends Application {
 
 		mainPane = fxmlLoader.getController();
 		mainPane.primaryStage = primaryStage;
-		mainPane.init();
+		mainPane.init(esupNfcTagServerUrl);
 		mainPane.changeTextPrincipal("Chargement...", MainController.StyleLevel.primary);
 
 		primaryStage.setOnCloseRequest(we -> stop());
-		
-		mainPane.nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, getMacAddress()));
-
-		mainService = new MainLoopService(mainPane);
 
 		FileLocalStorage.setAuthReady(mainPane.authReady);
-
-		mainPane.nfcReady.addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-				if(newValue) {
-					mainPane.setOk();
-					mainService.start();
-				}
-			}
-		});
 
 		InitEncodingServiceTask clientCheckService = new InitEncodingServiceTask(mainPane);
 		Thread clientCheckThread = new Thread(clientCheckService);
@@ -106,33 +91,5 @@ public class EsupSGCClientApplication extends Application {
 		System.exit(0);
 	}
 
-    private static String getMacAddress() {
-    	Enumeration<NetworkInterface> netInts = null;
-    	try {
-			netInts = NetworkInterface.getNetworkInterfaces();
-		} catch (SocketException e1) {
-			log.error("error get network int list");
-		}
-    	final StringBuilder sb = new StringBuilder();
-		while(true) {
-			byte[] mac = null;
-			try {
-				NetworkInterface netInf = netInts.nextElement();
-				mac = netInf.getHardwareAddress();
-				if(mac != null) {
-					if(mac.length>0) {
-				    	for (int i = 0; i < mac.length; i++) {
-				    	        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? ":" : ""));
-				    	}	
-			    		break;
-					}
-		    	}
-			} catch (Exception e) {
-				log.error("mac address read error");
-			}
-
-		}
-		return sb.toString();
-	}
     
 }

@@ -2,6 +2,7 @@ package org.esupportail.esupsgcclient.service.pcsc;
 
 import javafx.application.Platform;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.EsupSGCClientApplication;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.ui.MainController;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -32,8 +33,8 @@ public class InitEncodingServiceTask extends Task<Void> {
                 mainPane.hideCnousSteps();
             }
 
-            mainPane.addLogTextLn("INFO", "numeroId = " + EncodingService.getNumeroId());
-            mainPane.addLogTextLn("INFO", "sgcAuthToken = " + EncodingService.getSgcAuthToken());
+            mainPane.addLogTextLn("INFO", "numeroId = " + EsupSGCClientApplication.numeroId);
+            mainPane.addLogTextLn("INFO", "sgcAuthToken = " + EsupSGCClientApplication.sgcAuthToken);
             mainPane.addLogTextLn("INFO", "esupNfcTagServerUrl = " + EncodingService.getEsupNfcTagServerUrl());
             mainPane.addLogTextLn("INFO", "sgcUrl = " + EncodingService.getSgcUrl());
             mainPane.nfcReady.setValue(true);

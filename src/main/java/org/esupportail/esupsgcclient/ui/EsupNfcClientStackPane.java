@@ -97,6 +97,7 @@ public class EsupNfcClientStackPane extends StackPane {
             authType = window.getMember("authType").toString();
             if (numeroId != null && !numeroId.equals("") && !"undefined".equals(numeroId)) {
                 FileLocalStorage.setItem("numeroId", numeroId);
+                EsupSGCClientApplication.numeroId = numeroId;
             }
             if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken)) {
                 FileLocalStorage.setItem("sgcAuthToken", sgcAuthToken);
