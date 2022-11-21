@@ -1,22 +1,14 @@
 package org.esupportail.esupsgcclient;
 
 import java.io.IOException;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.Properties;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.VBox;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.service.QrCodeEncodeLoopService;
-import org.esupportail.esupsgcclient.service.SgcLoopService;
 import org.esupportail.esupsgcclient.service.pcsc.InitEncodingServiceTask;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
-import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.ui.MainController;
 import org.springframework.core.io.ClassPathResource;

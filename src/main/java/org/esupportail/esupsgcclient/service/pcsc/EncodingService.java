@@ -26,8 +26,9 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 public class EncodingService {
-
 	private final static Logger log = Logger.getLogger(EncodingService.class);
+
+	public enum BmpType {color, black};
 	private static RestTemplate restTemplate =  new RestTemplate(Utils.clientHttpRequestFactory());
 	private static boolean encodeCnous = false;
 	private static String pathToExe = "c:\\cnousApi\\";
@@ -108,14 +109,8 @@ public class EncodingService {
 		}
 	}
 
-	public static String getBmpColorAsBase64(String qrcode) {
-		String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=color", esupSgcUrl, EsupSGCClientApplication.sgcAuthToken, qrcode);
-		String bmpAsBase64 = restTemplate.getForObject(bpmEsupSgcUrl, String.class);
-		return bmpAsBase64;
-	}
-
-	public static String gatBmpBlackAsBase64(String qrcode) {
-		String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=black", esupSgcUrl, EsupSGCClientApplication.sgcAuthToken, qrcode);
+	public static String getBmpAsBase64(String qrcode, BmpType bmpType) {
+		String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=%s", esupSgcUrl, EsupSGCClientApplication.sgcAuthToken, qrcode, bmpType);
 		String bmpAsBase64 = restTemplate.getForObject(bpmEsupSgcUrl, String.class);
 		return bmpAsBase64;
 	}

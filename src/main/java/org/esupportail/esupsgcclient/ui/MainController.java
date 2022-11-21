@@ -5,30 +5,26 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import com.github.sarxos.webcam.WebcamUtils;
-import com.github.sarxos.webcam.ds.cgt.WebcamCloseTask;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.service.PrintEncodeLoopService;
-import org.esupportail.esupsgcclient.service.QrCodeEncodeLoopService;
-import org.esupportail.esupsgcclient.service.SgcLoopService;
+import org.esupportail.esupsgcclient.service.CnousEncodingTaskService;
+import org.esupportail.esupsgcclient.service.EsupSgcGetBmpTaskService;
+import org.esupportail.esupsgcclient.service.QrCodeTaskService;
+import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
+import org.esupportail.esupsgcclient.task.EncodingTaskService;
+import org.esupportail.esupsgcclient.task.EsupSgcLongPollTaskService;
+import org.esupportail.esupsgcclient.task.EvolisEjectTaskService;
+import org.esupportail.esupsgcclient.task.EvolisPrintTaskService;
 import org.esupportail.esupsgcclient.task.WebcamUiTask;
 
 import com.github.sarxos.webcam.Webcam;
@@ -141,9 +137,19 @@ public class MainController {
 
 	public static SimpleBooleanProperty authReady = new SimpleBooleanProperty();
 
-	PrintEncodeLoopService printEncodeLoopService;
+	EsupSgcGetBmpTaskService esupSgcGetBmpColorTaskService;
 
-	QrCodeEncodeLoopService qrCodeEncodeLoopService;
+	EsupSgcGetBmpTaskService esupSgcGetBmpBlackTaskService;
+
+	QrCodeTaskService qrCodeTaskService;
+
+	EncodingTaskService encodeTaskService;
+
+	EvolisPrintTaskService evolisPrintTaskService;
+
+	EvolisEjectTaskService evolisEjectTaskService;
+
+	EsupSgcLongPollTaskService esupSgcLongPollTaskService;
 
 	public void init(String esupNfcTagServerUrl) {
 
@@ -318,8 +324,64 @@ public class MainController {
 			}
 		});
 
-		qrCodeEncodeLoopService = new QrCodeEncodeLoopService(webcamImageView.imageProperty());
-		printEncodeLoopService = new PrintEncodeLoopService(bmpColorImageView, bmpBlackImageView);
+		qrCodeTaskService = new QrCodeTaskService(webcamImageView.imageProperty());
+		qrCodeTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+                String qrcode = qrCodeTaskService.getValue();
+				encodeTaskService = new EncodingTaskService(qrcode);
+				encodeTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent t) {
+						qrCodeTaskService.restart();
+					}
+				});
+				encodeTaskService.start();
+            }
+        });
+
+		esupSgcLongPollTaskService = new EsupSgcLongPollTaskService();
+		esupSgcLongPollTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent t) {
+				String qrcode = esupSgcLongPollTaskService.getValue();
+				esupSgcGetBmpColorTaskService = new EsupSgcGetBmpTaskService(qrcode, EncodingService.BmpType.color, bmpColorImageView);
+				esupSgcGetBmpColorTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent t) {
+						String qrcode = esupSgcLongPollTaskService.getValue();
+						esupSgcGetBmpBlackTaskService = new EsupSgcGetBmpTaskService(qrcode, EncodingService.BmpType.black, bmpBlackImageView);
+						esupSgcGetBmpBlackTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+							@Override
+							public void handle(WorkerStateEvent t) {
+								String bmpColorImageView = esupSgcGetBmpColorTaskService.getValue();
+								String bmpBlackImageView = esupSgcGetBmpBlackTaskService.getValue();
+								evolisPrintTaskService = new EvolisPrintTaskService(bmpColorImageView, bmpBlackImageView);
+								evolisPrintTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+									@Override
+									public void handle(WorkerStateEvent t) {
+										encodeTaskService = new EncodingTaskService(qrcode);
+										encodeTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+											@Override
+											public void handle(WorkerStateEvent t) {
+												evolisEjectTaskService = new EvolisEjectTaskService(true);
+												evolisEjectTaskService.start();
+											}
+										});
+										encodeTaskService.start();
+									}
+								});
+								evolisPrintTaskService.start();
+							}
+						});
+						esupSgcGetBmpBlackTaskService.start();
+					}
+				});
+				esupSgcGetBmpColorTaskService.start();
+			}
+		});
+		esupSgcLongPollTaskService.start();
+
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 
@@ -338,19 +400,19 @@ public class MainController {
 	}
 
 	private void startLoopServiceIfPossible() {
-		if(authReady.getValue() && nfcReady.getValue() && webcamReady.getValue() && !qrCodeEncodeLoopService.isRunning()) {
+		if(authReady.getValue() && nfcReady.getValue() && webcamReady.getValue() && !qrCodeTaskService.isRunning()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					qrCodeEncodeLoopService.start();
+					qrCodeTaskService.start();
 				}
 			});
 		}
-		if(authReady.getValue() && nfcReady.getValue() && EvolisHeartbeatTask.printerReady.getValue() && !printEncodeLoopService.isRunning()) {
+		if(authReady.getValue() && nfcReady.getValue() && EvolisHeartbeatTask.printerReady.getValue() && !esupSgcLongPollTaskService.isRunning()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					printEncodeLoopService.start();
+					esupSgcLongPollTaskService.start();
 				}
 			});
 		}
