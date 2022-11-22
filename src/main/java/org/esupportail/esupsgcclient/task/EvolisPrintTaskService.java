@@ -24,6 +24,7 @@ public class EvolisPrintTaskService extends Service<Void> {
 		Task<Void> evolisTask = new Task<Void>() {
 			@Override
 			protected Void call() throws Exception {
+				updateTitle("Impression de la carte");
 				EvolisPrinterService.print(bmpColorAsBase64, bmpBlackAsBase64, "todo");
 				return null;
 			}

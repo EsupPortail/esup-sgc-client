@@ -289,15 +289,18 @@ public class MainController {
 				encodeTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
 					@Override
 					public void handle(WorkerStateEvent t) {
+						textPrincipal.textProperty().bind(waitRemoveCardTaskService.titleProperty());
 						waitRemoveCardTaskService.restart();
 					}
 				});
 				encodeTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 					@Override
 					public void handle(WorkerStateEvent t) {
+						textPrincipal.textProperty().bind(waitRemoveCardTaskService.titleProperty());
 						waitRemoveCardTaskService.restart();
 					}
 				});
+				textPrincipal.textProperty().bind(encodeTaskService.titleProperty());
 				encodeTaskService.start();
             }
         });
@@ -307,6 +310,7 @@ public class MainController {
 			@Override
 			public void handle(WorkerStateEvent t) {
 				log.info("restart qrcode task ...");
+				textPrincipal.textProperty().bind(qrCodeTaskService.titleProperty());
 				qrCodeTaskService.restart();
 			}
 		});
@@ -340,23 +344,29 @@ public class MainController {
 												evolisEjectTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 													@Override
 													public void handle(WorkerStateEvent t) {
+														textPrincipal.textProperty().bind(esupSgcLongPollTaskService.titleProperty());
 														esupSgcLongPollTaskService.restart();
 													}
 												});
 											}
 										});
+										textPrincipal.textProperty().bind(encodeTaskService.titleProperty());
 										encodeTaskService.start();
 									}
 								});
+								textPrincipal.textProperty().bind(evolisPrintTaskService.titleProperty());
 								evolisPrintTaskService.start();
 							}
 						});
+						textPrincipal.textProperty().bind(esupSgcGetBmpBlackTaskService.titleProperty());
 						esupSgcGetBmpBlackTaskService.start();
 					}
 				});
+				textPrincipal.textProperty().bind(esupSgcGetBmpColorTaskService.titleProperty());
 				esupSgcGetBmpColorTaskService.start();
 			}
 		});
+		textPrincipal.textProperty().bind(esupSgcLongPollTaskService.titleProperty());
 		esupSgcLongPollTaskService.start();
 
 		comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));
@@ -383,6 +393,7 @@ public class MainController {
 				@Override
 				public void run() {
 					if(!qrCodeTaskService.isRunning()){
+						textPrincipal.textProperty().bind(qrCodeTaskService.titleProperty());
 						qrCodeTaskService.start();
 					}
 				}
@@ -393,6 +404,7 @@ public class MainController {
 				@Override
 				public void run() {
 					if(!esupSgcLongPollTaskService.isRunning()) {
+						textPrincipal.textProperty().bind(esupSgcLongPollTaskService.titleProperty());
 						esupSgcLongPollTaskService.start();
 					}
 				}

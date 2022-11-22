@@ -44,10 +44,6 @@ public class EsupSGCClientApplication extends Application {
 		
 		primaryStage.setTitle("Esup-SGC-Client");
 
-		primaryStage.setOnCloseRequest(event -> {
-			System.exit(0);
-		});
-
 		URL fxmlUrl = this.getClass().getClassLoader().getResource("esup-sgc-client.fxml");
 		FXMLLoader fxmlLoader = new FXMLLoader(fxmlUrl);
 		VBox root = fxmlLoader.load();
@@ -58,12 +54,8 @@ public class EsupSGCClientApplication extends Application {
 		mainPane = fxmlLoader.getController();
 		mainPane.primaryStage = primaryStage;
 		mainPane.init(esupNfcTagServerUrl);
-		mainPane.changeTextPrincipal("Chargement...", MainController.StyleLevel.primary);
-
-		primaryStage.setOnCloseRequest(we -> stop());
 
 		FileLocalStorage.setAuthReady(mainPane.authReady);
-
 		InitEncodingServiceTask clientCheckService = new InitEncodingServiceTask(mainPane);
 		Thread clientCheckThread = new Thread(clientCheckService);
 		clientCheckThread.setDaemon(true);
@@ -75,11 +67,5 @@ public class EsupSGCClientApplication extends Application {
 		evolisCheckThread.start();
 		
 	}
-	
-	@Override
-	public void stop(){
-		System.exit(0);
-	}
-
     
 }

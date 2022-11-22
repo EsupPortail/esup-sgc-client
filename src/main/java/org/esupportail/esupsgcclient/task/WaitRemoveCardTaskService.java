@@ -13,8 +13,10 @@ public class WaitRemoveCardTaskService extends Service<Void> {
 			@Override
 			protected Void call() throws Exception {
 				while (!EncodingService.pcscCardOnTerminal()) {
+					updateTitle("Merci de retirer cette carte");
 					Utils.sleep(1000);
 				}
+				updateTitle("Carte retirée");
 				return null;
 			}
 		};

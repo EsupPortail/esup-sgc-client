@@ -30,6 +30,7 @@ public class QrCodeTaskService extends Service<String> {
 			protected String call() throws Exception {
 				String qrcode = null;
 				while (true) {
+					updateTitle("En attente d'une carte ...");
 					if (isCancelled()) break;
 					BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(imageProperty.get(), null);
 					qrcode = QRCodeReader.readQrCode(webcamBufferedImage);

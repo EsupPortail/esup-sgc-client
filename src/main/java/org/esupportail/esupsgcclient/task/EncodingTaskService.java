@@ -29,6 +29,7 @@ public class EncodingTaskService extends Service<String> {
         Task<String> encodingTask = new Task<String>() {
             @Override
             protected String call() throws Exception {
+                updateTitle("Encodage de la carte");
                 EncodingService.pcscConnection();
                 String csn = EncodingService.readCsn();
                 EncodingService.checkBeforeEncoding(qrcode, csn);

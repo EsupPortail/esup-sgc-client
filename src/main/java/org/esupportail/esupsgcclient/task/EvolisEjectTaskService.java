@@ -21,6 +21,7 @@ public class EvolisEjectTaskService extends Service<Void> {
 		Task<Void> evolisTask = new Task<Void>() {
 			@Override
 			protected Void call() throws Exception {
+				updateTitle("Ejection de la carte");
 				if(eject4success) {
 					EvolisPrinterService.eject();
 				} else {
