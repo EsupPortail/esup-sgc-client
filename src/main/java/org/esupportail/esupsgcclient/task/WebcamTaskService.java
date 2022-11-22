@@ -40,6 +40,7 @@ public class WebcamTaskService extends Service<Void> {
                 webcamImageView.setRotate(180);
                 BufferedImage webcamBufferedImage = null;
                 BufferedImage newWebcamBufferedImage = null;
+                MainController.webcamReady.set(true);
                 while (true) {
                     try {
                         if(this.isCancelled()) {

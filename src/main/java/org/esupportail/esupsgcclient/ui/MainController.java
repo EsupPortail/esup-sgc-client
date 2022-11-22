@@ -388,11 +388,13 @@ public class MainController {
 				}
 			});
 		}
-		if(authReady.getValue() && nfcReady.getValue() && EvolisHeartbeatTask.printerReady.getValue() && !esupSgcLongPollTaskService.isRunning()) {
+		if(authReady.getValue() && nfcReady.getValue() && EvolisHeartbeatTask.printerReady.getValue()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					esupSgcLongPollTaskService.start();
+					if(!esupSgcLongPollTaskService.isRunning()) {
+						esupSgcLongPollTaskService.start();
+					}
 				}
 			});
 		}
