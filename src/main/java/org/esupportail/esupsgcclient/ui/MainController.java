@@ -294,6 +294,22 @@ public class MainController {
 				}
 			}
 		});
+		esupSgcTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent t) {
+				if(RootType.qrcode.equals(rootType)) {
+					WaitRemoveCardTaskService waitRemoveCardTaskService = new WaitRemoveCardTaskService();
+					setupFlowEsupSgcTaskService(waitRemoveCardTaskService, rootType);
+				} else if(RootType.evolis.equals(rootType)) {
+					EvolisEjectTaskService evolisEjectTaskService = new EvolisEjectTaskService(false);
+					setupFlowEsupSgcTaskService(evolisEjectTaskService, rootType);
+				}
+				if(esupSgcTaskService.getException() != null) {
+					logTextarea.appendText(esupSgcTaskService.getException().getMessage());
+				}
+			}
+		});
+
 		textPrincipal.textProperty().bind(esupSgcTaskService.titleProperty());
 		esupSgcTaskService.restart();
 	}
