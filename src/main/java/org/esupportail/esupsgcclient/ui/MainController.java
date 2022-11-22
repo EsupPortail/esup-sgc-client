@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
@@ -119,6 +120,9 @@ public class MainController {
 
 	@FXML
 	public ImageView bmpColorImageView;
+
+	@FXML
+	private ProgressBar progressBar;
 
 	private String lastText = null;
 
@@ -297,6 +301,7 @@ public class MainController {
 		esupSgcTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent t) {
+				log.error("Exception when procressing card ...", esupSgcTaskService.getException());
 				if(RootType.qrcode.equals(rootType)) {
 					WaitRemoveCardTaskService waitRemoveCardTaskService = new WaitRemoveCardTaskService();
 					setupFlowEsupSgcTaskService(waitRemoveCardTaskService, rootType);
@@ -304,13 +309,14 @@ public class MainController {
 					EvolisEjectTaskService evolisEjectTaskService = new EvolisEjectTaskService(false);
 					setupFlowEsupSgcTaskService(evolisEjectTaskService, rootType);
 				}
-				if(esupSgcTaskService.getException() != null) {
+				if(esupSgcTaskService.getException() != null && esupSgcTaskService.getException().getMessage()!=null) {
 					logTextarea.appendText(esupSgcTaskService.getException().getMessage());
 				}
 			}
 		});
 
 		textPrincipal.textProperty().bind(esupSgcTaskService.titleProperty());
+		progressBar.progressProperty().bind(esupSgcTaskService.progressProperty());
 		esupSgcTaskService.restart();
 	}
 
@@ -327,10 +333,13 @@ public class MainController {
 	}
 
 	private void startLoopServiceIfPossible() {
-		if(authReady.getValue() && nfcReady.getValue() && webcamReady.getValue()) {
+		if(authReady.getValue() && nfcReady.getValue() && webcamReady.getValue() && false) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
+					if(qrCodeTaskService!=null && qrCodeTaskService.isRunning()) {
+						qrCodeTaskService.cancel();
+					}
 					qrCodeTaskService = new QrCodeTaskService(webcamImageView.imageProperty());
 					setupFlowEsupSgcTaskService(qrCodeTaskService, RootType.qrcode);
 				}
@@ -340,6 +349,9 @@ public class MainController {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
+					if(esupSgcLongPollTaskService!=null && esupSgcLongPollTaskService.isRunning()) {
+						esupSgcLongPollTaskService.cancel();
+					}
 					esupSgcLongPollTaskService = new EsupSgcLongPollTaskService(bmpBlackImageView, bmpColorImageView);
 					setupFlowEsupSgcTaskService(esupSgcLongPollTaskService, RootType.evolis);
 				}

@@ -27,6 +27,7 @@ public class EvolisPrintTaskService extends EsupSgcTaskService<Void> {
 			protected Void call() throws Exception {
 				updateTitle("Impression de la carte");
 				EvolisPrinterService.print(bmpColorAsBase64, bmpBlackAsBase64, "todo");
+				updateTitle("Impression de la carte OK");
 				return null;
 			}
 		};

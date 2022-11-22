@@ -52,7 +52,7 @@
                               <FlowPane prefHeight="42.0" prefWidth="631.0" styleClass="panel-heading">
                                  <children>
                                     <Label fx:id="title" text="Status : " />
-                                    <Label fx:id="textPrincipal" styleClass="text-success"/>
+                                    <Label fx:id="textPrincipal" styleClass="text-success" />
                                  </children>
                               </FlowPane>
                               <FlowPane orientation="VERTICAL" prefHeight="238.0" prefWidth="415.0" styleClass="panel-body">
@@ -139,7 +139,7 @@
                               </FlowPane>
                            </children>
                         </FlowPane>
-                        <ProgressBar prefHeight="20.0" prefWidth="630.0" progress="0.0" />
+                        <ProgressBar fx:id="progressBar" prefHeight="20.0" prefWidth="630.0" progress="0.0" />
                         <TextArea fx:id="logTextarea" prefHeight="316.0" prefWidth="628.0" />
                      </children>
                   </FlowPane>

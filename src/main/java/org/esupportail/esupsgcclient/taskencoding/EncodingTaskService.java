@@ -12,6 +12,7 @@ import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import org.esupportail.esupsgcclient.utils.Utils;
 
 public class EncodingTaskService extends EsupSgcTaskService<String> {
     private final static Logger log = Logger.getLogger(EncodingTaskService.class);
@@ -31,8 +32,14 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
         Task<String> encodingTask = new Task<String>() {
             @Override
             protected String call() throws Exception {
-                updateTitle("Encodage de la carte");
+                updateTitle("Connexion au terminal NFC");
                 EncodingService.pcscConnection();
+                updateTitle("Attente de la carte sur le lecteur NFC");
+                while(!EncodingService.pcscCardOnTerminal()) {
+                    log.info("Attente de la carte sur le lecteur NFC");
+                    Utils.sleep(200);
+                }
+                updateTitle("Encodage de la carte");
                 String csn = EncodingService.readCsn();
                 EncodingService.checkBeforeEncoding(qrcode, csn);
                 log.info("Encoding : Start");
@@ -45,14 +52,7 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
                         if (!"END".equals(nfcResultBean.getFullApdu())) {
                             try {
                                 result = PcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
-                                Platform.runLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // TODO ...
-                                        // logTextarea.appendText(".");
-                                        // logTextarea.positionCaret(logTextarea.getLength());
-                                    }
-                                });
+                                //updateProgress((long)this.getProgress()+1, (long)this.getTotalWork()+1);
                             } catch (CardException e) {
                                 throw new PcscException("pcsc send apdu error", e);
                             }
