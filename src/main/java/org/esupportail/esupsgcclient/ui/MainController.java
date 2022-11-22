@@ -42,6 +42,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import org.esupportail.esupsgcclient.taskencoding.WaitTaskService;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 public class MainController {
@@ -277,6 +278,12 @@ public class MainController {
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		Webcam.getWebcams(); // with this webcams are discovered and mistener works at startup
+
+		/* just for testing ...
+		WaitTaskService waitTaskService = new WaitTaskService();
+		setupFlowEsupSgcTaskService(waitTaskService, null);
+		*/
+
 	}
 	/*
 		Permet de mettre en oeuvre un flow (circulaire) de tâches

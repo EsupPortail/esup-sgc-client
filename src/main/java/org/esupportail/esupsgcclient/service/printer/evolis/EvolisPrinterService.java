@@ -85,14 +85,30 @@ public class EvolisPrinterService {
 		log.debug("Response : {}", response);
 	}
 
-	public static void print(String bmpColorAsBase64, String bmpBlackAsBase64, String bmpVarnishAsBase64) {
+	public static void insertCard() {
 		sendRequestAndLog(EvolisPrinterCommands.insertCard());
+	}
+
+	public static void printFrontColorBmp(String bmpColorAsBase64) {
 		sendRequestAndLog(EvolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
+	}
+
+	public static void printFrontBlackBmp(String bmpBlackAsBase64) {
 		sendRequestAndLog(EvolisPrinterCommands.printFrontBlackBmp(bmpBlackAsBase64));
+	}
+
+	public static void printFrontVarnish(String bmpVarnishAsBase64) {
 		sendRequestAndLog(EvolisPrinterCommands.printFrontVarnish(bmpVarnishAsBase64));
+	}
+
+	public static void print() {
 		sendRequestAndLog(EvolisPrinterCommands.print());
+	}
+
+	public static void insertCardToContactLessStation() {
 		sendRequestAndLog(EvolisPrinterCommands.insertCardToContactLessStation());
 	}
+
 
 	public static void eject() {
 		sendRequestAndLog(EvolisPrinterCommands.eject());

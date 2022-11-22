@@ -16,6 +16,8 @@ public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 
 	private final static Logger log = Logger.getLogger(EsupSgcLongPollTaskService.class);
 
+	static long lastRunTime = 100000;
+
 	RestTemplate restTemplate;
 
 	ImageView bmpBlackImageView;
@@ -38,16 +40,15 @@ public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 			@Override
 			protected String call() throws Exception {
 				updateTitle("En attente...");
-				updateProgress(0, 8);
+				updateProgress(1, 2);
 				while (true) {
 					String sgcAuthToken = EsupNfcClientStackPane.sgcAuthToken;
 					if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken) && EvolisPrinterService.initSocket(false)) {
 						try {
 							log.debug("Call " + EncodingService.esupSgcUrl + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken);
 							String qrcode = restTemplate.getForObject(EncodingService.esupSgcUrl + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken, String.class);
-							updateProgress(1, 8);
 							if (qrcode != null) {
-								updateProgress(2, 8);
+								updateProgress(2, 2);
 								return qrcode;
 							}
 						} catch (ResourceAccessException e) {

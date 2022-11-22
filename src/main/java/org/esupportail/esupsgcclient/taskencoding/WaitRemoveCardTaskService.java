@@ -7,6 +7,8 @@ import javafx.concurrent.Task;
 
 public class WaitRemoveCardTaskService extends EsupSgcTaskService<Void> {
 
+	static long lastRunTime = 100000;
+
 	protected Task<Void> createTask() {
 		Task<Void> waitRemoveCardTask = new Task<Void>() {
 			@Override

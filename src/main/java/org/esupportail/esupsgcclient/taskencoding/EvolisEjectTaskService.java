@@ -20,12 +20,14 @@ public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 		Task<Void> evolisTask = new Task<Void>() {
 			@Override
 			protected Void call() throws Exception {
+				updateProgress(1, 2);
 				updateTitle("Ejection de la carte");
 				if(eject4success) {
 					EvolisPrinterService.eject();
 				} else {
 					EvolisPrinterService.reject();
 				}
+				updateProgress(2, 2);
 				return null;
 			}
 		};

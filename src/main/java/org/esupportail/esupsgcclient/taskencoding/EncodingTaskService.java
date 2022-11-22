@@ -15,7 +15,11 @@ import javafx.concurrent.Task;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 public class EncodingTaskService extends EsupSgcTaskService<String> {
+
     private final static Logger log = Logger.getLogger(EncodingTaskService.class);
+
+    static long lastRunTime = 5000;
+
     private String qrcode;
 
     private boolean fromPrinter;
@@ -32,6 +36,9 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
         Task<String> encodingTask = new Task<String>() {
             @Override
             protected String call() throws Exception {
+                long start = System.currentTimeMillis();
+                long t;
+                updateProgress(1, 10);
                 updateTitle("Connexion au terminal NFC");
                 EncodingService.pcscConnection();
                 updateTitle("Attente de la carte sur le lecteur NFC");
@@ -45,6 +52,8 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
                 log.info("Encoding : Start");
                 String result = "";
                 while (true) {
+                    t = System.currentTimeMillis() - start;
+                    updateProgress(t, Math.max(lastRunTime-1000, t));
                     log.info("RAPDU : " + result);
                     NfcResultBean nfcResultBean = EsupNgcTagService.getApdu(csn, result);
                     log.info("SAPDU : " + nfcResultBean.getFullApdu());
@@ -58,6 +67,7 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
                             }
                         } else {
                             log.info("Encoding  : OK");
+                            lastRunTime = t;
                             return nfcResultBean.getFullApdu();
                         }
                     } else {

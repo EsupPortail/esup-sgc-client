@@ -28,16 +28,16 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 		Task<String> qrcodeEncodeTask = new Task<String>() {
 			@Override
 			protected String call() throws Exception {
+				updateProgress(1, 2);
 				String qrcode = null;
 				while (true) {
 					updateTitle("En attente...");
-					updateProgress(1, 8);
 					if (isCancelled()) break;
 					BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(imageProperty.get(), null);
 					qrcode = QRCodeReader.readQrCode(webcamBufferedImage);
 					if(webcamBufferedImage != null) {
 						if (qrcode != null) {
-							updateProgress(2, 8);
+							updateProgress(2, 2);
 							break;
 						}
 					} else {

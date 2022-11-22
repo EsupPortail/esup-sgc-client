@@ -42,9 +42,11 @@ public class EsupSgcGetBmpTaskService extends EsupSgcTaskService<String> {
 		Task<String> esupSgcGetBmpTask = new Task<String>() {
 			@Override
 			protected String call() throws Exception {
+				updateProgress(1,2);
 				updateTitle("Récupération de la partie " + (bmpType.equals(EncodingService.BmpType.black) ? "N/B" : "Couleur") + " de la carte");
 				String bmpAsBase64 = EncodingService.getBmpAsBase64(qrcode, bmpType);
 
+				updateProgress(2,2);
 				// TODO :: do this block outside this thread ?
 				byte[] bmp = Base64.getDecoder().decode(bmpAsBase64.getBytes());
 				BufferedImage input_image = ImageIO.read(new ByteArrayInputStream(bmp)); //
