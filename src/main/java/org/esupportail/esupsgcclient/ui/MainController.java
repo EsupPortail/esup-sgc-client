@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -15,7 +16,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.service.CnousEncodingTaskService;
 import org.esupportail.esupsgcclient.service.EsupSgcGetBmpTaskService;
 import org.esupportail.esupsgcclient.service.QrCodeTaskService;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
@@ -26,14 +26,13 @@ import org.esupportail.esupsgcclient.task.EsupSgcLongPollTaskService;
 import org.esupportail.esupsgcclient.task.EvolisEjectTaskService;
 import org.esupportail.esupsgcclient.task.EvolisPrintTaskService;
 import org.esupportail.esupsgcclient.task.WaitRemoveCardTaskService;
-import org.esupportail.esupsgcclient.task.WebcamUiTask;
+import org.esupportail.esupsgcclient.task.WebcamTaskService;
 
 import com.github.sarxos.webcam.Webcam;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -50,8 +49,6 @@ public class MainController {
 	final static Logger log = Logger.getLogger(MainController.class);
 
 	public enum StyleLevel {success, danger, warning, primary, info};
-
-	private Thread threadWebcamStream = null;
 
 	public Stage primaryStage;
 
@@ -127,8 +124,6 @@ public class MainController {
 	private String lastText = null;
 
 	public ObjectProperty<Image> imageProperty;
-	
-	public Webcam webcam = null;
 
 	private BufferedImage webcamBufferedImage;
 
@@ -137,6 +132,8 @@ public class MainController {
 	public SimpleBooleanProperty nfcReady = new SimpleBooleanProperty();
 
 	public static SimpleBooleanProperty authReady = new SimpleBooleanProperty();
+
+	WebcamTaskService webcamTaskService;
 
 	EsupSgcGetBmpTaskService esupSgcGetBmpColorTaskService;
 
@@ -155,45 +152,16 @@ public class MainController {
 	WaitRemoveCardTaskService waitRemoveCardTaskService;
 
 	public void init(String esupNfcTagServerUrl) {
-
 		nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, Utils.getMacAddress()));
-
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldWebcamName, newWebcamName) -> {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldWebcamName + " - " + newWebcamName);
-			if(options.getValue()!=null && newWebcamName!=null && !newWebcamName.equals(oldWebcamName) && (oldWebcamName!=null || webcam==null)) {
-					 Thread t = new Thread(() -> {
-						synchronized (newWebcamName) {
-							Webcam newWebcam = Webcam.getWebcamByName(newWebcamName);
-								if (webcam != null && webcam.isOpen()) {
-									webcam.close();
-								}
-								if (!newWebcam.isOpen()) {
-									try {
-										newWebcam.open();
-									} catch(Exception e) {
-										log.warn("can't start camera", e);
-									}
-								}
-								if (!newWebcam.getLock().isLocked()) {
-									newWebcam.getLock().unlock();
-								}
-								webcam = newWebcam;
-								checkCamera.getTooltip().setText(webcam.getName());
-								webcamImageView.imageProperty().unbind();
-								threadWebcamStream.interrupt();
-								webcamReady.set(webcam.isOpen());
-							}
-					});
-					 t.start();
-				try {
-					t.join(1000);
-				} catch (InterruptedException e) {
-					log.error(e);
+			if(options.getValue()!=null && newWebcamName!=null && !newWebcamName.equals(oldWebcamName)) {
+				if(webcamTaskService != null && webcamTaskService.isRunning()) {
+					webcamTaskService.cancel();
 				}
-				if (t.isAlive()) {
-					log.warn("can't start webcam " + newWebcamName);
-					t.interrupt();
-				}
+				webcamTaskService = new WebcamTaskService(newWebcamName, webcamImageView);
+				webcamTaskService.start();
+				checkCamera.getTooltip().setText(newWebcamName);
 			}
 		});
 
@@ -288,28 +256,16 @@ public class MainController {
 		webcamReady.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-				if(threadWebcamStream!=null && threadWebcamStream.isAlive()) {
-					threadWebcamStream.interrupt();
-				}
 				if(newValue) {
-							log.info("restart with webcam " + webcam);
-							checkCamera.getStyleClass().clear();
-							checkCamera.getStyleClass().add("btn-success");
-							webcamImageView.setVisible(true);
-							webcamImageView.setManaged(true);
-							// bmpBlackImageView.setVisible(false);
-							// bmpBlackImageView.setManaged(false);
-							// bmpColorImageView.setVisible(false);
-							// bmpColorImageView.setManaged(false);
-							checkCamera.getTooltip().setText(webcam.getName());
-							startWebCamStream();
-							// primaryStage.sizeToScene();
-							addLogTextLn("INFO", "Caméra OK : " + webcam);
-							startLoopServiceIfPossible();
+					checkCamera.getStyleClass().clear();
+					checkCamera.getStyleClass().add("btn-success");
+					webcamImageView.setVisible(true);
+					webcamImageView.setManaged(true);
+					startLoopServiceIfPossible();
 				} else {
-							checkCamera.getStyleClass().clear();
-							checkCamera.getStyleClass().add("btn-danger");
-							addLogTextLn("ERROR", "Caméra déconnectée ?!");
+					checkCamera.getStyleClass().clear();
+					checkCamera.getStyleClass().add("btn-danger");
+					addLogTextLn("ERROR", "Caméra déconnectée ?!");
 				}
 				Platform.runLater(new Runnable() {
 					@Override
@@ -319,9 +275,6 @@ public class MainController {
 							if(!comboBox.getItems().contains(webcam.getName())) {
 								comboBox.getItems().add(webcam.getName());
 							}
-						}
-						if (webcam != null) {
-							comboBox.getSelectionModel().select(webcam.getName());
 						}
 					}});
 			}
@@ -405,28 +358,33 @@ public class MainController {
 			}
 		});
 		esupSgcLongPollTaskService.start();
-		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 
 		comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));
-		for(Webcam webcam : Webcam.getWebcams()) {
-			if(!comboBox.getItems().contains(webcam.getName())) {
-				comboBox.getItems().add(webcam.getName());
-			}
-		}
 
-		webcam = Webcam.getDefault();
-		if(webcam!=null) {
-			comboBox.getSelectionModel().select(webcam.getName());
-		}
+		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
+		Webcam.getWebcams(); // with this webcams are discovered and mistener works at startup
+	}
 
+	public synchronized void addWebcamComboBox(String webcamName) {
+		if(!comboBox.getItems().contains(webcamName)) {
+			comboBox.getItems().add(webcamName);
+		}
+		if(comboBox.getSelectionModel().getSelectedItem() == null && comboBox.getItems().size()>0) {
+			comboBox.getSelectionModel().select(0);
+		}
+	}
+	public synchronized void removeWebcamComboBox(String webcamName) {
+		comboBox.getItems().remove(webcamName);
 	}
 
 	private void startLoopServiceIfPossible() {
-		if(authReady.getValue() && nfcReady.getValue() && webcamReady.getValue() && !qrCodeTaskService.isRunning()) {
+		if(authReady.getValue() && nfcReady.getValue() && webcamReady.getValue()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					qrCodeTaskService.start();
+					if(!qrCodeTaskService.isRunning()){
+						qrCodeTaskService.start();
+					}
 				}
 			});
 		}
@@ -438,17 +396,6 @@ public class MainController {
 				}
 			});
 		}
-	}
-
-	private void startWebCamStream() {
-		log.debug("startWebCamStream ...");
-		imageProperty = new SimpleObjectProperty<Image>();
-		Task<Void> webcamUiTask = new WebcamUiTask(webcam, imageProperty);
-		threadWebcamStream = new Thread(webcamUiTask);
-		threadWebcamStream.setDaemon(true);
-		threadWebcamStream.start();
-		webcamImageView.imageProperty().bind(imageProperty);
-		webcamImageView.setRotate(180);
 	}
 
 	public void changeTextPrincipal(String text, StyleLevel styleLevel) {
@@ -516,12 +463,5 @@ public class MainController {
 				}});
 		}
 	}
-
-	public void exit() {
-		if (webcam != null) {
-			webcam.close();
-		}
-	}
-
 
 }

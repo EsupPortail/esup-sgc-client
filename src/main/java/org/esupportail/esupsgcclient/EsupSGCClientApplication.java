@@ -45,7 +45,6 @@ public class EsupSGCClientApplication extends Application {
 		primaryStage.setTitle("Esup-SGC-Client");
 
 		primaryStage.setOnCloseRequest(event -> {
-			mainPane.exit();
 			System.exit(0);
 		});
 
@@ -79,7 +78,6 @@ public class EsupSGCClientApplication extends Application {
 	
 	@Override
 	public void stop(){
-		mainPane.exit();
 		System.exit(0);
 	}
 
