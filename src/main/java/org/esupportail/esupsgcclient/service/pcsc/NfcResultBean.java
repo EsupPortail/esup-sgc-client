@@ -1,4 +1,4 @@
-package org.esupportail.esupsgcclient.domain;
+package org.esupportail.esupsgcclient.service.pcsc;
 
 import java.io.Serializable;
 

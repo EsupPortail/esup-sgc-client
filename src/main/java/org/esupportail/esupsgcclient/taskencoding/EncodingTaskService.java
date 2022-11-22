@@ -1,10 +1,9 @@
-package org.esupportail.esupsgcclient.task;
+package org.esupportail.esupsgcclient.taskencoding;
 
 import javax.smartcardio.CardException;
 
-import javafx.concurrent.Service;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.domain.NfcResultBean;
+import org.esupportail.esupsgcclient.service.pcsc.NfcResultBean;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingException;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.pcsc.EsupNgcTagService;
@@ -14,13 +13,16 @@ import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
-public class EncodingTaskService extends Service<String> {
+public class EncodingTaskService extends EsupSgcTaskService<String> {
     private final static Logger log = Logger.getLogger(EncodingTaskService.class);
     private String qrcode;
 
-    public EncodingTaskService(String qrcode) {
+    private boolean fromPrinter;
+
+    public EncodingTaskService(String qrcode, boolean fromPrinter) {
         super();
         this.qrcode = qrcode;
+        this.fromPrinter = fromPrinter;
     }
 
     @Override
@@ -65,6 +67,15 @@ public class EncodingTaskService extends Service<String> {
             }
         };
         return encodingTask;
+    }
+
+    @Override
+    public EsupSgcTaskService getNext() {
+        if(fromPrinter) {
+            return new EvolisEjectTaskService(true);
+        } else {
+            return new WaitRemoveCardTaskService();
+        }
     }
 
 }

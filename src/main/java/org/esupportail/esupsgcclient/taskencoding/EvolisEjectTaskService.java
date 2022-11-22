@@ -1,11 +1,10 @@
-package org.esupportail.esupsgcclient.task;
+package org.esupportail.esupsgcclient.taskencoding;
 
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 
-public class EvolisEjectTaskService extends Service<Void> {
+public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 
 	private final static Logger log = Logger.getLogger(EvolisEjectTaskService.class);
 
@@ -33,4 +32,8 @@ public class EvolisEjectTaskService extends Service<Void> {
 		return evolisTask;
 	}
 
+	@Override
+	public EsupSgcTaskService getNext() {
+		return null;
+	}
 }

@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -16,23 +15,23 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.service.EsupSgcGetBmpTaskService;
-import org.esupportail.esupsgcclient.service.QrCodeTaskService;
+import org.esupportail.esupsgcclient.taskencoding.EsupSgcGetBmpTaskService;
+import org.esupportail.esupsgcclient.taskencoding.QrCodeTaskService;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
-import org.esupportail.esupsgcclient.task.EncodingTaskService;
-import org.esupportail.esupsgcclient.task.EsupSgcLongPollTaskService;
-import org.esupportail.esupsgcclient.task.EvolisEjectTaskService;
-import org.esupportail.esupsgcclient.task.EvolisPrintTaskService;
-import org.esupportail.esupsgcclient.task.WaitRemoveCardTaskService;
-import org.esupportail.esupsgcclient.task.WebcamTaskService;
+import org.esupportail.esupsgcclient.taskencoding.EncodingTaskService;
+import org.esupportail.esupsgcclient.taskencoding.EsupSgcLongPollTaskService;
+import org.esupportail.esupsgcclient.taskencoding.EsupSgcTaskService;
+import org.esupportail.esupsgcclient.taskencoding.EvolisEjectTaskService;
+import org.esupportail.esupsgcclient.taskencoding.EvolisPrintTaskService;
+import org.esupportail.esupsgcclient.taskencoding.WaitRemoveCardTaskService;
+import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
 
 import com.github.sarxos.webcam.Webcam;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -135,21 +134,11 @@ public class MainController {
 
 	WebcamTaskService webcamTaskService;
 
-	EsupSgcGetBmpTaskService esupSgcGetBmpColorTaskService;
-
-	EsupSgcGetBmpTaskService esupSgcGetBmpBlackTaskService;
-
 	QrCodeTaskService qrCodeTaskService;
-
-	EncodingTaskService encodeTaskService;
-
-	EvolisPrintTaskService evolisPrintTaskService;
-
-	EvolisEjectTaskService evolisEjectTaskService;
 
 	EsupSgcLongPollTaskService esupSgcLongPollTaskService;
 
-	WaitRemoveCardTaskService waitRemoveCardTaskService;
+	public enum RootType {qrcode, evolis}
 
 	public void init(String esupNfcTagServerUrl) {
 		nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, Utils.getMacAddress()));
@@ -280,99 +269,33 @@ public class MainController {
 			}
 		});
 
-		qrCodeTaskService = new QrCodeTaskService(webcamImageView.imageProperty());
-		qrCodeTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent t) {
-                String qrcode = qrCodeTaskService.getValue();
-				encodeTaskService = new EncodingTaskService(qrcode);
-				encodeTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent t) {
-						textPrincipal.textProperty().bind(waitRemoveCardTaskService.titleProperty());
-						waitRemoveCardTaskService.restart();
-					}
-				});
-				encodeTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent t) {
-						textPrincipal.textProperty().bind(waitRemoveCardTaskService.titleProperty());
-						waitRemoveCardTaskService.restart();
-					}
-				});
-				textPrincipal.textProperty().bind(encodeTaskService.titleProperty());
-				encodeTaskService.start();
-            }
-        });
-
-		waitRemoveCardTaskService = new WaitRemoveCardTaskService();
-		waitRemoveCardTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-			@Override
-			public void handle(WorkerStateEvent t) {
-				log.info("restart qrcode task ...");
-				textPrincipal.textProperty().bind(qrCodeTaskService.titleProperty());
-				qrCodeTaskService.restart();
-			}
-		});
-
-		esupSgcLongPollTaskService = new EsupSgcLongPollTaskService();
-		esupSgcLongPollTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-			@Override
-			public void handle(WorkerStateEvent t) {
-				String qrcode = esupSgcLongPollTaskService.getValue();
-				esupSgcGetBmpColorTaskService = new EsupSgcGetBmpTaskService(qrcode, EncodingService.BmpType.color, bmpColorImageView);
-				esupSgcGetBmpColorTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent t) {
-						String qrcode = esupSgcLongPollTaskService.getValue();
-						esupSgcGetBmpBlackTaskService = new EsupSgcGetBmpTaskService(qrcode, EncodingService.BmpType.black, bmpBlackImageView);
-						esupSgcGetBmpBlackTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-							@Override
-							public void handle(WorkerStateEvent t) {
-								String bmpColorImageView = esupSgcGetBmpColorTaskService.getValue();
-								String bmpBlackImageView = esupSgcGetBmpBlackTaskService.getValue();
-								evolisPrintTaskService = new EvolisPrintTaskService(bmpColorImageView, bmpBlackImageView);
-								evolisPrintTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-									@Override
-									public void handle(WorkerStateEvent t) {
-										encodeTaskService = new EncodingTaskService(qrcode);
-										encodeTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-											@Override
-											public void handle(WorkerStateEvent t) {
-												evolisEjectTaskService = new EvolisEjectTaskService(true);
-												evolisEjectTaskService.start();
-												evolisEjectTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-													@Override
-													public void handle(WorkerStateEvent t) {
-														textPrincipal.textProperty().bind(esupSgcLongPollTaskService.titleProperty());
-														esupSgcLongPollTaskService.restart();
-													}
-												});
-											}
-										});
-										textPrincipal.textProperty().bind(encodeTaskService.titleProperty());
-										encodeTaskService.start();
-									}
-								});
-								textPrincipal.textProperty().bind(evolisPrintTaskService.titleProperty());
-								evolisPrintTaskService.start();
-							}
-						});
-						textPrincipal.textProperty().bind(esupSgcGetBmpBlackTaskService.titleProperty());
-						esupSgcGetBmpBlackTaskService.start();
-					}
-				});
-				textPrincipal.textProperty().bind(esupSgcGetBmpColorTaskService.titleProperty());
-				esupSgcGetBmpColorTaskService.start();
-			}
-		});
-		textPrincipal.textProperty().bind(esupSgcLongPollTaskService.titleProperty());
-		esupSgcLongPollTaskService.start();
-
 		comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		Webcam.getWebcams(); // with this webcams are discovered and mistener works at startup
+	}
+	/*
+		Permet de mettre en oeuvre un flow (circulaire) de tâches
+		en s'appuyant sur la méthode  EsupSgcTaskService.next()
+		qui donne la tâche suivant à effectuer
+ 	*/
+	void setupFlowEsupSgcTaskService(EsupSgcTaskService esupSgcTaskService, RootType rootType) {
+		esupSgcTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent t) {
+				if (esupSgcTaskService.getNext() != null) {
+					setupFlowEsupSgcTaskService(esupSgcTaskService.getNext(), rootType);
+				} else {
+					if(RootType.qrcode.equals(rootType)) {
+						setupFlowEsupSgcTaskService(qrCodeTaskService, rootType);
+					} else if(RootType.evolis.equals(rootType)) {
+						setupFlowEsupSgcTaskService(esupSgcLongPollTaskService, rootType);
+					}
+				}
+			}
+		});
+		textPrincipal.textProperty().bind(esupSgcTaskService.titleProperty());
+		esupSgcTaskService.restart();
 	}
 
 	public synchronized void addWebcamComboBox(String webcamName) {
@@ -392,10 +315,8 @@ public class MainController {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					if(!qrCodeTaskService.isRunning()){
-						textPrincipal.textProperty().bind(qrCodeTaskService.titleProperty());
-						qrCodeTaskService.start();
-					}
+					qrCodeTaskService = new QrCodeTaskService(webcamImageView.imageProperty());
+					setupFlowEsupSgcTaskService(qrCodeTaskService, RootType.qrcode);
 				}
 			});
 		}
@@ -403,10 +324,8 @@ public class MainController {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					if(!esupSgcLongPollTaskService.isRunning()) {
-						textPrincipal.textProperty().bind(esupSgcLongPollTaskService.titleProperty());
-						esupSgcLongPollTaskService.start();
-					}
+					esupSgcLongPollTaskService = new EsupSgcLongPollTaskService(bmpBlackImageView, bmpColorImageView);
+					setupFlowEsupSgcTaskService(esupSgcLongPollTaskService, RootType.evolis);
 				}
 			});
 		}

@@ -1,7 +1,8 @@
-package org.esupportail.esupsgcclient.task;
+package org.esupportail.esupsgcclient.taskencoding;
 
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.event.EventDispatchChain;
+import javafx.scene.image.ImageView;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
@@ -11,14 +12,19 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-public class EsupSgcLongPollTaskService extends Service<String> {
+public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 
 	private final static Logger log = Logger.getLogger(EsupSgcLongPollTaskService.class);
 
 	RestTemplate restTemplate;
 
-	public EsupSgcLongPollTaskService() {
+	ImageView bmpBlackImageView;
+	ImageView bmpColorImageView;
+
+	public EsupSgcLongPollTaskService(ImageView bmpBlackImageView, ImageView bmpColorImageView) {
 		super();
+		this.bmpColorImageView = bmpColorImageView;
+		this.bmpBlackImageView = bmpBlackImageView;
 		HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
 		httpRequestFactory.setConnectionRequestTimeout(300000);
 		httpRequestFactory.setConnectTimeout(300000);
@@ -31,6 +37,7 @@ public class EsupSgcLongPollTaskService extends Service<String> {
 		Task<String> esupSgcLongPollTask = new Task<String>() {
 			@Override
 			protected String call() throws Exception {
+				updateTitle("En attente...");
 				while (true) {
 					String sgcAuthToken = EsupNfcClientStackPane.sgcAuthToken;
 					if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken) && EvolisPrinterService.initSocket(false)) {
@@ -51,6 +58,12 @@ public class EsupSgcLongPollTaskService extends Service<String> {
 			}
 		};
 		return esupSgcLongPollTask;
+	}
+
+	@Override
+	public EsupSgcTaskService getNext() {
+		String qrcode = this.getValue();
+		return new EsupSgcGetBmpTaskService(bmpBlackImageView, bmpColorImageView, qrcode, EncodingService.BmpType.color,null);
 	}
 
 }

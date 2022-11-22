@@ -1,4 +1,4 @@
-package org.esupportail.esupsgcclient.service;
+package org.esupportail.esupsgcclient.taskencoding;
 
 import com.github.sarxos.webcam.WebcamException;
 import javafx.beans.property.ObjectProperty;
@@ -12,7 +12,7 @@ import org.esupportail.esupsgcclient.utils.Utils;
 
 import java.awt.image.BufferedImage;
 
-public class QrCodeTaskService extends Service<String> {
+public class QrCodeTaskService extends EsupSgcTaskService<String> {
 
 	private final static Logger log = Logger.getLogger(QrCodeTaskService.class);
 
@@ -30,7 +30,7 @@ public class QrCodeTaskService extends Service<String> {
 			protected String call() throws Exception {
 				String qrcode = null;
 				while (true) {
-					updateTitle("En attente d'une carte ...");
+					updateTitle("En attente...");
 					if (isCancelled()) break;
 					BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(imageProperty.get(), null);
 					qrcode = QRCodeReader.readQrCode(webcamBufferedImage);
@@ -47,6 +47,12 @@ public class QrCodeTaskService extends Service<String> {
 			}
 		};
 		return qrcodeEncodeTask;
+	}
+
+	@Override
+	public EsupSgcTaskService getNext() {
+		String qrcode = this.getValue();
+		return new EncodingTaskService(qrcode, false);
 	}
 
 }

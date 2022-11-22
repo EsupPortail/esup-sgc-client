@@ -1,4 +1,4 @@
-package org.esupportail.esupsgcclient.task;
+package org.esupportail.esupsgcclient.service.webcam;
 
 import com.github.sarxos.webcam.Webcam;
 import javafx.beans.property.ObjectProperty;

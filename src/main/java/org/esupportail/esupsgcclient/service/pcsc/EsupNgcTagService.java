@@ -2,7 +2,6 @@ package org.esupportail.esupsgcclient.service.pcsc;
 
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.EsupSGCClientApplication;
-import org.esupportail.esupsgcclient.domain.NfcResultBean;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;

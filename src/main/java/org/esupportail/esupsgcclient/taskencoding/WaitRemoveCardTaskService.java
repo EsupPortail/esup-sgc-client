@@ -1,12 +1,11 @@
-package org.esupportail.esupsgcclient.task;
+package org.esupportail.esupsgcclient.taskencoding;
 
-import javafx.concurrent.Service;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.concurrent.Task;
 
-public class WaitRemoveCardTaskService extends Service<Void> {
+public class WaitRemoveCardTaskService extends EsupSgcTaskService<Void> {
 
 	protected Task<Void> createTask() {
 		Task<Void> waitRemoveCardTask = new Task<Void>() {
@@ -21,5 +20,10 @@ public class WaitRemoveCardTaskService extends Service<Void> {
 			}
 		};
 		return waitRemoveCardTask;
+	}
+
+	@Override
+	public EsupSgcTaskService getNext() {
+		return null;
 	}
 }
