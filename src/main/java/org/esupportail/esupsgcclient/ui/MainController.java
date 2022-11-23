@@ -1,6 +1,8 @@
 package org.esupportail.esupsgcclient.ui;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,9 +13,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.taskencoding.EsupSgcGetBmpTaskService;
@@ -52,6 +57,9 @@ public class MainController {
 	public enum StyleLevel {success, danger, warning, primary, info};
 
 	public Stage primaryStage;
+
+	@FXML
+	private FlowPane actionsPane;
 
 	@FXML
 	private MenuItem buttonLogs;
@@ -284,7 +292,25 @@ public class MainController {
 		setupFlowEsupSgcTaskService(waitTaskService, null);
 		*/
 
+		for(int i=0; i<5; i++) {
+			TextFlow textFlow = getActionTextFlow();
+			Label label = (Label)textFlow.getChildren().get(0);
+			label.setText("TODO " + i);
+			actionsPane.getChildren().add(textFlow);
+		}
 	}
+
+	public TextFlow getActionTextFlow() {
+		URL fxmlUrl = this.getClass().getClassLoader().getResource("esup-sgc-client-action-template.fxml");
+		FXMLLoader fxmlLoader = new FXMLLoader(fxmlUrl);
+		try {
+			return fxmlLoader.load();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+
 	/*
 		Permet de mettre en oeuvre un flow (circulaire) de tâches
 		en s'appuyant sur la méthode  EsupSgcTaskService.next()

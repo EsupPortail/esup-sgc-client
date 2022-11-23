@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.text.TextFlow?>
+
+<TextFlow fx:id="actionTewtFlowTemplate" prefHeight="20.0" prefWidth="597.0" styleClass="alert-warning" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="stepClientReady" text="...">
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </Label>
+   </children>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+</TextFlow>

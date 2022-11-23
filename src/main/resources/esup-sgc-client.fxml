@@ -16,7 +16,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.TextFlow?>
 
 <VBox stylesheets="@/org/kordamp/bootstrapfx/bootstrapfx.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esupportail.esupsgcclient.ui.MainController">
    <children>
@@ -55,88 +54,7 @@
                                     <Label fx:id="textPrincipal" styleClass="text-success" />
                                  </children>
                               </FlowPane>
-                              <FlowPane orientation="VERTICAL" prefHeight="238.0" prefWidth="415.0" styleClass="panel-body">
-                                 <children>
-                                    <TextFlow prefHeight="20.0" prefWidth="597.0" styleClass="alert-warning">
-                                       <children>
-                                          <Label fx:id="stepClientReady" text="Client en cours de chargement">
-                                             <padding>
-                                                <Insets left="10.0" />
-                                             </padding>
-                                          </Label>
-                                       </children>
-                                       <opaqueInsets>
-                                          <Insets />
-                                       </opaqueInsets>
-                                    </TextFlow>
-                                    <TextFlow styleClass="alert-warning">
-                                       <children>
-                                          <Label fx:id="stepReadQR" prefHeight="18.0" prefWidth="162.0" styleClass="text-warning" text="Lecture du QRCode" />
-                                       </children>
-                                       <opaqueInsets>
-                                          <Insets />
-                                       </opaqueInsets>
-                                       <FlowPane.margin>
-                                          <Insets />
-                                       </FlowPane.margin>
-                                       <padding>
-                                          <Insets left="10.0" />
-                                       </padding>
-                                    </TextFlow>
-                                    <TextFlow styleClass="alert-warning">
-                                       <children>
-                                          <Label fx:id="stepReadCSN" styleClass="text-warning" text="Lecture du CSN" />
-                                       </children>
-                                       <FlowPane.margin>
-                                          <Insets />
-                                       </FlowPane.margin>
-                                       <padding>
-                                          <Insets left="10.0" />
-                                       </padding>
-                                    </TextFlow>
-                                    <TextFlow styleClass="alert-warning">
-                                       <children>
-                                          <Label fx:id="stepSelectSGC" styleClass="text-warning" text="Sélection dans le SGC" />
-                                       </children>
-                                       <padding>
-                                          <Insets left="10.0" />
-                                       </padding>
-                                    </TextFlow>
-                                    <TextFlow styleClass="alert-warning">
-                                       <children>
-                                          <Label fx:id="stepEncodageCnous" styleClass="text-warning" text="Encodage CNOUS" />
-                                       </children>
-                                       <FlowPane.margin>
-                                          <Insets />
-                                       </FlowPane.margin>
-                                       <padding>
-                                          <Insets left="10.0" />
-                                       </padding>
-                                    </TextFlow>
-                                    <TextFlow styleClass="alert-warning">
-                                       <children>
-                                          <Label fx:id="stepEncodageApp" styleClass="text-warning" text="Encodage de la carte" />
-                                       </children>
-                                       <FlowPane.margin>
-                                          <Insets />
-                                       </FlowPane.margin>
-                                       <padding>
-                                          <Insets left="10.0" />
-                                       </padding>
-                                    </TextFlow>
-                                    <TextFlow styleClass="alert-warning">
-                                       <children>
-                                          <Label fx:id="stepSendCSV" styleClass="text-warning" text="Envoi du CSV" />
-                                       </children>
-                                       <FlowPane.margin>
-                                          <Insets />
-                                       </FlowPane.margin>
-                                       <padding>
-                                          <Insets left="10.0" />
-                                       </padding>
-                                    </TextFlow>
-                                 </children>
-                              </FlowPane>
+                              <FlowPane fx:id="actionsPane" orientation="VERTICAL" prefHeight="238.0" prefWidth="415.0" styleClass="panel-body" />
                            </children>
                         </FlowPane>
                         <ProgressBar fx:id="progressBar" prefHeight="20.0" prefWidth="630.0" progress="0.0" />
