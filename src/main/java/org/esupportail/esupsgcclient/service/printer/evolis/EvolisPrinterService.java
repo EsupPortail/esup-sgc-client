@@ -80,9 +80,9 @@ public class EvolisPrinterService {
 		}
 	}
 	static void sendRequestAndLog(EvolisRequest evolisRequest) {
-		log.debug("Request : {}", evolisRequest);
+		log.trace("Request : {}", evolisRequest);
 		EvolisResponse response = sendRequest(evolisRequest);
-		log.debug("Response : {}", response);
+		log.trace("Response : {}", response);
 	}
 
 	public static void insertCard() {

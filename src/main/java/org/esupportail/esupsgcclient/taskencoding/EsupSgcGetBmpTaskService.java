@@ -69,7 +69,6 @@ public class EsupSgcGetBmpTaskService extends EsupSgcTaskService<String> {
 			return new EsupSgcGetBmpTaskService(bmpBlackImageView, bmpColorImageView, qrcode, EncodingService.BmpType.black, bmpColorAsBase64);
 		} else {
 			String bmpBlacksBase64 = this.getValue();
-			log.info("-> getNext EvolisPrintTaskService : " + bmpColorAsBase64);
 			return new EvolisPrintTaskService(qrcode, bmpColorAsBase64, bmpBlacksBase64);
 		}
 	}

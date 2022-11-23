@@ -44,4 +44,5 @@ public class EvolisRequest {
     public void setParams(Map<String, String> params) {
         this.params = params;
     }
+
 }

@@ -6,7 +6,7 @@ import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService
 
 public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 
-	private final static Logger log = Logger.getLogger(EvolisEjectTaskService.class);
+	final static Logger log = Logger.getLogger(EvolisEjectTaskService.class);
 
 	final boolean eject4success;
 
@@ -20,14 +20,20 @@ public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 		Task<Void> evolisTask = new Task<Void>() {
 			@Override
 			protected Void call() throws Exception {
-				updateProgress(1, 2);
-				updateTitle("Ejection de la carte");
-				if(eject4success) {
-					EvolisPrinterService.eject();
-				} else {
-					EvolisPrinterService.reject();
+				try {
+					updateProgress(1, 2);
+					updateTitle("Ejection de la carte");
+					if(eject4success) {
+						EvolisPrinterService.eject();
+					} else {
+						EvolisPrinterService.reject();
+					}
+					updateProgress(2, 2);
+				} catch(Exception e) {
+					// tâche de fin - on ne tolère pas d'erreur ici
+					updateTitle("Erreur lors de l'ejection de la carte - " + e.getMessage());
+					log.error("Erreur lors de l'ejection de la carte", e);
 				}
-				updateProgress(2, 2);
 				return null;
 			}
 		};

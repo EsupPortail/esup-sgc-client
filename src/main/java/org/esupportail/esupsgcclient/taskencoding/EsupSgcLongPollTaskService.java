@@ -39,8 +39,10 @@ public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 		Task<String> esupSgcLongPollTask = new Task<String>() {
 			@Override
 			protected String call() throws Exception {
+				bmpBlackImageView.setImage(null);
+				bmpColorImageView.setImage(null);
 				updateTitle("En attente...");
-				updateProgress(1, 2);
+				updateProgress(0, 2);
 				while (true) {
 					String sgcAuthToken = EsupNfcClientStackPane.sgcAuthToken;
 					if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken) && EvolisPrinterService.initSocket(false)) {

@@ -28,7 +28,7 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 		Task<String> qrcodeEncodeTask = new Task<String>() {
 			@Override
 			protected String call() throws Exception {
-				updateProgress(1, 2);
+				updateProgress(0, 2);
 				String qrcode = null;
 				while (true) {
 					updateTitle("En attente...");
