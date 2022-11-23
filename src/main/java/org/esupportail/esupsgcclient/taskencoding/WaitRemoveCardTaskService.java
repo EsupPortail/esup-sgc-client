@@ -13,9 +13,9 @@ public class WaitRemoveCardTaskService extends EsupSgcTaskService<Void> {
 		Task<Void> waitRemoveCardTask = new Task<Void>() {
 			@Override
 			protected Void call() throws Exception {
-				while (!EncodingService.pcscCardOnTerminal()) {
-					updateTitle("Merci de retirer cette carte");
-					Utils.sleep(1000);
+				updateTitle("Merci de retirer cette carte");
+				while (!EncodingService.waitForCardAbsent(1000)) {
+					// Utils.sleep(1000); -  sleep non nécessaire : EncodingService.waitForCardAbsent l'intègre
 				}
 				updateTitle("Carte retirée");
 				return null;

@@ -10,7 +10,6 @@ import org.esupportail.esupsgcclient.service.pcsc.EsupNgcTagService;
 import org.esupportail.esupsgcclient.service.pcsc.PcscException;
 import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.esupportail.esupsgcclient.utils.Utils;
 
@@ -39,12 +38,9 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
                 long start = System.currentTimeMillis();
                 long t;
                 updateProgress(1, 10);
-                updateTitle("Connexion au terminal NFC");
-                EncodingService.pcscConnection();
-                updateTitle("Attente de la carte sur le lecteur NFC");
-                while(!EncodingService.pcscCardOnTerminal()) {
-                    log.info("Attente de la carte sur le lecteur NFC");
-                    Utils.sleep(200);
+                updateTitle("Connexion au terminal NFC disposant d'une carte");
+                while(!EncodingService.pcscConnection()) {
+                    Utils.sleep(1000);
                 }
                 updateTitle("Encodage de la carte");
                 String csn = EncodingService.readCsn();

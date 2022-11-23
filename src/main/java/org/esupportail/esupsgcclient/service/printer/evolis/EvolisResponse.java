@@ -38,10 +38,11 @@ public class EvolisResponse {
 
     @Override
     public String toString() {
+        String partOfResult = result.length()>200 ? result.substring(0, 200) + "..." : result;
         return "EvolisResponse{" +
                 "jsonrpc='" + jsonrpc + '\'' +
                 ", id='" + id + '\'' +
-                ", result='" + result + '\'' +
+                ", result='" + partOfResult + '\'' +
                 '}';
     }
 

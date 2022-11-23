@@ -43,8 +43,12 @@ public class PcscUsbService {
 		}
 	}
 	
-	public static boolean isCardOnTerminal() throws CardException{
-		return cardTerminal.waitForCardAbsent(2);
+	public static boolean waitForCardAbsent(long timeout) throws CardException{
+		return cardTerminal.waitForCardAbsent(timeout);
+	}
+
+	public static boolean waitForCardPresent(long timeout) throws CardException{
+		return cardTerminal.waitForCardPresent(timeout);
 	}
 	
 	public static String connection() throws CardException{

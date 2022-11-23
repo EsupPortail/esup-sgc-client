@@ -60,13 +60,15 @@ public class EncodingService {
 
 	}
 	
-	public static void pcscConnection() throws PcscException{
+	public static boolean pcscConnection() throws PcscException{
 		try {
 			String cardTerminalName = PcscUsbService.connection();
 			log.debug("cardTerminal : " + cardTerminalName);
+			return true;
 		} catch (CardException e) {
-			throw new PcscException("pcsc connection error", e);
+			log.warn("pcsc connection error : " + e.getMessage());
 		}
+		return false;
 	}
 	
 	public static String readCsn() throws PcscException{
@@ -170,9 +172,18 @@ public class EncodingService {
 		}
 	}
 	
-	public static boolean pcscCardOnTerminal(){
+	public static boolean waitForCardAbsent(long timeout){
 		try {
-			return PcscUsbService.isCardOnTerminal();
+			return PcscUsbService.waitForCardAbsent(timeout);
+		} catch (CardException e) {
+			return false;
+		}
+	}
+
+
+	public static boolean waitForCardPresent(long timeout) {
+		try {
+			return PcscUsbService.waitForCardPresent(timeout);
 		} catch (CardException e) {
 			return false;
 		}
