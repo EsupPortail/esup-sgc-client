@@ -46,8 +46,7 @@ public class WebcamTaskService extends Service<Void> {
                         if(this.isCancelled()) {
                             imageProperty.unbind();
                             webcam.close();
-                            EsupSgcClientJfxController.webcamReady.set(false);
-                            log.info("-> cancel");
+                            log.info("webcam canceled");
                             return null;
                         }
                         if ((newWebcamBufferedImage = webcam.getImage()) != null) {

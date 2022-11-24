@@ -25,6 +25,6 @@ public class EsupWebcamDiscoveryListener implements WebcamDiscoveryListener {
     @Override
     public void webcamGone(WebcamDiscoveryEvent webcamDiscoveryEvent) {
         log.info("webcam gone");
-        mainController.removeWebcamComboBox(webcamDiscoveryEvent.getWebcam().getName());
+       mainController.removeWebcamComboBox(webcamDiscoveryEvent.getWebcam().getName());
     }
 }

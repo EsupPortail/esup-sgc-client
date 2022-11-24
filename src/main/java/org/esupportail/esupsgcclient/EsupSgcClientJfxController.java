@@ -243,23 +243,11 @@ public class EsupSgcClientJfxController {
 					checkCamera.getStyleClass().add("btn-danger");
 					logTextarea.appendText("Caméra déconnectée ?!\n");
 				}
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));
-						for (Webcam webcam : Webcam.getWebcams()) {
-							if(!comboBox.getItems().contains(webcam.getName())) {
-								comboBox.getItems().add(webcam.getName());
-							}
-						}
-					}});
 			}
 		});
 
-		comboBox.setItems(FXCollections.observableList(new ArrayList<String>()));
-
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
-		Webcam.getWebcams(); // with this webcams are discovered and mistener works at startup
+		Webcam.getWebcams(); // with this webcams are discovered and listener works at startup
 
 		/* just for testing ...
 		WaitTaskService waitTaskService = new WaitTaskService();
