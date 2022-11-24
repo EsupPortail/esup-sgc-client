@@ -39,6 +39,6 @@ public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 
 	@Override
 	public EsupSgcTaskService getNext() {
-		return null;
+		return new EsupSgcLongPollTaskService(taskParamBean);
 	}
 }

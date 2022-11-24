@@ -318,15 +318,7 @@ public class EsupSgcClientJfxController {
 		esupSgcTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent t) {
-				if (esupSgcTaskService.getNext() != null) {
-					setupFlowEsupSgcTaskService(esupSgcTaskService.getNext(), rootType);
-				} else {
-					if(RootType.qrcode.equals(rootType)) {
-						setupFlowEsupSgcTaskService(qrCodeTaskService, rootType);
-					} else if(RootType.evolis.equals(rootType)) {
-						setupFlowEsupSgcTaskService(evolisEsupSgcLongPollTaskService, rootType);
-					}
-				}
+				setupFlowEsupSgcTaskService(esupSgcTaskService.getNext(), rootType);
 			}
 		});
 
