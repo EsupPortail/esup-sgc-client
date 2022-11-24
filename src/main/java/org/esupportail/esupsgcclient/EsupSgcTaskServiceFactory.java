@@ -137,6 +137,7 @@ public class EsupSgcTaskServiceFactory {
         });
 
         textPrincipal.textProperty().bind(esupSgcTaskService.titleProperty());
+        esupSgcTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
         progressBar.progressProperty().bind(esupSgcTaskService.progressProperty());
         log.debug("restart " + esupSgcTaskService);
         if(esupSgcTaskService.isRoot()) {
