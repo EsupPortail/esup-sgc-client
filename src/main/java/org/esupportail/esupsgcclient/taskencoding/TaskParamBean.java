@@ -3,11 +3,17 @@ package org.esupportail.esupsgcclient.taskencoding;
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.TextFlow;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
+import org.esupportail.esupsgcclient.ui.UiStep;
+
+import java.util.Map;
 
 public class TaskParamBean {
 
     public enum RootType {qrcode, evolis}
+
+    final Map<UiStep, TextFlow> uiSteps;
 
     final RootType rootType;
     final String qrcode;
@@ -30,10 +36,12 @@ public class TaskParamBean {
 
     final Boolean fromPrinter;
 
-    public TaskParamBean(RootType rootType, String qrcode, ObjectProperty<Image> imageProperty, String csn,
+    public TaskParamBean(Map<UiStep, TextFlow> uiSteps,
+                         RootType rootType, String qrcode, ObjectProperty<Image> imageProperty, String csn,
                          EncodingService.BmpType bmpType, ImageView bmpColorImageView, ImageView bmpBlackImageView,
                          String bmpColorAsBase64, String bmpBlackAsBase64,
                          Boolean eject4success, Boolean fromPrinter) {
+        this.uiSteps = uiSteps;
         this.rootType = rootType;
         this.qrcode = qrcode;
         this.webcamImageProperty = imageProperty;

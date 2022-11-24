@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
+import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.ResourceAccessException;
@@ -27,6 +28,13 @@ public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 		restTemplate = new RestTemplate(httpRequestFactory);
 	}
 
+	public boolean isRoot() {
+		return true;
+	}
+
+	public UiStep getUiStep() {
+		return UiStep.long_poll;
+	}
 
 	@Override
 	protected Task<String> createTask() {
@@ -61,10 +69,30 @@ public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 		return esupSgcLongPollTask;
 	}
 
+	public void setUiStepSuccess() {
+		for(UiStep step : new UiStep[]{
+				UiStep.long_poll,
+				UiStep.bmp_black,
+				UiStep.bmp_color,
+				UiStep.printer_insert,
+				UiStep.printer_color,
+				UiStep.printer_black,
+				UiStep.printer_overlay,
+				UiStep.printer_nfc,
+				UiStep.csn_read,
+				UiStep.encode,
+				UiStep.encode_cnous,
+				UiStep.send_csv,
+				UiStep.printer_eject}) {
+			taskParamBean.uiSteps.get(step).setVisible(true);
+		}
+		super.setUiStepSuccess();
+	}
+
 	@Override
 	public EsupSgcTaskService getNextWhenSuccess() {
 		String qrcode = this.getValue();
-		return new EsupSgcGetBmpTaskService(new TaskParamBean(taskParamBean.rootType, qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+		return new EsupSgcGetBmpTaskService(new TaskParamBean(taskParamBean.uiSteps, taskParamBean.rootType, qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
 				taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
 				taskParamBean.bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
 				taskParamBean.eject4success, taskParamBean.fromPrinter));

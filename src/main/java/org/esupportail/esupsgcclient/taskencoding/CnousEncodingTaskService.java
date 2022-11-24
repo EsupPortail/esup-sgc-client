@@ -4,6 +4,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
+import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 public class CnousEncodingTaskService extends EsupSgcTaskService<String> {
@@ -13,6 +14,10 @@ public class CnousEncodingTaskService extends EsupSgcTaskService<String> {
     public CnousEncodingTaskService(TaskParamBean taskParamBean) {
         super(taskParamBean);
         assert taskParamBean.csn != null;
+    }
+
+    UiStep getUiStep() {
+        return UiStep.encode_cnous;
     }
 
     @Override

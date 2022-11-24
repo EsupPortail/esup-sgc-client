@@ -2,6 +2,7 @@ package org.esupportail.esupsgcclient.taskencoding;
 
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
+import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.concurrent.Task;
@@ -19,10 +20,12 @@ public class WaitRemoveCardTaskService extends EsupSgcTaskService<Void> {
 			@Override
 			protected Void call() throws Exception {
 				try {
+					updateProgress(1,4);
 					updateTitle("Merci de retirer cette carte");
 					while (!EncodingService.waitForCardAbsent(1000)) {
 						// Utils.sleep(1000); -  sleep non nécessaire : EncodingService.waitForCardAbsent l'intègre
 					}
+					updateProgress(4,4);
 					updateTitle("Carte retirée");
 				} catch(Exception e) {
 					// tâche de fin - on ne tolère pas d'erreur ici

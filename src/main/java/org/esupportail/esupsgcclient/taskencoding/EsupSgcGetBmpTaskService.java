@@ -6,6 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
+import org.esupportail.esupsgcclient.ui.UiStep;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -19,6 +20,10 @@ public class EsupSgcGetBmpTaskService extends EsupSgcTaskService<String> {
 
 	public EsupSgcGetBmpTaskService(TaskParamBean taskParamBean) {
 		super(taskParamBean);
+	}
+
+	UiStep getUiStep() {
+		return EncodingService.BmpType.black.equals(taskParamBean.bmpType) ? UiStep.bmp_black : UiStep.bmp_color;
 	}
 
 	@Override
@@ -51,13 +56,13 @@ public class EsupSgcGetBmpTaskService extends EsupSgcTaskService<String> {
 		log.info("getNext " + taskParamBean.bmpType);
 		if(taskParamBean.bmpType.equals(EncodingService.BmpType.black)) {
 			String bmpColorAsBase64 = this.getValue();
-			return new EsupSgcGetBmpTaskService(new TaskParamBean(taskParamBean.rootType, taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+			return new EsupSgcGetBmpTaskService(new TaskParamBean(taskParamBean.uiSteps, taskParamBean.rootType, taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
 					EncodingService.BmpType.color, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
 					bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
 					taskParamBean.eject4success, taskParamBean.fromPrinter));
 		} else {
 			String bmpBlackAsBase64 = this.getValue();
-			return new EvolisPrintTaskService(new TaskParamBean(taskParamBean.rootType,taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+			return new EvolisPrintTaskService(new TaskParamBean(taskParamBean.uiSteps, taskParamBean.rootType,taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
 					taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
 					taskParamBean.bmpColorAsBase64, bmpBlackAsBase64,
 					taskParamBean.eject4success, taskParamBean.fromPrinter));

@@ -11,7 +11,6 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.MenuItem;
@@ -20,10 +19,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.taskencoding.EsupSgcTaskServiceFactory;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
-import org.esupportail.esupsgcclient.taskencoding.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
 
 import com.github.sarxos.webcam.Webcam;
@@ -144,7 +141,7 @@ public class EsupSgcClientJfxController {
 
 	public void init(String esupNfcTagServerUrl) {
 
-		esupSgcTaskServiceFactory = new EsupSgcTaskServiceFactory(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal);
+		esupSgcTaskServiceFactory = new EsupSgcTaskServiceFactory(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane);
 
 		nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, Utils.getMacAddress()));
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldWebcamName, newWebcamName) -> {
@@ -284,22 +281,6 @@ public class EsupSgcClientJfxController {
 		setupFlowEsupSgcTaskService(waitTaskService, null);
 		*/
 
-		for(int i=0; i<5; i++) {
-			TextFlow textFlow = getActionTextFlow();
-			Label label = (Label)textFlow.getChildren().get(0);
-			label.setText("TODO " + i);
-			actionsPane.getChildren().add(textFlow);
-		}
-	}
-
-	public TextFlow getActionTextFlow() {
-		URL fxmlUrl = this.getClass().getClassLoader().getResource("esup-sgc-client-action-template.fxml");
-		FXMLLoader fxmlLoader = new FXMLLoader(fxmlUrl);
-		try {
-			return fxmlLoader.load();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	public synchronized void addWebcamComboBox(String webcamName) {

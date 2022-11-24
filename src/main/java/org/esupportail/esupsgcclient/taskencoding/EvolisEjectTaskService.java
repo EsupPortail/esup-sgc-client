@@ -3,6 +3,7 @@ package org.esupportail.esupsgcclient.taskencoding;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
+import org.esupportail.esupsgcclient.ui.UiStep;
 
 public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 
@@ -10,6 +11,10 @@ public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 
 	public EvolisEjectTaskService(TaskParamBean taskParamBean) {
 		super(taskParamBean);
+	}
+
+	UiStep getUiStep() {
+		return UiStep.printer_eject;
 	}
 
 	@Override
@@ -39,7 +44,7 @@ public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 
 	@Override
 	public EsupSgcTaskService getNextWhenSuccess() {
-		return new EsupSgcLongPollTaskService(new TaskParamBean(taskParamBean.rootType, taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+		return new EsupSgcLongPollTaskService(new TaskParamBean(taskParamBean.uiSteps, taskParamBean.rootType, taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
 				taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
 				taskParamBean.bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
 				true, taskParamBean.fromPrinter));

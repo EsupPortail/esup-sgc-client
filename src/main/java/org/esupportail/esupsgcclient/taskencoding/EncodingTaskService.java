@@ -5,6 +5,7 @@ import javax.smartcardio.CardException;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.service.SgcCheckException;
 import org.esupportail.esupsgcclient.service.pcsc.NfcResultBean;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingException;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
@@ -13,6 +14,7 @@ import org.esupportail.esupsgcclient.service.pcsc.PcscException;
 import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 
 import javafx.concurrent.Task;
+import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 public class EncodingTaskService extends EsupSgcTaskService<String> {
@@ -25,6 +27,10 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
         super(taskParamBean);
         assert taskParamBean.qrcode != null;
         assert taskParamBean.fromPrinter != null;
+    }
+
+    UiStep getUiStep() {
+        return UiStep.encode;
     }
 
     @Override
@@ -41,7 +47,9 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
                 }
                 updateTitle("Encodage de la carte");
                 String csn = EncodingService.readCsn();
+                setUiStepSuccess(UiStep.csn_read);
                 EncodingService.checkBeforeEncoding(taskParamBean.qrcode, csn);
+                setUiStepSuccess(UiStep.sgc_select);
                 log.info("Encoding : Start");
                 String result = "";
                 while (true) {
@@ -70,6 +78,15 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
             }
         };
         return encodingTask;
+    }
+
+    @Override
+    public void setUiStepFailed(Throwable exception) {
+        if(exception != null && exception instanceof SgcCheckException) {
+            setUiStepFailed(UiStep.sgc_select, exception);
+        } else {
+            super.setUiStepFailed(exception);
+        }
     }
 
     @Override
