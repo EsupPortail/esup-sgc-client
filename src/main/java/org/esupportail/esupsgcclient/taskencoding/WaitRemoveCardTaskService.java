@@ -40,7 +40,10 @@ public class WaitRemoveCardTaskService extends EsupSgcTaskService<Void> {
 
 	@Override
 	public EsupSgcTaskService getNextWhenSuccess() {
-		return new QrCodeTaskService(taskParamBean);
+		return new QrCodeTaskService(new TaskParamBean(taskParamBean.uiSteps, taskParamBean.rootType, null, taskParamBean.webcamImageProperty, null,
+				null, null, null,
+				null, null,
+				true, false));
 	}
 
 	@Override
