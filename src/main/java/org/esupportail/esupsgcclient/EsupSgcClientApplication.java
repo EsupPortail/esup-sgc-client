@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.InitEncodingServiceTask;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
-import org.esupportail.esupsgcclient.ui.MainController;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -18,10 +17,10 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class EsupSGCClientApplication extends Application {
+public class EsupSgcClientApplication extends Application {
 
-	private final static Logger log = Logger.getLogger(EsupSGCClientApplication.class);
-	public static MainController mainPane;
+	private final static Logger log = Logger.getLogger(EsupSgcClientApplication.class);
+	public static EsupSgcClientJfxController mainPane;
 	public static String esupNfcTagServerUrl;
 	public static String esupSgcUrl;
 	public static boolean encodeCnous;

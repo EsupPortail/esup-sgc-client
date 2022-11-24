@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox stylesheets="@/org/kordamp/bootstrapfx/bootstrapfx.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esupportail.esupsgcclient.ui.MainController">
+<VBox stylesheets="@/org/kordamp/bootstrapfx/bootstrapfx.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esupportail.esupsgcclient.EsupSgcClientJfxController">
    <children>
       <MenuBar>
         <menus>

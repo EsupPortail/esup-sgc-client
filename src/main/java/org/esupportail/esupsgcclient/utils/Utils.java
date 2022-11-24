@@ -7,7 +7,7 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.EsupSGCClientApplication;
+import org.esupportail.esupsgcclient.EsupSgcClientApplication;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
 import javafx.scene.media.Media;
@@ -41,7 +41,7 @@ public class Utils {
 	
 	public static void playSound(String soundFile) {
 		try {
-			Media audio = new Media(EsupSGCClientApplication.class.getResource("/sound/" + soundFile).toString());
+			Media audio = new Media(EsupSgcClientApplication.class.getResource("/sound/" + soundFile).toString());
             MediaPlayer mediaPlayer = new MediaPlayer(audio);
             mediaPlayer.play();
 		} catch (Exception e) {

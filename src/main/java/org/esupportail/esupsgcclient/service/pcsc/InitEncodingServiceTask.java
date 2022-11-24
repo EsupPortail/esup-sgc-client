@@ -2,9 +2,9 @@ package org.esupportail.esupsgcclient.service.pcsc;
 
 import javafx.application.Platform;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.EsupSGCClientApplication;
+import org.esupportail.esupsgcclient.EsupSgcClientApplication;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
-import org.esupportail.esupsgcclient.ui.MainController;
+import org.esupportail.esupsgcclient.EsupSgcClientJfxController;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.concurrent.Task;
@@ -14,9 +14,9 @@ public class InitEncodingServiceTask extends Task<Void> {
     final static Logger log = Logger.getLogger(InitEncodingServiceTask.class);
 
 
-    private MainController mainPane;
+    private EsupSgcClientJfxController mainPane;
 
-    public InitEncodingServiceTask(MainController mainPane) {
+    public InitEncodingServiceTask(EsupSgcClientJfxController mainPane) {
         this.mainPane = mainPane;
     }
 
@@ -33,8 +33,8 @@ public class InitEncodingServiceTask extends Task<Void> {
                 mainPane.hideCnousSteps();
             }
 
-            mainPane.addLogTextLn("INFO", "numeroId = " + EsupSGCClientApplication.numeroId);
-            mainPane.addLogTextLn("INFO", "sgcAuthToken = " + EsupSGCClientApplication.sgcAuthToken);
+            mainPane.addLogTextLn("INFO", "numeroId = " + EsupSgcClientApplication.numeroId);
+            mainPane.addLogTextLn("INFO", "sgcAuthToken = " + EsupSgcClientApplication.sgcAuthToken);
             mainPane.addLogTextLn("INFO", "esupNfcTagServerUrl = " + EncodingService.getEsupNfcTagServerUrl());
             mainPane.addLogTextLn("INFO", "sgcUrl = " + EncodingService.getSgcUrl());
             mainPane.nfcReady.setValue(true);
@@ -62,15 +62,15 @@ public class InitEncodingServiceTask extends Task<Void> {
                         log.error(message);
                         mainPane.addLogTextLn(level, message);
                     }
-                    mainPane.changeTextPrincipal(message, MainController.StyleLevel.danger);
-                    mainPane.changeStepClientReady("Client non prêt", MainController.StyleLevel.danger);
+                    mainPane.changeTextPrincipal(message, EsupSgcClientJfxController.StyleLevel.danger);
+                    mainPane.changeStepClientReady("Client non prêt", EsupSgcClientJfxController.StyleLevel.danger);
                 } else if ("WARN".equals(level)) {
                     if (throwable != null) {
                         log.warn(message, throwable);
                     } else {
                         log.warn(message, throwable);
                     }
-                    mainPane.changeTextPrincipal(message, MainController.StyleLevel.warning);
+                    mainPane.changeTextPrincipal(message, EsupSgcClientJfxController.StyleLevel.warning);
                     mainPane.addLogTextLn(level, message);
                 }
                 Utils.playSound("fail.wav");

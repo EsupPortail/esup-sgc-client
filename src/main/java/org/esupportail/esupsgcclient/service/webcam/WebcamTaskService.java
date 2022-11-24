@@ -9,7 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.ui.MainController;
+import org.esupportail.esupsgcclient.EsupSgcClientJfxController;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import java.awt.image.BufferedImage;
@@ -40,13 +40,13 @@ public class WebcamTaskService extends Service<Void> {
                 webcamImageView.setRotate(180);
                 BufferedImage webcamBufferedImage = null;
                 BufferedImage newWebcamBufferedImage = null;
-                MainController.webcamReady.set(true);
+                EsupSgcClientJfxController.webcamReady.set(true);
                 while (true) {
                     try {
                         if(this.isCancelled()) {
                             imageProperty.unbind();
                             webcam.close();
-                            MainController.webcamReady.set(false);
+                            EsupSgcClientJfxController.webcamReady.set(false);
                             log.info("-> cancel");
                             return null;
                         }

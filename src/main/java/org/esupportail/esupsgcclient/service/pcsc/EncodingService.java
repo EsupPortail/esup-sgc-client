@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.smartcardio.CardException;
 
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.EsupSGCClientApplication;
+import org.esupportail.esupsgcclient.EsupSgcClientApplication;
 import org.esupportail.esupsgcclient.service.SgcCheckException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteRunExe;
@@ -42,9 +42,9 @@ public class EncodingService {
 
 		PcscUsbService.init();
 
-		esupNfcTagServerUrl = EsupSGCClientApplication.esupNfcTagServerUrl;
-		esupSgcUrl = EsupSGCClientApplication.esupSgcUrl;
-		encodeCnous = EsupSGCClientApplication.encodeCnous;
+		esupNfcTagServerUrl = EsupSgcClientApplication.esupNfcTagServerUrl;
+		esupSgcUrl = EsupSgcClientApplication.esupSgcUrl;
+		encodeCnous = EsupSgcClientApplication.encodeCnous;
 			
 		if(encodeCnous){
 			try{
@@ -112,13 +112,13 @@ public class EncodingService {
 	}
 
 	public static String getBmpAsBase64(String qrcode, BmpType bmpType) {
-		String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=%s", esupSgcUrl, EsupSGCClientApplication.sgcAuthToken, qrcode, bmpType);
+		String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=%s", esupSgcUrl, EsupSgcClientApplication.sgcAuthToken, qrcode, bmpType);
 		String bmpAsBase64 = restTemplate.getForObject(bpmEsupSgcUrl, String.class);
 		return bmpAsBase64;
 	}
 	
 	public static boolean cnousEncoding(String cardId) throws CnousFournisseurCarteException {
-		String cnousUrl = esupSgcUrl + "/wsrest/nfc/cnousCardId?csn=" + cardId + "&authToken=" + EsupSGCClientApplication.sgcAuthToken;
+		String cnousUrl = esupSgcUrl + "/wsrest/nfc/cnousCardId?csn=" + cardId + "&authToken=" + EsupSgcClientApplication.sgcAuthToken;
 		log.info("get cnousId : " + cnousUrl);
 		try{
 			ResponseEntity<String> response = restTemplate.exchange(cnousUrl, HttpMethod.GET, null, String.class);
@@ -148,7 +148,7 @@ public class EncodingService {
 					map, headers);
 			try {
 				ResponseEntity<String> fileSendResult = restTemplate.exchange(
-						esupSgcUrl + "/wsrest/nfc/addCrousCsvFile?&csn=" + csn + "&authToken=" + EsupSGCClientApplication.sgcAuthToken,
+						esupSgcUrl + "/wsrest/nfc/addCrousCsvFile?&csn=" + csn + "&authToken=" + EsupSgcClientApplication.sgcAuthToken,
 					HttpMethod.POST, requestEntity,
 					String.class);
 				log.debug("csv send : " + fileSendResult.getBody());

@@ -145,7 +145,7 @@
 					<appendAssemblyId>false</appendAssemblyId>
 					<archive>
 						<manifest>
-							<mainClass>org.esupportail.esupsgcclient.EsupSGCClientApplication</mainClass>
+							<mainClass>org.esupportail.esupsgcclient.EsupSgcClientApplication</mainClass>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
 						<manifestEntries>
@@ -169,7 +169,7 @@
 				<artifactId>javafx-maven-plugin</artifactId>
 				<version>0.0.8</version>
 				<configuration>
-					<mainClass>org.esupportail.esupsgcclient.EsupSGCClientApplication</mainClass>
+					<mainClass>org.esupportail.esupsgcclient.EsupSgcClientApplication</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>

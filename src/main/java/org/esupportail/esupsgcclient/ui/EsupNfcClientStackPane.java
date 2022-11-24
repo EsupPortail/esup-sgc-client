@@ -17,8 +17,7 @@ import javafx.concurrent.Worker.State;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
-import org.esupportail.esupsgcclient.EsupSGCClientApplication;
-import org.esupportail.esupsgcclient.utils.Utils;
+import org.esupportail.esupsgcclient.EsupSgcClientApplication;
 
 public class EsupNfcClientStackPane extends StackPane {
 
@@ -97,11 +96,11 @@ public class EsupNfcClientStackPane extends StackPane {
             authType = window.getMember("authType").toString();
             if (numeroId != null && !numeroId.equals("") && !"undefined".equals(numeroId)) {
                 FileLocalStorage.setItem("numeroId", numeroId);
-                EsupSGCClientApplication.numeroId = numeroId;
+                EsupSgcClientApplication.numeroId = numeroId;
             }
             if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken)) {
                 FileLocalStorage.setItem("sgcAuthToken", sgcAuthToken);
-                EsupSGCClientApplication.sgcAuthToken = sgcAuthToken;
+                EsupSgcClientApplication.sgcAuthToken = sgcAuthToken;
             }
             if (eppnInit != null && !eppnInit.equals("") && !"undefined".equals(eppnInit)) {
                 FileLocalStorage.setItem("eppnInit", eppnInit);

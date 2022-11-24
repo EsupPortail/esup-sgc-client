@@ -1,4 +1,4 @@
-package org.esupportail.esupsgcclient.ui;
+package org.esupportail.esupsgcclient;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -17,20 +17,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.taskencoding.EsupSgcGetBmpTaskService;
 import org.esupportail.esupsgcclient.taskencoding.QrCodeTaskService;
-import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
-import org.esupportail.esupsgcclient.taskencoding.EncodingTaskService;
 import org.esupportail.esupsgcclient.taskencoding.EsupSgcLongPollTaskService;
 import org.esupportail.esupsgcclient.taskencoding.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.taskencoding.EvolisEjectTaskService;
-import org.esupportail.esupsgcclient.taskencoding.EvolisPrintTaskService;
 import org.esupportail.esupsgcclient.taskencoding.WaitRemoveCardTaskService;
 import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
 
@@ -47,12 +42,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import org.esupportail.esupsgcclient.taskencoding.WaitTaskService;
+import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
+import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.utils.Utils;
 
-public class MainController {
+public class EsupSgcClientJfxController {
 
-	final static Logger log = Logger.getLogger(MainController.class);
+	final static Logger log = Logger.getLogger(EsupSgcClientJfxController.class);
 
 	public enum StyleLevel {success, danger, warning, primary, info};
 
