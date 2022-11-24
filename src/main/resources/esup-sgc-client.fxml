@@ -54,7 +54,7 @@
                                     <Label fx:id="textPrincipal" styleClass="text-success" />
                                  </children>
                               </FlowPane>
-                              <FlowPane fx:id="actionsPane" orientation="VERTICAL" prefHeight="249.0" prefWidth="629.0" styleClass="panel-body" />
+                              <FlowPane fx:id="actionsPane" orientation="VERTICAL" prefHeight="249.0" prefWidth="629.0" />
                            </children>
                         </FlowPane>
                         <ProgressBar fx:id="progressBar" prefHeight="20.0" prefWidth="630.0" progress="0.0" />
