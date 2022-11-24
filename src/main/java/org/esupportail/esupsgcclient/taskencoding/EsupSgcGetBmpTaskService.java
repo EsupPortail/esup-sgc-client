@@ -17,23 +17,8 @@ public class EsupSgcGetBmpTaskService extends EsupSgcTaskService<String> {
 
 	final static Logger log = Logger.getLogger(Service.class);
 
-	final String qrcode;
-
-	final EncodingService.BmpType bmpType;
-
-	final ImageView bmpColorImageView;
-
-	final ImageView bmpBlackImageView;
-
-	final String bmpColorAsBase64;
-
-	public EsupSgcGetBmpTaskService(ImageView bmpBlackImageView, ImageView bmpColorImageView, String qrcode, EncodingService.BmpType bmpType, String bmpColorAsBase64) {
-		super();
-		this.bmpColorImageView = bmpColorImageView;
-		this.bmpBlackImageView = bmpBlackImageView;
-		this.qrcode = qrcode;
-		this.bmpType = bmpType;
-		this.bmpColorAsBase64 = bmpColorAsBase64;
+	public EsupSgcGetBmpTaskService(TaskParamBean taskParamBean) {
+		super(taskParamBean);
 	}
 
 	@Override
@@ -43,8 +28,8 @@ public class EsupSgcGetBmpTaskService extends EsupSgcTaskService<String> {
 			@Override
 			protected String call() throws Exception {
 				updateProgress(1,2);
-				updateTitle("Récupération de la partie " + (bmpType.equals(EncodingService.BmpType.black) ? "N/B" : "Couleur") + " de la carte");
-				String bmpAsBase64 = EncodingService.getBmpAsBase64(qrcode, bmpType);
+				updateTitle("Récupération de la partie " + (taskParamBean.bmpType.equals(EncodingService.BmpType.black) ? "N/B" : "Couleur") + " de la carte");
+				String bmpAsBase64 = EncodingService.getBmpAsBase64(taskParamBean.qrcode, taskParamBean.bmpType);
 
 				updateProgress(2,2);
 				// TODO :: do this block outside this thread ?
@@ -52,7 +37,7 @@ public class EsupSgcGetBmpTaskService extends EsupSgcTaskService<String> {
 				BufferedImage input_image = ImageIO.read(new ByteArrayInputStream(bmp)); //
 				ByteArrayOutputStream out = new ByteArrayOutputStream();// read bmp into input_image object
 				ImageIO.write(input_image, "PNG", out);
-				ImageView bmpImageView = bmpType.equals(EncodingService.BmpType.black) ? bmpBlackImageView : bmpColorImageView;
+				ImageView bmpImageView = taskParamBean.bmpType.equals(EncodingService.BmpType.black) ? taskParamBean.bmpBlackImageView : taskParamBean.bmpColorImageView;
 				bmpImageView.setImage(new Image(new ByteArrayInputStream(out.toByteArray()), 200, 200, true, true));
 				//
 				return bmpAsBase64;
@@ -63,13 +48,19 @@ public class EsupSgcGetBmpTaskService extends EsupSgcTaskService<String> {
 
 	@Override
 	public EsupSgcTaskService getNext() {
-		log.info("getNext " + bmpType);
-		if(bmpType.equals(EncodingService.BmpType.color)) {
+		log.info("getNext " + taskParamBean.bmpType);
+		if(taskParamBean.bmpType.equals(EncodingService.BmpType.black)) {
 			String bmpColorAsBase64 = this.getValue();
-			return new EsupSgcGetBmpTaskService(bmpBlackImageView, bmpColorImageView, qrcode, EncodingService.BmpType.black, bmpColorAsBase64);
+			return new EsupSgcGetBmpTaskService(new TaskParamBean(taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+					EncodingService.BmpType.color, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
+					bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
+					taskParamBean.eject4success, taskParamBean.fromPrinter));
 		} else {
-			String bmpBlacksBase64 = this.getValue();
-			return new EvolisPrintTaskService(qrcode, bmpColorAsBase64, bmpBlacksBase64);
+			String bmpBlackAsBase64 = this.getValue();
+			return new EvolisPrintTaskService(new TaskParamBean(taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+					taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
+					taskParamBean.bmpColorAsBase64, bmpBlackAsBase64,
+					taskParamBean.eject4success, taskParamBean.fromPrinter));
 		}
 	}
 }

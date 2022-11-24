@@ -16,11 +16,8 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 
 	private final static Logger log = Logger.getLogger(QrCodeTaskService.class);
 
-	final ObjectProperty<Image> imageProperty;
-
-	public QrCodeTaskService(final ObjectProperty<Image> imageProperty) {
-		super();
-		this.imageProperty = imageProperty;
+	public QrCodeTaskService(TaskParamBean taskParamBean) {
+		super(taskParamBean);
 	}
 
 	@Override
@@ -33,7 +30,7 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 				while (true) {
 					updateTitle("En attente...");
 					if (isCancelled()) break;
-					BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(imageProperty.get(), null);
+					BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(taskParamBean.webcamImageProperty.get(), null);
 					qrcode = QRCodeReader.readQrCode(webcamBufferedImage);
 					if(webcamBufferedImage != null) {
 						if (qrcode != null) {
@@ -54,7 +51,10 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 	@Override
 	public EsupSgcTaskService getNext() {
 		String qrcode = this.getValue();
-		return new EncodingTaskService(qrcode, false);
+		return new EncodingTaskService(new TaskParamBean(qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+				taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
+				taskParamBean.bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
+				taskParamBean.eject4success, taskParamBean.fromPrinter));
 	}
 
 }

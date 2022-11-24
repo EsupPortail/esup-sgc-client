@@ -8,11 +8,8 @@ public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 
 	final static Logger log = Logger.getLogger(EvolisEjectTaskService.class);
 
-	final boolean eject4success;
-
-	public EvolisEjectTaskService(boolean eject4success) {
-		super();
-		this.eject4success = eject4success;
+	public EvolisEjectTaskService(TaskParamBean taskParamBean) {
+		super(taskParamBean);
 	}
 
 	@Override
@@ -23,7 +20,7 @@ public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 				try {
 					updateProgress(1, 2);
 					updateTitle("Ejection de la carte");
-					if(eject4success) {
+					if(taskParamBean.eject4success) {
 						EvolisPrinterService.eject();
 					} else {
 						EvolisPrinterService.reject();

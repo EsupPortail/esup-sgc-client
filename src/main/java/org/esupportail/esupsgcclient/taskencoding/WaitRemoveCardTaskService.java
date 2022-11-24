@@ -10,6 +10,10 @@ public class WaitRemoveCardTaskService extends EsupSgcTaskService<Void> {
 
 	final static Logger log = Logger.getLogger(WaitRemoveCardTaskService.class);
 
+	public WaitRemoveCardTaskService(TaskParamBean taskParamBean) {
+		super(taskParamBean);
+	}
+
 	protected Task<Void> createTask() {
 		Task<Void> waitRemoveCardTask = new Task<Void>() {
 			@Override

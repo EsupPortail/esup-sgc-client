@@ -2,6 +2,8 @@ package org.esupportail.esupsgcclient.taskencoding;
 
 import javax.smartcardio.CardException;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.NfcResultBean;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingException;
@@ -19,19 +21,14 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
 
     static long lastRunTime = 5000;
 
-    private String qrcode;
-
-    private boolean fromPrinter;
-
-    public EncodingTaskService(String qrcode, boolean fromPrinter) {
-        super();
-        this.qrcode = qrcode;
-        this.fromPrinter = fromPrinter;
+    public EncodingTaskService(TaskParamBean taskParamBean) {
+        super(taskParamBean);
+        assert taskParamBean.qrcode != null;
+        assert taskParamBean.fromPrinter != null;
     }
 
     @Override
     protected Task<String> createTask() {
-
         Task<String> encodingTask = new Task<String>() {
             @Override
             protected String call() throws Exception {
@@ -44,7 +41,7 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
                 }
                 updateTitle("Encodage de la carte");
                 String csn = EncodingService.readCsn();
-                EncodingService.checkBeforeEncoding(qrcode, csn);
+                EncodingService.checkBeforeEncoding(taskParamBean.qrcode, csn);
                 log.info("Encoding : Start");
                 String result = "";
                 while (true) {
@@ -77,10 +74,10 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
 
     @Override
     public EsupSgcTaskService getNext() {
-        if(fromPrinter) {
-            return new EvolisEjectTaskService(true);
+        if(taskParamBean.fromPrinter) {
+            return new EvolisEjectTaskService(taskParamBean);
         } else {
-            return new WaitRemoveCardTaskService();
+            return new WaitRemoveCardTaskService(taskParamBean);
         }
     }
 

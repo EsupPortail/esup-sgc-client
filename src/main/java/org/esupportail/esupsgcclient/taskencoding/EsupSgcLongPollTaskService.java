@@ -1,8 +1,6 @@
 package org.esupportail.esupsgcclient.taskencoding;
 
 import javafx.concurrent.Task;
-import javafx.event.EventDispatchChain;
-import javafx.scene.image.ImageView;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
@@ -20,13 +18,8 @@ public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 
 	RestTemplate restTemplate;
 
-	ImageView bmpBlackImageView;
-	ImageView bmpColorImageView;
-
-	public EsupSgcLongPollTaskService(ImageView bmpBlackImageView, ImageView bmpColorImageView) {
-		super();
-		this.bmpColorImageView = bmpColorImageView;
-		this.bmpBlackImageView = bmpBlackImageView;
+	public EsupSgcLongPollTaskService(TaskParamBean taskParamBean) {
+		super(taskParamBean);
 		HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
 		httpRequestFactory.setConnectionRequestTimeout(300000);
 		httpRequestFactory.setConnectTimeout(300000);
@@ -34,13 +27,14 @@ public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 		restTemplate = new RestTemplate(httpRequestFactory);
 	}
 
+
 	@Override
 	protected Task<String> createTask() {
 		Task<String> esupSgcLongPollTask = new Task<String>() {
 			@Override
 			protected String call() throws Exception {
-				bmpBlackImageView.setImage(null);
-				bmpColorImageView.setImage(null);
+				taskParamBean.bmpBlackImageView.setImage(null);
+				taskParamBean.bmpColorImageView.setImage(null);
 				updateTitle("En attente...");
 				updateProgress(0, 2);
 				while (true) {
@@ -51,6 +45,7 @@ public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 							String qrcode = restTemplate.getForObject(EncodingService.esupSgcUrl + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken, String.class);
 							if (qrcode != null) {
 								updateProgress(2, 2);
+								log.debug("qrcode : " + qrcode);
 								return qrcode;
 							}
 						} catch (ResourceAccessException e) {
@@ -69,7 +64,10 @@ public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 	@Override
 	public EsupSgcTaskService getNext() {
 		String qrcode = this.getValue();
-		return new EsupSgcGetBmpTaskService(bmpBlackImageView, bmpColorImageView, qrcode, EncodingService.BmpType.color,null);
+		return new EsupSgcGetBmpTaskService(new TaskParamBean(qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+				taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
+				taskParamBean.bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
+				taskParamBean.eject4success, taskParamBean.fromPrinter));
 	}
 
 }

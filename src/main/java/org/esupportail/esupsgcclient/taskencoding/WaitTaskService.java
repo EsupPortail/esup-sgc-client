@@ -16,6 +16,10 @@ public class WaitTaskService extends EsupSgcTaskService<Void> {
 	// (alors que la tâche n'est en fait pas complètement finie [1sec]
 	static long lastRunTime = 5000;
 
+	public WaitTaskService(TaskParamBean taskParamBean) {
+		super(taskParamBean);
+	}
+
 	protected Task<Void> createTask() {
 		Task<Void> waitTask = new Task<Void>() {
 			@Override
@@ -37,6 +41,9 @@ public class WaitTaskService extends EsupSgcTaskService<Void> {
 
 	@Override
 	public EsupSgcTaskService getNext() {
-		return new WaitTaskService();
+		return new WaitTaskService(new TaskParamBean(taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+				taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
+				taskParamBean.bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
+				taskParamBean.eject4success, taskParamBean.fromPrinter));
 	}
 }

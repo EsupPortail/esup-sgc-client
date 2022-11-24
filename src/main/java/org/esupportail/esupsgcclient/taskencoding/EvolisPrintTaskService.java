@@ -9,16 +9,8 @@ public class EvolisPrintTaskService extends EsupSgcTaskService<Void> {
 
 	private final static Logger log = Logger.getLogger(EvolisPrintTaskService.class);
 
-	String qrcode;
-	String bmpColorAsBase64;
-
-	String bmpBlackAsBase64;
-
-	public EvolisPrintTaskService(String qrcode, String bmpColorAsBase64, String bmpBlackAsBase64) {
-		super();
-		this.qrcode = qrcode;
-		this.bmpColorAsBase64 = bmpColorAsBase64;
-		this.bmpBlackAsBase64 = bmpBlackAsBase64;
+	public EvolisPrintTaskService(TaskParamBean taskParamBean) {
+		super(taskParamBean);
 	}
 
 	@Override
@@ -31,10 +23,10 @@ public class EvolisPrintTaskService extends EsupSgcTaskService<Void> {
 				EvolisPrinterService.insertCard();
 				updateProgress(2,10);
 				updateTitle("Panneau couleur");
-				EvolisPrinterService.printFrontColorBmp(bmpColorAsBase64);
+				EvolisPrinterService.printFrontColorBmp(taskParamBean.bmpColorAsBase64);
 				updateProgress(3,10);
 				updateTitle("Panneau noir");
-				EvolisPrinterService.printFrontBlackBmp(bmpBlackAsBase64);
+				EvolisPrinterService.printFrontBlackBmp(taskParamBean.bmpBlackAsBase64);
 				updateProgress(4,10);
 				updateTitle("Overlay");
 				EvolisPrinterService.printFrontVarnish("todo");
@@ -52,7 +44,7 @@ public class EvolisPrintTaskService extends EsupSgcTaskService<Void> {
 
 	@Override
 	public EsupSgcTaskService getNext() {
-		return new EncodingTaskService(qrcode, true);
+		return new EncodingTaskService(taskParamBean);
 	}
 
 }

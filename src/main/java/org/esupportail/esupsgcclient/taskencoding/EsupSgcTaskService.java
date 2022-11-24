@@ -7,6 +7,13 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 
 public abstract class EsupSgcTaskService<S> extends Service<S> {
+
+	final TaskParamBean taskParamBean;
+
+	public EsupSgcTaskService(TaskParamBean taskParamBean) {
+		this.taskParamBean = taskParamBean;
+	}
+
 	public abstract EsupSgcTaskService getNext();
 
 }

@@ -20,12 +20,14 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.taskencoding.QrCodeTaskService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.taskencoding.EsupSgcLongPollTaskService;
 import org.esupportail.esupsgcclient.taskencoding.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.taskencoding.EvolisEjectTaskService;
+import org.esupportail.esupsgcclient.taskencoding.TaskParamBean;
 import org.esupportail.esupsgcclient.taskencoding.WaitRemoveCardTaskService;
 import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
 
@@ -145,7 +147,7 @@ public class EsupSgcClientJfxController {
 
 	QrCodeTaskService qrCodeTaskService;
 
-	EsupSgcLongPollTaskService esupSgcLongPollTaskService;
+	EsupSgcLongPollTaskService evolisEsupSgcLongPollTaskService;
 
 	public enum RootType {qrcode, evolis}
 
@@ -322,15 +324,17 @@ public class EsupSgcClientJfxController {
 					if(RootType.qrcode.equals(rootType)) {
 						setupFlowEsupSgcTaskService(qrCodeTaskService, rootType);
 					} else if(RootType.evolis.equals(rootType)) {
-						setupFlowEsupSgcTaskService(esupSgcLongPollTaskService, rootType);
+						setupFlowEsupSgcTaskService(evolisEsupSgcLongPollTaskService, rootType);
 					}
 				}
 			}
 		});
+
 		esupSgcTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent t) {
 				log.error("Exception when procressing card ...", esupSgcTaskService.getException());
+				/*
 				if(RootType.qrcode.equals(rootType)) {
 					WaitRemoveCardTaskService waitRemoveCardTaskService = new WaitRemoveCardTaskService();
 					setupFlowEsupSgcTaskService(waitRemoveCardTaskService, rootType);
@@ -341,11 +345,14 @@ public class EsupSgcClientJfxController {
 				if(esupSgcTaskService.getException() != null && esupSgcTaskService.getException().getMessage()!=null) {
 					logTextarea.appendText(esupSgcTaskService.getException().getMessage());
 				}
+				 */
 			}
 		});
 
+
 		textPrincipal.textProperty().bind(esupSgcTaskService.titleProperty());
 		progressBar.progressProperty().bind(esupSgcTaskService.progressProperty());
+		log.debug("restart " + esupSgcTaskService);
 		esupSgcTaskService.restart();
 	}
 
@@ -362,15 +369,20 @@ public class EsupSgcClientJfxController {
 	}
 
 	private void startLoopServiceIfPossible() {
-		if(authReady.getValue() && nfcReady.getValue() && webcamReady.getValue() && false) {
+		log.debug("startLoopServiceIfPossible ...");
+		if(authReady.getValue() && nfcReady.getValue() && webcamReady.getValue()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
 					if(qrCodeTaskService!=null && qrCodeTaskService.isRunning()) {
 						qrCodeTaskService.cancel();
 					}
-					qrCodeTaskService = new QrCodeTaskService(webcamImageView.imageProperty());
+					qrCodeTaskService = new QrCodeTaskService(new TaskParamBean(null, webcamImageView.imageProperty(), null,
+							null, bmpColorImageView, bmpBlackImageView,
+							null,null,
+							true, true));
 					setupFlowEsupSgcTaskService(qrCodeTaskService, RootType.qrcode);
+					logTextarea.appendText("qrCodeTaskService is now running");
 				}
 			});
 		}
@@ -378,11 +390,15 @@ public class EsupSgcClientJfxController {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					if(esupSgcLongPollTaskService!=null && esupSgcLongPollTaskService.isRunning()) {
-						esupSgcLongPollTaskService.cancel();
+					if(evolisEsupSgcLongPollTaskService !=null && evolisEsupSgcLongPollTaskService.isRunning()) {
+						evolisEsupSgcLongPollTaskService.cancel();
 					}
-					esupSgcLongPollTaskService = new EsupSgcLongPollTaskService(bmpBlackImageView, bmpColorImageView);
-					setupFlowEsupSgcTaskService(esupSgcLongPollTaskService, RootType.evolis);
+					evolisEsupSgcLongPollTaskService = new EsupSgcLongPollTaskService(new TaskParamBean(null, webcamImageView.imageProperty(), null,
+							EncodingService.BmpType.black, bmpColorImageView, bmpBlackImageView,
+							null,null,
+							true, true));
+					setupFlowEsupSgcTaskService(evolisEsupSgcLongPollTaskService, RootType.evolis);
+					logTextarea.appendText("evolisEsupSgcLongPollTaskService is now running");
 				}
 			});
 		}

@@ -9,6 +9,9 @@ import org.esupportail.esupsgcclient.utils.Utils;
 
 import javafx.concurrent.Task;
 
+/*
+TODO : Refactor as javafx.concurrent.Service
+ */
 public class InitEncodingServiceTask extends Task<Void> {
 
     final static Logger log = Logger.getLogger(InitEncodingServiceTask.class);
@@ -25,25 +28,26 @@ public class InitEncodingServiceTask extends Task<Void> {
 
         try {
             EncodingService.init();
-            mainPane.addLogTextLn("INFO", "pc/sc : OK");
+            mainPane.logTextarea.appendText("pc/sc : OK\n");
 
+
+            /* TODO ...
             if (EncodingService.isEncodeCnous()) {
-                mainPane.addLogTextLn("INFO", "dll cnous : OK");
+                mainPane.logTextarea.appendText("dll cnous : OK");
             } else {
                 mainPane.hideCnousSteps();
-            }
+            }*/
 
-            mainPane.addLogTextLn("INFO", "numeroId = " + EsupSgcClientApplication.numeroId);
-            mainPane.addLogTextLn("INFO", "sgcAuthToken = " + EsupSgcClientApplication.sgcAuthToken);
-            mainPane.addLogTextLn("INFO", "esupNfcTagServerUrl = " + EncodingService.getEsupNfcTagServerUrl());
-            mainPane.addLogTextLn("INFO", "sgcUrl = " + EncodingService.getSgcUrl());
+            mainPane.logTextarea.appendText("numeroId = " + EsupSgcClientApplication.numeroId);
+            mainPane.logTextarea.appendText("sgcAuthToken = " + EsupSgcClientApplication.sgcAuthToken);
+            mainPane.logTextarea.appendText( "esupNfcTagServerUrl = " + EncodingService.getEsupNfcTagServerUrl());
+            mainPane.logTextarea.appendText( "sgcUrl = " + EncodingService.getSgcUrl());
             mainPane.nfcReady.setValue(true);
 
         } catch (CnousFournisseurCarteException e) {
-            customLog("ERROR", "Erreur de configuration cnous", e);
+            log.error("Erreur de configuration cnous", e);
         } catch (EncodingException | PcscException e) {
-            mainPane.nfcReady.setValue(false);
-            customLog("ERROR", "Erreur lecteur PC/SC", e);
+            log.error("Erreur lecteur PC/SC", e);
         }
         return null;
     }
