@@ -7,6 +7,9 @@ import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 
 public class TaskParamBean {
 
+    public enum RootType {qrcode, evolis}
+
+    final RootType rootType;
     final String qrcode;
 
     final ObjectProperty<Image> webcamImageProperty;
@@ -27,10 +30,11 @@ public class TaskParamBean {
 
     final Boolean fromPrinter;
 
-    public TaskParamBean(String qrcode, ObjectProperty<Image> imageProperty, String csn,
+    public TaskParamBean(RootType rootType, String qrcode, ObjectProperty<Image> imageProperty, String csn,
                          EncodingService.BmpType bmpType, ImageView bmpColorImageView, ImageView bmpBlackImageView,
                          String bmpColorAsBase64, String bmpBlackAsBase64,
                          Boolean eject4success, Boolean fromPrinter) {
+        this.rootType = rootType;
         this.qrcode = qrcode;
         this.webcamImageProperty = imageProperty;
         this.csn = csn;

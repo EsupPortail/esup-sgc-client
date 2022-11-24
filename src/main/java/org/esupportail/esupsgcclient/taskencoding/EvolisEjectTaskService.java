@@ -38,7 +38,16 @@ public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 	}
 
 	@Override
-	public EsupSgcTaskService getNext() {
-		return new EsupSgcLongPollTaskService(taskParamBean);
+	public EsupSgcTaskService getNextWhenSuccess() {
+		return new EsupSgcLongPollTaskService(new TaskParamBean(taskParamBean.rootType, taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+				taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
+				taskParamBean.bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
+				true, taskParamBean.fromPrinter));
 	}
+
+	@Override
+	public EsupSgcTaskService getNextWhenFail() {
+		return getNextWhenSuccess();
+	}
+
 }

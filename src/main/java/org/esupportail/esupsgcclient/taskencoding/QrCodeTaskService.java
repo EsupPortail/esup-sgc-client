@@ -49,9 +49,9 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 	}
 
 	@Override
-	public EsupSgcTaskService getNext() {
+	public EsupSgcTaskService getNextWhenSuccess() {
 		String qrcode = this.getValue();
-		return new EncodingTaskService(new TaskParamBean(qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+		return new EncodingTaskService(new TaskParamBean(taskParamBean.rootType, qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
 				taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
 				taskParamBean.bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
 				taskParamBean.eject4success, taskParamBean.fromPrinter));

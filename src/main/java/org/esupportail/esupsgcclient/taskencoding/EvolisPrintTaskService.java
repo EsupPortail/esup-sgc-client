@@ -43,7 +43,7 @@ public class EvolisPrintTaskService extends EsupSgcTaskService<Void> {
 	}
 
 	@Override
-	public EsupSgcTaskService getNext() {
+	public EsupSgcTaskService getNextWhenSuccess() {
 		return new EncodingTaskService(taskParamBean);
 	}
 

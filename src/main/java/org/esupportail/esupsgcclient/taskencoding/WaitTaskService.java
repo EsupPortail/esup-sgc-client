@@ -40,10 +40,7 @@ public class WaitTaskService extends EsupSgcTaskService<Void> {
 	}
 
 	@Override
-	public EsupSgcTaskService getNext() {
-		return new WaitTaskService(new TaskParamBean(taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
-				taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
-				taskParamBean.bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
-				taskParamBean.eject4success, taskParamBean.fromPrinter));
+	public EsupSgcTaskService getNextWhenSuccess() {
+		return new WaitTaskService(taskParamBean);
 	}
 }

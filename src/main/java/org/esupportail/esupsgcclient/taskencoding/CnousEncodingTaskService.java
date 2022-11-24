@@ -50,7 +50,7 @@ public class CnousEncodingTaskService extends EsupSgcTaskService<String> {
     }
 
     @Override
-    public EsupSgcTaskService getNext() {
+    public EsupSgcTaskService getNextWhenSuccess() {
         throw new RuntimeException("TODO ...");
     }
 }

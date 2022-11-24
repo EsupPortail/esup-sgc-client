@@ -36,7 +36,13 @@ public class WaitRemoveCardTaskService extends EsupSgcTaskService<Void> {
 	}
 
 	@Override
-	public EsupSgcTaskService getNext() {
+	public EsupSgcTaskService getNextWhenSuccess() {
 		return new QrCodeTaskService(taskParamBean);
 	}
+
+	@Override
+	public EsupSgcTaskService getNextWhenFail() {
+		return getNextWhenSuccess();
+	}
+
 }

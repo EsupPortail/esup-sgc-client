@@ -47,17 +47,17 @@ public class EsupSgcGetBmpTaskService extends EsupSgcTaskService<String> {
 	}
 
 	@Override
-	public EsupSgcTaskService getNext() {
+	public EsupSgcTaskService getNextWhenSuccess() {
 		log.info("getNext " + taskParamBean.bmpType);
 		if(taskParamBean.bmpType.equals(EncodingService.BmpType.black)) {
 			String bmpColorAsBase64 = this.getValue();
-			return new EsupSgcGetBmpTaskService(new TaskParamBean(taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+			return new EsupSgcGetBmpTaskService(new TaskParamBean(taskParamBean.rootType, taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
 					EncodingService.BmpType.color, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
 					bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
 					taskParamBean.eject4success, taskParamBean.fromPrinter));
 		} else {
 			String bmpBlackAsBase64 = this.getValue();
-			return new EvolisPrintTaskService(new TaskParamBean(taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
+			return new EvolisPrintTaskService(new TaskParamBean(taskParamBean.rootType,taskParamBean.qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
 					taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
 					taskParamBean.bmpColorAsBase64, bmpBlackAsBase64,
 					taskParamBean.eject4success, taskParamBean.fromPrinter));
