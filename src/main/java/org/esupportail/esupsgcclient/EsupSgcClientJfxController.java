@@ -82,21 +82,6 @@ public class EsupSgcClientJfxController {
 	public Pane nfcTagPane;
 
 	@FXML
-	private Label stepClientReady;
-
-	@FXML
-	private Label stepReadQR;
-
-	@FXML
-	private Label stepReadCSN;
-
-	@FXML
-	private Label stepSelectSGC;
-
-	@FXML
-	private Label stepEncodageApp;
-
-	@FXML
 	private FlowPane panePrincipal;
 
 	@FXML
@@ -195,7 +180,7 @@ public class EsupSgcClientJfxController {
 				if(newValue) {
 					checkNfc.getStyleClass().clear();
 					checkNfc.getStyleClass().add("btn-success");
-					addLogTextLn("INFO", "PC/SC OK");
+					logTextarea.appendText("PC/SC OK\n");
 					startLoopServiceIfPossible();
 				} else {
 					checkNfc.getStyleClass().clear();
@@ -211,7 +196,7 @@ public class EsupSgcClientJfxController {
 					checkAuth.getStyleClass().clear();
 					checkAuth.getStyleClass().add("btn-success");
 					checkAuth.getTooltip().setText(FileLocalStorage.eppnInit);
-					addLogTextLn("INFO", "Authentification OK : " + FileLocalStorage.eppnInit);
+					logTextarea.appendText("Authentification OK : " + FileLocalStorage.eppnInit + "\n");
 					startLoopServiceIfPossible();
 				} else {
 					checkAuth.getStyleClass().clear();
@@ -227,7 +212,7 @@ public class EsupSgcClientJfxController {
 				if(newValue) {
 					checkPrinter.getStyleClass().clear();
 					checkPrinter.getStyleClass().add("btn-success");
-					addLogTextLn("INFO", "imprimante evolis OK");
+					logTextarea.appendText("imprimante evolis OK\n");
 					bmpBlackImageView.setVisible(true);
 					bmpBlackImageView.setManaged(true);
 					bmpColorImageView.setVisible(true);
@@ -256,7 +241,7 @@ public class EsupSgcClientJfxController {
 				} else {
 					checkCamera.getStyleClass().clear();
 					checkCamera.getStyleClass().add("btn-danger");
-					addLogTextLn("ERROR", "Caméra déconnectée ?!");
+					logTextarea.appendText("Caméra déconnectée ?!\n");
 				}
 				Platform.runLater(new Runnable() {
 					@Override
@@ -302,7 +287,7 @@ public class EsupSgcClientJfxController {
 				@Override
 				public void run() {
 					esupSgcTaskServiceFactory.runQrCodeTaskService();
-					logTextarea.appendText("qrCodeTaskService is now running");
+					logTextarea.appendText("qrCodeTaskService is now running\n");
 				}
 			});
 		}
@@ -311,7 +296,7 @@ public class EsupSgcClientJfxController {
 				@Override
 				public void run() {
 					esupSgcTaskServiceFactory.runEvolisEsupSgcLongPollTaskService();
-					logTextarea.appendText("evolisEsupSgcLongPollTaskService is now running");
+					logTextarea.appendText("evolisEsupSgcLongPollTaskService is now running\n");
 				}
 			});
 		}
@@ -321,66 +306,6 @@ public class EsupSgcClientJfxController {
 		textPrincipal.setText(text);
 		panePrincipal.getStyleClass().clear();
 		panePrincipal.getStyleClass().add("panel-" + styleLevel);
-	}
-
-	public void changeStepClientReady(String text, StyleLevel styleLevel) {
-		stepClientReady.setText(text);
-		stepClientReady.getParent().getStyleClass().clear();
-		stepClientReady.getParent().getStyleClass().add("alert-" + styleLevel);
-	}
-
-	public void changeStepReadQR(StyleLevel styleLevel) {
-		stepReadQR.getParent().getStyleClass().clear();
-		stepReadQR.getParent().getStyleClass().add("alert-" + styleLevel);
-	}
-
-	public void changeStepReadCSN(StyleLevel styleLevel) {
-		stepReadCSN.getParent().getStyleClass().clear();
-		stepReadCSN.getParent().getStyleClass().add("alert-" + styleLevel);
-	}
-
-	public void changeStepSelectSGC(StyleLevel styleLevel) {
-		stepSelectSGC.getParent().getStyleClass().clear();
-		stepSelectSGC.getParent().getStyleClass().add("alert-" + styleLevel);
-	}
-
-	public void changeStepEncodageApp(StyleLevel styleLevel) {
-		stepEncodageApp.getParent().getStyleClass().clear();
-		stepEncodageApp.getParent().getStyleClass().add("alert-" + styleLevel);
-	}
-
-	public void changeStepEncodageCnous(StyleLevel styleLevel) {
-		stepEncodageCnous.getParent().getStyleClass().clear();
-		stepEncodageCnous.getParent().getStyleClass().add("alert-" + styleLevel);
-	}
-
-	public void changeStepSendCSV(StyleLevel styleLevel) {
-		stepSendCSV.getParent().getStyleClass().clear();
-		stepSendCSV.getParent().getStyleClass().add("alert-" + styleLevel);
-	}
-
-	public void hideCnousSteps() {
-		stepEncodageCnous.setVisible(false);
-		stepSendCSV.setVisible(false);
-	}
-
-	public void setOk() {
-		//changeStepClientReady("Client prêt", MainController.StyleLevel.success);
-		//changeTextPrincipal("En attente d'une carte...", MainController.StyleLevel.success);
-		log.info("client ok");
-	}
-	
-	public void addLogTextLn(String type, String text) {
-		if (!text.equals(lastText)) {
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					String date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
-					logTextarea.appendText("[" + type + "] " + date + " - " + text + "\n");
-					lastText = text;
-					logTextarea.positionCaret(logTextarea.getLength());
-				}});
-		}
 	}
 
 }

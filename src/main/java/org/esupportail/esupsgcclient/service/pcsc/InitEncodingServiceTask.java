@@ -52,34 +52,4 @@ public class InitEncodingServiceTask extends Task<Void> {
         return null;
     }
 
-
-    private void customLog(String level, String message, Throwable throwable) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                if ("ERROR".equals(level)) {
-                    if (throwable != null) {
-                        log.error(message, throwable);
-                        mainPane.addLogTextLn(level, throwable.getMessage());
-                        mainPane.addLogTextLn(level, Utils.getExceptionString(throwable));
-                    } else {
-                        log.error(message);
-                        mainPane.addLogTextLn(level, message);
-                    }
-                    mainPane.changeTextPrincipal(message, EsupSgcClientJfxController.StyleLevel.danger);
-                    mainPane.changeStepClientReady("Client non prêt", EsupSgcClientJfxController.StyleLevel.danger);
-                } else if ("WARN".equals(level)) {
-                    if (throwable != null) {
-                        log.warn(message, throwable);
-                    } else {
-                        log.warn(message, throwable);
-                    }
-                    mainPane.changeTextPrincipal(message, EsupSgcClientJfxController.StyleLevel.warning);
-                    mainPane.addLogTextLn(level, message);
-                }
-                Utils.playSound("fail.wav");
-            }
-        });
-    }
-
 }

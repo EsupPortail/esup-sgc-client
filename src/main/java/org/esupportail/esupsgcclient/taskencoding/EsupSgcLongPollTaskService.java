@@ -54,6 +54,9 @@ public class EsupSgcLongPollTaskService extends EsupSgcTaskService<String> {
 							if (qrcode != null) {
 								updateProgress(2, 2);
 								log.debug("qrcode : " + qrcode);
+								if("stop".equals(qrcode)) {
+									throw new RuntimeException("Un esup-sg-client avec le même utilisateur est déjà démarré ??");
+								}
 								return qrcode;
 							}
 						} catch (ResourceAccessException e) {
