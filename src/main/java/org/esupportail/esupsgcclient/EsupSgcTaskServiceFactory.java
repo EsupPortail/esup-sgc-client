@@ -76,7 +76,7 @@ public class EsupSgcTaskServiceFactory {
         for(UiStep step : uiSteps.keySet()) {
             uiSteps.get(step).setVisible(false);
             uiSteps.get(step).getStyleClass().clear();
-            uiSteps.get(step).getStyleClass().add("alert-warning");
+            uiSteps.get(step).getStyleClass().add("alert-info");
         }
     }
 
@@ -114,6 +114,12 @@ public class EsupSgcTaskServiceFactory {
     qui donne la tâche suivant à effectuer
  */
     void setupFlowEsupSgcTaskService(EsupSgcTaskService esupSgcTaskService) {
+        esupSgcTaskService.setOnRunning(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+                esupSgcTaskService.setUiStepRunning();
+            }
+        });
         esupSgcTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {

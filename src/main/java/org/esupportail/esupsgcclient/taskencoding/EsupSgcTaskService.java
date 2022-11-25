@@ -38,6 +38,13 @@ public abstract class EsupSgcTaskService<S> extends Service<S> {
 			setUiStepSuccess(getUiStep());
 		}
 	}
+	public void setUiStepRunning() {
+		if(getUiStep() !=null) {
+			taskParamBean.uiSteps.get(getUiStep()).getStyleClass().clear();
+			taskParamBean.uiSteps.get(getUiStep()).getStyleClass().add("alert-warning");
+		}
+	}
+
 	public void setUiStepSuccess(UiStep uiStep) {
 		taskParamBean.uiSteps.get(uiStep).getStyleClass().clear();
 		taskParamBean.uiSteps.get(uiStep).getStyleClass().add("alert-success");
