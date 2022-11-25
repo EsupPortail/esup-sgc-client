@@ -90,7 +90,7 @@ public class EsupSgcTaskServiceFactory {
         qrCodeTaskService = new QrCodeTaskService(new TaskParamBean(uiSteps, TaskParamBean.RootType.qrcode, null, webcamImageView.imageProperty(), null,
                 null, bmpColorImageView, bmpBlackImageView,
                 null,null,
-                true, true));
+                true, false));
         setupFlowEsupSgcTaskService(qrCodeTaskService);
     }
 
