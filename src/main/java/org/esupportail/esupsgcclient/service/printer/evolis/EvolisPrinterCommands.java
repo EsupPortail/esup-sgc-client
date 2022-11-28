@@ -44,14 +44,14 @@ public class EvolisPrinterCommands {
 	static EvolisRequest printSet() {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.Set");
-		req.getParams().put("data", "GRibbonType=RC_YMCKO;FOverlayManagement=FULLVARNISH");
+		req.getParams().put("data", "GRibbonType=RC_YMCKO;Duplex=NONE");
 		req.getParams().put("session", "JOB000001");
 		return req;
 	}
 
 	static EvolisRequest printFrontColorBmp(String bmpAsBase64) {
 		EvolisRequest req = new EvolisRequest();
-		req.setMethod("PRINT.SetBitMap");
+		req.setMethod("PRINT.SetBitmap");
 		req.getParams().put("session", "JOB000001");
 		req.getParams().put("face", "front");
 		req.getParams().put("panel", "color");
@@ -61,7 +61,7 @@ public class EvolisPrinterCommands {
 
 	static EvolisRequest printFrontBlackBmp(String bmpAsBase64) {
 		EvolisRequest req = new EvolisRequest();
-		req.setMethod("PRINT.SetBitMap");
+		req.setMethod("PRINT.SetBitmap");
 		req.getParams().put("session", "JOB000001");
 		req.getParams().put("face", "front");
 		req.getParams().put("panel", "resin");
@@ -74,7 +74,7 @@ public class EvolisPrinterCommands {
 	 */
 	static EvolisRequest printFrontVarnish(String bmpAsBase64) {
 		EvolisRequest req = new EvolisRequest();
-		req.setMethod("PRINT.SetBitMap");
+		req.setMethod("PRINT.SetBitmap");
 		req.getParams().put("session", "JOB000001");
 		req.getParams().put("face", "front");
 		req.getParams().put("panel", "varnish");
@@ -99,18 +99,24 @@ public class EvolisPrinterCommands {
 	static EvolisRequest insertCardToContactLessStation() {
 		EvolisRequest req = new EvolisRequest();
 		req.getParams().put("command", "Sic");
+		req.getParams().put("device", "Evolis Primacy 2");
+		req.getParams().put("timeout", "5000");
 		return req;
 	}
 
 	static EvolisRequest eject() {
 		EvolisRequest req = new EvolisRequest();
 		req.getParams().put("command", "Se");
+		req.getParams().put("device", "Evolis Primacy 2");
+		req.getParams().put("timeout", "5000");
 		return req;
 	}
 
 	static EvolisRequest reject() {
 		EvolisRequest req = new EvolisRequest();
 		req.getParams().put("command", "Ser");
+		req.getParams().put("device", "Evolis Primacy 2");
+		req.getParams().put("timeout", "5000");
 		return req;
 	}
 
