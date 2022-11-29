@@ -10,11 +10,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
-import org.esupportail.esupsgcclient.taskencoding.EvolisTaskService;
-import org.esupportail.esupsgcclient.taskencoding.EsupSgcTaskService;
-import org.esupportail.esupsgcclient.taskencoding.QrCodeTaskService;
-import org.esupportail.esupsgcclient.taskencoding.TaskParamBean;
+import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
+import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
+import org.esupportail.esupsgcclient.tasks.TaskParamBean;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
 import java.io.IOException;

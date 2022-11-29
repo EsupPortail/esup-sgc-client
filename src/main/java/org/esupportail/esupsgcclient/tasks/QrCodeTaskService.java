@@ -1,4 +1,4 @@
-package org.esupportail.esupsgcclient.taskencoding;
+package org.esupportail.esupsgcclient.tasks;
 
 import com.github.sarxos.webcam.WebcamException;
 import javafx.concurrent.Task;

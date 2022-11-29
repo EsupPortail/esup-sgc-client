@@ -1,4 +1,4 @@
-package org.esupportail.esupsgcclient.taskencoding;
+package org.esupportail.esupsgcclient.tasks;
 
 import javafx.concurrent.Service;
 import org.esupportail.esupsgcclient.ui.UiStep;

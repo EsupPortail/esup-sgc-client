@@ -12,12 +12,10 @@ public enum UiStep {
         encode("Encodage de la carte"),
         encode_cnous("Encodage CNOUS"),
         send_csv("Envoi du CSV"),
-        printer_insert("Insertion Carte dans l'imprimante"),
-        printer_color("Impression Couleur"),
-        printer_black("Impression Noir et Blanc"),
-        printer_overlay("Impression Overlay"),
-        printer_print("Impression"),
-        printer_eject("Carte éjectée");
+        printer_color("Envoi Panneau Couleur"),
+        printer_black("Envoi Panneau Noir et Blanc"),
+        printer_overlay("Envoi Panneau Overlay"),
+        printer_print("Impression");
 
         private String name;
 

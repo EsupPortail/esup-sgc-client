@@ -1,24 +1,17 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Random;
 
 
 /**
@@ -82,7 +75,7 @@ public class EvolisPrinterService {
 					byte[] buffer = new byte[1024];
 					n = socketInputStream.read(buffer);
 					responseStr = responseStr + new String(buffer);
-				} catch(SocketTimeoutException ex){
+				} catch(SocketTimeoutException | SocketException ex){
 					if(StringUtils.hasText(responseStr)) {
 						log.debug("SocketTimeoutException - response received - we stop it");
 						log.warn(responseStr.length() > 200 ? responseStr.substring(0, 200) : responseStr);
@@ -93,6 +86,9 @@ public class EvolisPrinterService {
 			EvolisResponse response = objectMapper.readValue(responseStr, EvolisResponse.class);
 			// close socket - sinon evolis center reste en boucle infinie
 			socketInputStream.close();
+			if(response.getError()!=null) {
+				throw new EvolisException(response.getError());
+			}
 			return response;
 		} catch (IOException e) {
 			throw new RuntimeException("IOException seding Request to evolis : " + req, e);
@@ -116,14 +112,7 @@ public class EvolisPrinterService {
 	}
 
 	public static EvolisResponse printBegin() {
-		EvolisResponse response = sendRequestAndLog(EvolisPrinterCommands.printBegin());
-		if(response.getError()!=null && response.getError().getCode()==1700) {
-			// 1700 == Printing session already ...
-			log.warn(response.getError().getMessage());
-			printEnd();
-			response = sendRequestAndLog(EvolisPrinterCommands.printBegin());
-		}
-		return response;
+		return sendRequestAndLog(EvolisPrinterCommands.printBegin());
 	}
 
 	public static void printSet() {
@@ -162,5 +151,13 @@ public class EvolisPrinterService {
 
 	public static void reject() {
 		sendRequestAndLog(EvolisPrinterCommands.reject());
+	}
+
+	public static void startSequence() {
+		sendRequestAndLog(EvolisPrinterCommands.startSequence());
+	}
+
+	public static void endSequence() {
+		sendRequestAndLog(EvolisPrinterCommands.endSequence());
 	}
 }

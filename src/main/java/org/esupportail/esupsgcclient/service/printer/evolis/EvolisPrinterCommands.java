@@ -1,6 +1,7 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,8 @@ import java.net.Socket;
  * It computes JSON-RPC commands to send to Evolis Services Provider 2
  */
 public class EvolisPrinterCommands {
+
+	static String JOB_ID = "JOB000001";
 
 	static EvolisRequest getPrinterStatus() {
 		EvolisRequest req = new EvolisRequest();
@@ -37,7 +40,7 @@ public class EvolisPrinterCommands {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.Begin");
 		req.getParams().put("device", "Evolis Primacy 2");
-		req.getParams().put("session", "JOB000001");
+		req.getParams().put("session", JOB_ID);
 		return req;
 	}
 
@@ -45,14 +48,14 @@ public class EvolisPrinterCommands {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.Set");
 		req.getParams().put("data", "GRibbonType=RC_YMCKO;Duplex=NONE");
-		req.getParams().put("session", "JOB000001");
+		req.getParams().put("session", JOB_ID);
 		return req;
 	}
 
 	static EvolisRequest printFrontColorBmp(String bmpAsBase64) {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.SetBitmap");
-		req.getParams().put("session", "JOB000001");
+		req.getParams().put("session", JOB_ID);
 		req.getParams().put("face", "front");
 		req.getParams().put("panel", "color");
 		req.getParams().put("data", "base64:" + bmpAsBase64);
@@ -62,7 +65,7 @@ public class EvolisPrinterCommands {
 	static EvolisRequest printFrontBlackBmp(String bmpAsBase64) {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.SetBitmap");
-		req.getParams().put("session", "JOB000001");
+		req.getParams().put("session", JOB_ID);
 		req.getParams().put("face", "front");
 		req.getParams().put("panel", "resin");
 		req.getParams().put("data", "base64:" + bmpAsBase64);
@@ -75,7 +78,7 @@ public class EvolisPrinterCommands {
 	static EvolisRequest printFrontVarnish(String bmpAsBase64) {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.SetBitmap");
-		req.getParams().put("session", "JOB000001");
+		req.getParams().put("session", JOB_ID);
 		req.getParams().put("face", "front");
 		req.getParams().put("panel", "varnish");
 		req.getParams().put("data", "base64:" + bmpAsBase64);
@@ -85,14 +88,14 @@ public class EvolisPrinterCommands {
 	static EvolisRequest print() {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.Print");
-		req.getParams().put("session", "JOB000001");
+		req.getParams().put("session", JOB_ID);
 		return req;
 	}
 
 	static EvolisRequest printEnd() {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.End");
-		req.getParams().put("session", "JOB000001");
+		req.getParams().put("session", JOB_ID);
 		return req;
 	}
 
@@ -120,4 +123,15 @@ public class EvolisPrinterCommands {
 		return req;
 	}
 
+	public static EvolisRequest startSequence() {
+		EvolisRequest req = new EvolisRequest();
+		req.getParams().put("command", "Ss");
+		return req;
+	}
+
+	public static EvolisRequest endSequence() {
+		EvolisRequest req = new EvolisRequest();
+		req.getParams().put("command", "Se");
+		return req;
+	}
 }

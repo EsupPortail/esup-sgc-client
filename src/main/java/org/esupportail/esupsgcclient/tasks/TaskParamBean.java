@@ -1,10 +1,9 @@
-package org.esupportail.esupsgcclient.taskencoding;
+package org.esupportail.esupsgcclient.tasks;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
-import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
 import java.util.Map;
