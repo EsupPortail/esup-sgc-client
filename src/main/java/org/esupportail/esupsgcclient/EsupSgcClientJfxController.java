@@ -1,31 +1,22 @@
 package org.esupportail.esupsgcclient;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
+import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTaskService;
+import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
 
 import com.github.sarxos.webcam.Webcam;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -33,7 +24,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
@@ -58,6 +48,12 @@ public class EsupSgcClientJfxController {
 	private MenuItem buttonNfcTag;
 
 	@FXML
+	private MenuItem evolisReject;
+
+	@FXML
+	private MenuItem evolisPrintEnd;
+
+	@FXML
 	private Button checkAuth;
 
 	@FXML
@@ -76,9 +72,6 @@ public class EsupSgcClientJfxController {
 	public TextArea logTextarea;
 
 	@FXML
-	private Pane mainPane;
-
-	@FXML
 	public Pane nfcTagPane;
 
 	@FXML
@@ -88,16 +81,7 @@ public class EsupSgcClientJfxController {
 	private Label textPrincipal;
 
 	@FXML
-	private Label title;
-
-	@FXML
 	public ImageView webcamImageView;
-
-	@FXML
-	private Label stepEncodageCnous;
-
-	@FXML
-	private Label stepSendCSV;
 
 	@FXML
 	public ImageView bmpBlackImageView;
@@ -107,12 +91,6 @@ public class EsupSgcClientJfxController {
 
 	@FXML
 	private ProgressBar progressBar;
-
-	private String lastText = null;
-
-	public ObjectProperty<Image> imageProperty;
-
-	private BufferedImage webcamBufferedImage;
 
 	public static SimpleBooleanProperty webcamReady = new SimpleBooleanProperty(false);
 
@@ -205,8 +183,36 @@ public class EsupSgcClientJfxController {
 				}
 			}
 		});
+		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				Thread th = new Thread(new Task<>() {
+					@Override
+					protected Object call() throws Exception {
+						EvolisPrinterService.reject();
+						return null;
+					}
+				});
+				th.setDaemon(true);
+				th.start();
+			}
+		});
+		evolisPrintEnd.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				Thread th = new Thread(new Task<>() {
+					@Override
+					protected Object call() throws Exception {
+						EvolisPrinterService.printEnd();
+						return null;
+					}
+				});
+				th.setDaemon(true);
+				th.start();
+			}
+		});
 
-		EvolisHeartbeatTask.printerReady.addListener(new ChangeListener<Boolean>() {
+		EvolisHeartbeatTaskService.printerReady.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
@@ -246,6 +252,10 @@ public class EsupSgcClientJfxController {
 			}
 		});
 
+		EvolisHeartbeatTaskService evolisHeartbeatTaskService = new EvolisHeartbeatTaskService();
+		checkPrinter.getTooltip().textProperty().bind(evolisHeartbeatTaskService.titleProperty());
+		evolisHeartbeatTaskService.start();
+
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		Webcam.getWebcams(); // with this webcams are discovered and listener works at startup
 
@@ -279,7 +289,7 @@ public class EsupSgcClientJfxController {
 				}
 			});
 		}
-		if(authReady.getValue() && nfcReady.getValue() && EvolisHeartbeatTask.printerReady.getValue()) {
+		if(authReady.getValue() && nfcReady.getValue() && EvolisHeartbeatTaskService.printerReady.getValue()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {

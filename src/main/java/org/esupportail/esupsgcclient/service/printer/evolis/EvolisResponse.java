@@ -11,6 +11,8 @@ public class EvolisResponse {
 
     String result;
 
+    EvolisError error;
+
 
     public String getJsonrpc() {
         return jsonrpc;
@@ -36,13 +38,21 @@ public class EvolisResponse {
         this.result = result;
     }
 
+    public EvolisError getError() {
+        return error;
+    }
+
+    public void setError(EvolisError error) {
+        this.error = error;
+    }
+
     @Override
     public String toString() {
-        String partOfResult = result.length()>200 ? result.substring(0, 200) + "..." : result;
         return "EvolisResponse{" +
                 "jsonrpc='" + jsonrpc + '\'' +
                 ", id='" + id + '\'' +
-                ", result='" + partOfResult + '\'' +
+                ", result='" + result + '\'' +
+                ", error=" + error +
                 '}';
     }
 

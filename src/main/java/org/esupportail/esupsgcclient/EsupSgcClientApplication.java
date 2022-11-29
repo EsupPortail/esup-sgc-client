@@ -8,7 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.VBox;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.InitEncodingServiceTask;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTask;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -59,11 +58,6 @@ public class EsupSgcClientApplication extends Application {
 		Thread clientCheckThread = new Thread(clientCheckService);
 		clientCheckThread.setDaemon(true);
 		clientCheckThread.start();
-
-		EvolisHeartbeatTask evolisHeartbeatTask = new EvolisHeartbeatTask();
-		Thread evolisCheckThread = new Thread(evolisHeartbeatTask);
-		evolisCheckThread.setDaemon(true);
-		evolisCheckThread.start();
 		
 	}
     

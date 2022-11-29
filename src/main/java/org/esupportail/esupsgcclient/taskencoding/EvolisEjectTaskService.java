@@ -26,6 +26,11 @@ public class EvolisEjectTaskService extends EsupSgcTaskService<Void> {
 				try {
 					updateProgress(1, 2);
 					updateTitle("Ejection de la carte");
+					try {
+						EvolisPrinterService.printEnd();
+					}catch(Exception e) {
+						log.warn("print end exception", e);
+					}
 					if(taskParamBean.eject4success) {
 						EvolisPrinterService.eject();
 					} else {

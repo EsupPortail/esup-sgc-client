@@ -92,7 +92,7 @@ public class EncodingTaskService extends EsupSgcTaskService<String> {
     @Override
     public EsupSgcTaskService getNextWhenSuccess() {
         if(taskParamBean.fromPrinter) {
-            return new EvolisEjectTaskService(taskParamBean);
+            return new EvolisPrintTaskService(taskParamBean);
         } else {
             return new WaitRemoveCardTaskService(taskParamBean);
         }

@@ -27,6 +27,12 @@
               <MenuItem fx:id="buttonLogs" mnemonicParsing="false" text="Masquer les logs" />
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="Evolis">
+               <items>
+                  <MenuItem fx:id="evolisReject" mnemonicParsing="false" text="Rejeter la carte" />
+                  <MenuItem fx:id="evolisPrintEnd" mnemonicParsing="false" text="Clore la session d'impression" />
+               </items>
+            </Menu>
         </menus>
       </MenuBar>
       <FlowPane fx:id="mainPane" orientation="VERTICAL">

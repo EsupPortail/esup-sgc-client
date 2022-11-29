@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
@@ -13,8 +14,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Random;
 
 
@@ -26,7 +29,8 @@ public class EvolisPrinterService {
 	
 	final static Logger log = LoggerFactory.getLogger(EvolisPrinterService.class);
 
-	static String ip = "127.0.0.1";
+	static String ip = "10.197.1.71";
+	//static String ip = "127.0.0.1";
 
 	static int port = 18000;
 
@@ -38,6 +42,7 @@ public class EvolisPrinterService {
 		if(socket == null || socket.isClosed() || !socket.isConnected() || socket.isClosed() || !socket.isBound()) {
 			try {
 				socket = new Socket(ip, port);
+				socket.setSoTimeout(100);
 				return true;
 			} catch (IOException e) {
 				if (exceptionIfFailed) {
@@ -51,7 +56,7 @@ public class EvolisPrinterService {
 		return true;
 	}
 
-	public void closeSocket() {
+	public static void closeSocket() {
 		try {
 			if(socket!=null) {
 				socket.close();
@@ -61,33 +66,74 @@ public class EvolisPrinterService {
 		}
 	}
 
-	static EvolisResponse sendRequest(EvolisRequest req) {
+	static synchronized EvolisResponse sendRequest(EvolisRequest req) {
 		try {
 			initSocket(true);
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 			String cmdString = objectMapper.writeValueAsString(req) ;
-			cmdString = cmdString.replaceAll("\n", "");
 			writer.write(cmdString);
-			writer.newLine();
 			writer.flush();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			String responseValue = reader.readLine();
-			EvolisResponse response = objectMapper.readValue(responseValue, EvolisResponse.class);
-			socket.close();
+			log.debug(cmdString.length()>200 ? cmdString.substring(0,200) + "..." + cmdString.substring(cmdString.length()-199) : cmdString);
+			InputStream socketInputStream= socket.getInputStream();
+			String responseStr ="";
+			while (true) {
+				int n;
+				try {
+					byte[] buffer = new byte[1024];
+					n = socketInputStream.read(buffer);
+					responseStr = responseStr + new String(buffer);
+				} catch(SocketTimeoutException ex){
+					if(StringUtils.hasText(responseStr)) {
+						log.debug("SocketTimeoutException - response received - we stop it");
+						log.warn(responseStr.length() > 200 ? responseStr.substring(0, 200) : responseStr);
+						break;
+					}
+				}
+			}
+			EvolisResponse response = objectMapper.readValue(responseStr, EvolisResponse.class);
+			// close socket - sinon evolis center reste en boucle infinie
+			socketInputStream.close();
 			return response;
 		} catch (IOException e) {
 			throw new RuntimeException("IOException seding Request to evolis : " + req, e);
+		} finally {
+			closeSocket();
 		}
 	}
-	static void sendRequestAndLog(EvolisRequest evolisRequest) {
+	static EvolisResponse sendRequestAndLog(EvolisRequest evolisRequest) {
 		log.trace("Request : {}", evolisRequest);
 		EvolisResponse response = sendRequest(evolisRequest);
 		log.trace("Response : {}", response);
+		return response;
 	}
 
-	public static void insertCard() {
-		sendRequestAndLog(EvolisPrinterCommands.insertCard());
+	public static EvolisResponse insertCard() {
+		return sendRequestAndLog(EvolisPrinterCommands.insertCard());
 	}
+
+	public static EvolisResponse getPrinterStatus() {
+		return sendRequestAndLog(EvolisPrinterCommands.getPrinterStatus());
+	}
+
+	public static EvolisResponse printBegin() {
+		EvolisResponse response = sendRequestAndLog(EvolisPrinterCommands.printBegin());
+		if(response.getError()!=null && response.getError().getCode()==1700) {
+			// 1700 == Printing session already ...
+			log.warn(response.getError().getMessage());
+			printEnd();
+			response = sendRequestAndLog(EvolisPrinterCommands.printBegin());
+		}
+		return response;
+	}
+
+	public static void printSet() {
+		sendRequestAndLog(EvolisPrinterCommands.printSet());
+	}
+
+	public static void printEnd() {
+		sendRequestAndLog(EvolisPrinterCommands.printEnd());
+	}
+
 
 	public static void printFrontColorBmp(String bmpColorAsBase64) {
 		sendRequestAndLog(EvolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
@@ -105,8 +151,8 @@ public class EvolisPrinterService {
 		sendRequestAndLog(EvolisPrinterCommands.print());
 	}
 
-	public static void insertCardToContactLessStation() {
-		sendRequestAndLog(EvolisPrinterCommands.insertCardToContactLessStation());
+	public static EvolisResponse insertCardToContactLessStation() {
+		return sendRequestAndLog(EvolisPrinterCommands.insertCardToContactLessStation());
 	}
 
 
