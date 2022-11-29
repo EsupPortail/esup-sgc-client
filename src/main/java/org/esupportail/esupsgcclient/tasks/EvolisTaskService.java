@@ -1,6 +1,8 @@
 package org.esupportail.esupsgcclient.tasks;
 
 import javafx.concurrent.Task;
+import javafx.scene.image.ImageView;
+import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisException;
@@ -9,13 +11,22 @@ import org.esupportail.esupsgcclient.service.printer.evolis.EvolisResponse;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcLongPollService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
+import java.util.Map;
+
 public class EvolisTaskService extends EsupSgcTaskService<String> {
 
 	private final static Logger log = Logger.getLogger(EvolisTaskService.class);
 
 	EsupSgcLongPollService esupSgcLongPollService;
-	public EvolisTaskService(TaskParamBean taskParamBean) {
-		super(taskParamBean);
+
+	ImageView bmpColorImageView;
+
+	ImageView bmpBlackImageView;
+
+	public EvolisTaskService(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+		super(uiSteps);
+		this.bmpColorImageView = bmpColorImageView;
+		this.bmpBlackImageView = bmpBlackImageView;
 		esupSgcLongPollService = new EsupSgcLongPollService();
 	}
 
@@ -85,7 +96,7 @@ public class EvolisTaskService extends EsupSgcTaskService<String> {
 				UiStep.printer_overlay,
 				UiStep.encode,
 				UiStep.printer_print}) {
-			taskParamBean.uiSteps.get(step).setVisible(true);
+			uiSteps.get(step).setVisible(true);
 		}
 	}
 

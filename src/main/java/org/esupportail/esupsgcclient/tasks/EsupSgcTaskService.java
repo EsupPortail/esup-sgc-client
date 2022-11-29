@@ -1,29 +1,32 @@
 package org.esupportail.esupsgcclient.tasks;
 
 import javafx.concurrent.Service;
+import javafx.scene.text.TextFlow;
 import org.esupportail.esupsgcclient.ui.UiStep;
+
+import java.util.Map;
 
 public abstract class EsupSgcTaskService<S> extends Service<S> {
 
-	final TaskParamBean taskParamBean;
+	Map<UiStep, TextFlow> uiSteps;
 
-	public EsupSgcTaskService(TaskParamBean taskParamBean) {
-		this.taskParamBean = taskParamBean;
+	public EsupSgcTaskService(Map<UiStep, TextFlow> uiSteps) {
+		this.uiSteps = uiSteps;
 	}
 
 	public void setUiStepRunning(UiStep uiStep) {
-		taskParamBean.uiSteps.get(uiStep).getStyleClass().clear();
-		taskParamBean.uiSteps.get(uiStep).getStyleClass().add("alert-warning");
+		uiSteps.get(uiStep).getStyleClass().clear();
+		uiSteps.get(uiStep).getStyleClass().add("alert-warning");
 	}
 
 	public void setUiStepSuccess(UiStep uiStep) {
-		taskParamBean.uiSteps.get(uiStep).getStyleClass().clear();
-		taskParamBean.uiSteps.get(uiStep).getStyleClass().add("alert-success");
+		uiSteps.get(uiStep).getStyleClass().clear();
+		uiSteps.get(uiStep).getStyleClass().add("alert-success");
 	}
 
 	public void setUiStepFailed(UiStep uiStep, Throwable exception) {
-		taskParamBean.uiSteps.get(uiStep).getStyleClass().clear();
-		taskParamBean.uiSteps.get(uiStep).getStyleClass().add("alert-danger");
+		uiSteps.get(uiStep).getStyleClass().clear();
+		uiSteps.get(uiStep).getStyleClass().add("alert-danger");
 	}
 
 }

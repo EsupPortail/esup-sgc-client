@@ -1,8 +1,13 @@
 package org.esupportail.esupsgcclient.tasks;
 
 import com.github.sarxos.webcam.WebcamException;
+import javafx.beans.property.ObjectProperty;
+import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.webcam.QRCodeReader;
@@ -10,21 +15,17 @@ import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
 public class QrCodeTaskService extends EsupSgcTaskService<String> {
 
 	private final static Logger log = Logger.getLogger(QrCodeTaskService.class);
 
-	public QrCodeTaskService(TaskParamBean taskParamBean) {
-		super(taskParamBean);
-	}
+	ObjectProperty<Image> webcamImageProperty;
 
-	public boolean isRoot() {
-		return true;
-	}
-
-	public UiStep getUiStep() {
-		return UiStep.qrcode_read;
+	public QrCodeTaskService(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty) {
+		super(uiSteps);
+		this.webcamImageProperty = webcamImageProperty;
 	}
 
 	@Override
@@ -54,7 +55,7 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 	public String getQrcode() {
 		String qrcode = null;
 		while (true) {
-			BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(taskParamBean.webcamImageProperty.get(), null);
+			BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(webcamImageProperty.get(), null);
 			qrcode = QRCodeReader.readQrCode(webcamBufferedImage);
 			if(webcamBufferedImage != null) {
 				if (qrcode != null) {
@@ -77,7 +78,7 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 				UiStep.encode,
 				UiStep.encode_cnous,
 				UiStep.send_csv}) {
-			taskParamBean.uiSteps.get(step).setVisible(true);
+			uiSteps.get(step).setVisible(true);
 		}
 	}
 

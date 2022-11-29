@@ -12,7 +12,6 @@ import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
 import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
-import org.esupportail.esupsgcclient.tasks.TaskParamBean;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
 import java.io.IOException;
@@ -84,7 +83,7 @@ public class EsupSgcTaskServiceFactory {
         if(qrCodeTaskService!=null && qrCodeTaskService.isRunning()) {
             qrCodeTaskService.cancel();
         }
-        qrCodeTaskService = new QrCodeTaskService(new TaskParamBean(uiSteps,  webcamImageView.imageProperty(), bmpColorImageView, bmpBlackImageView));
+        qrCodeTaskService = new QrCodeTaskService(uiSteps,  webcamImageView.imageProperty());
         // TODO setupFlowEsupSgcTaskService(qrCodeTaskService);
     }
 
@@ -95,7 +94,7 @@ public class EsupSgcTaskServiceFactory {
         if(evolisEvolisTaskService !=null && evolisEvolisTaskService.isRunning()) {
             evolisEvolisTaskService.cancel();
         }
-        evolisEvolisTaskService = new EvolisTaskService(new TaskParamBean(uiSteps,  webcamImageView.imageProperty(), bmpColorImageView, bmpBlackImageView));
+        evolisEvolisTaskService = new EvolisTaskService(uiSteps, bmpColorImageView, bmpBlackImageView);
         evolisEvolisTaskService.setOnRunning(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
