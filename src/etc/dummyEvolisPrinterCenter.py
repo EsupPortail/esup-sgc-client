@@ -1,31 +1,23 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
-import asyncio
-import time
+import socket
 
-async def handle_echo(reader, writer):
-    message = await reader.readline()
-    if(len(message)>200):
-        message = message[0:200]
-    print(f"Received {message!r}")
-    time.sleep(0.5)
-    
-    message = b'{"id":"1","jsonrpc":"2.0","result":"OK"}'
-    print(f"Send: {message!r}")
-    writer.writelines([message])
-    await writer.drain()
-    writer.close()
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+well_known_port = 18000
+sock.bind(('', well_known_port))
+sock.listen(30)
 
-async def main():
-    server = await asyncio.start_server(handle_echo, '127.0.0.1', 18000, limit=1024*1024*10)
-
-    addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
-    print(f'Serving on {addrs}')
-
-    async with server:
-        await server.serve_forever()
-
-asyncio.run(main())
-
-
+try:
+    while 1:
+        newSocket, address = sock.accept(  )
+        print "Connected from", address
+        while 1:
+            receivedData = newSocket.recv(1024)
+            if not receivedData: break
+            newSocket.send(b'{"id":"1","jsonrpc":"2.0","result":"OK"}')
+        newSocket.close(  )
+        print "Disconnected from", address
+finally:
+    sock.close(  )
