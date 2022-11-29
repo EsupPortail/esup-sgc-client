@@ -6,11 +6,13 @@ import java.util.Map;
 
 import javax.smartcardio.CardException;
 
+import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.EsupSgcClientApplication;
 import org.esupportail.esupsgcclient.service.SgcCheckException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteRunExe;
+import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
@@ -28,8 +30,10 @@ import org.springframework.web.client.RestTemplate;
 public class EncodingService {
 	private final static Logger log = Logger.getLogger(EncodingService.class);
 
-	public enum BmpType {color, black};
-	private static RestTemplate restTemplate =  new RestTemplate(Utils.clientHttpRequestFactory());
+	public enum BmpType {color, black}
+
+	;
+	private static RestTemplate restTemplate = new RestTemplate(Utils.clientHttpRequestFactory());
 	private static boolean encodeCnous = false;
 	private static String pathToExe = "c:\\cnousApi\\";
 	private static String csvPath = "c:\\cnousApi\\csv_out.csv";
@@ -37,7 +41,7 @@ public class EncodingService {
 	private static boolean cnousOK = false;
 	public static String esupNfcTagServerUrl = "https://esup-nfc-tag.univ-ville.fr";
 	public static String esupSgcUrl = "https://esup-sgc.univ-ville.fr";
-	
+
 	public static void init() throws EncodingException, PcscException, CnousFournisseurCarteException {
 
 		PcscUsbService.init();
@@ -45,22 +49,22 @@ public class EncodingService {
 		esupNfcTagServerUrl = EsupSgcClientApplication.esupNfcTagServerUrl;
 		esupSgcUrl = EsupSgcClientApplication.esupSgcUrl;
 		encodeCnous = EsupSgcClientApplication.encodeCnous;
-			
-		if(encodeCnous){
-			try{
+
+		if (encodeCnous) {
+			try {
 				cnousFournisseurCarteRunExe = new CnousFournisseurCarteRunExe(pathToExe);
 				cnousOK = cnousFournisseurCarteRunExe.check();
-			}catch(CnousFournisseurCarteException e){
+			} catch (CnousFournisseurCarteException e) {
 				throw new CnousFournisseurCarteException(e.getMessage(), e);
 			}
-			if(!cnousOK) {
+			if (!cnousOK) {
 				throw new CnousFournisseurCarteException("Erreur cnousApi");
 			}
 		}
 
 	}
-	
-	public static boolean pcscConnection() throws PcscException{
+
+	public static boolean pcscConnection() throws PcscException {
 		try {
 			String cardTerminalName = PcscUsbService.connection();
 			log.debug("cardTerminal : " + cardTerminalName);
@@ -70,18 +74,18 @@ public class EncodingService {
 		}
 		return false;
 	}
-	
-	public static String readCsn() throws PcscException{
+
+	public static String readCsn() throws PcscException {
 		try {
 			String csn = PcscUsbService.byteArrayToHexString(PcscUsbService.hexStringToByteArray(PcscUsbService.getCardId()));
-			log.info("csn : "+csn);
+			log.info("csn : " + csn);
 			return csn;
 		} catch (CardException e) {
 			log.error("csn read error" + e);
 			throw new PcscException("csn read error", e);
 		}
 	}
-	
+
 	public static void checkBeforeEncoding(String qrcode, String csn) throws SgcCheckException {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.add("Content-Type", MediaType.APPLICATION_JSON.toString());
@@ -89,14 +93,14 @@ public class EncodingService {
 		requestBody.put("qrcode", qrcode);
 		requestBody.put("csn", csn);
 		HttpEntity<Map<String, String>> httpEntity = new HttpEntity<Map<String, String>>(requestBody, httpHeaders);
-		String selectUrl = esupSgcUrl + "/wsrest/nfc/check4encode";	
-		
+		String selectUrl = esupSgcUrl + "/wsrest/nfc/check4encode";
+
 		try {
 			restTemplate.postForObject(selectUrl, httpEntity, String.class);
 		} catch (HttpClientErrorException e) {
-			if(HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
 				log.warn("Card for " + qrcode + " not found, please check its state in SGC web application.");
-				throw new SgcCheckException("Card for " + qrcode + " not found, please check its state in SGC web application.");	
+				throw new SgcCheckException("Card for " + qrcode + " not found, please check its state in SGC web application.");
 
 			} else {
 				log.error(e);
@@ -105,7 +109,7 @@ public class EncodingService {
 		} catch (HttpServerErrorException e) {
 			log.error(e);
 			throw new SgcCheckException("SGC select error : Web Server Error " + e.getResponseBodyAsString());
-		} catch (Exception e){
+		} catch (Exception e) {
 			log.error(e);
 			throw new SgcCheckException("SGC select error", e);
 		}
@@ -116,32 +120,32 @@ public class EncodingService {
 		String bmpAsBase64 = restTemplate.getForObject(bpmEsupSgcUrl, String.class);
 		return bmpAsBase64;
 	}
-	
+
 	public static boolean cnousEncoding(String cardId) throws CnousFournisseurCarteException {
 		String cnousUrl = esupSgcUrl + "/wsrest/nfc/cnousCardId?csn=" + cardId + "&authToken=" + EsupSgcClientApplication.sgcAuthToken;
 		log.info("get cnousId : " + cnousUrl);
-		try{
+		try {
 			ResponseEntity<String> response = restTemplate.exchange(cnousUrl, HttpMethod.GET, null, String.class);
 			log.debug("cnous id : " + response.getBody());
 			String result = cnousFournisseurCarteRunExe.writeCard(response.getBody());
-			log.debug("cnous encoding : "+result);
-			if(!result.contains("false")){
+			log.debug("cnous encoding : " + result);
+			if (!result.contains("false")) {
 				return true;
-			}else{
+			} else {
 				return false;
 			}
-		}catch (RestClientException e) {
+		} catch (RestClientException e) {
 			log.error(e);
 			throw new CnousFournisseurCarteException("cnous error : can't get cnousId : " + e.getMessage());
 		}
 	}
-	
-	public static boolean sendCnousCsv(String csn) throws EncodingException{
-		try{
+
+	public static boolean sendCnousCsv(String csn) throws EncodingException {
+		try {
 			File file = new File(csvPath);
 			LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
 			map.add("file", new FileSystemResource(file));
-	
+
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 			HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(
@@ -149,30 +153,30 @@ public class EncodingService {
 			try {
 				ResponseEntity<String> fileSendResult = restTemplate.exchange(
 						esupSgcUrl + "/wsrest/nfc/addCrousCsvFile?&csn=" + csn + "&authToken=" + EsupSgcClientApplication.sgcAuthToken,
-					HttpMethod.POST, requestEntity,
-					String.class);
+						HttpMethod.POST, requestEntity,
+						String.class);
 				log.debug("csv send : " + fileSendResult.getBody());
-			} catch(HttpClientErrorException clientEx) {
+			} catch (HttpClientErrorException clientEx) {
 				throw new EncodingException("Exception during calling esupSgc (adding crous csv)", clientEx);
 			}
 		} catch (Exception e) {
 			log.error("Erreur lors de l'envoi du CSV", e);
 			throw new EncodingException("Erreur lors de l'envoi du CSV", e);
 		}
-		
+
 		return true;
 	}
 
-	public static boolean delCnousCsv() throws EncodingException{
-		try{
+	public static boolean delCnousCsv() throws EncodingException {
+		try {
 			File file = new File(csvPath);
 			return file.delete();
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw new EncodingException("Probléme de suppression du CSV", e);
 		}
 	}
-	
-	public static boolean waitForCardAbsent(long timeout){
+
+	public static boolean waitForCardAbsent(long timeout) {
 		try {
 			return PcscUsbService.waitForCardAbsent(timeout);
 		} catch (CardException e) {
@@ -188,8 +192,8 @@ public class EncodingService {
 			return false;
 		}
 	}
-	
-	public static void pcscDisconnect() throws PcscException{
+
+	public static void pcscDisconnect() throws PcscException {
 		try {
 			PcscUsbService.disconnect();
 		} catch (PcscException e) {
@@ -197,7 +201,7 @@ public class EncodingService {
 		}
 		Utils.sleep(1000);
 	}
-	
+
 	public static String getEsupNfcTagServerUrl() {
 		return esupNfcTagServerUrl;
 	}
@@ -210,8 +214,62 @@ public class EncodingService {
 		return encodeCnous;
 	}
 
-	public static boolean isCnousOK(){
+	public static boolean isCnousOK() {
 		return cnousOK;
 	}
-	
+
+	public static void encode(String qrcode) throws Exception {
+		long start = System.currentTimeMillis();
+		long t;
+		while (!pcscConnection()) {
+			Utils.sleep(1000);
+		}
+		String csn = EncodingService.readCsn();
+		checkBeforeEncoding(qrcode, csn);
+		log.info("Encoding : Start");
+		String result = "";
+		while (true) {
+			t = System.currentTimeMillis() - start;
+			log.info("RAPDU : " + result);
+			NfcResultBean nfcResultBean = EsupNgcTagService.getApdu(csn, result);
+			log.info("SAPDU : " + nfcResultBean.getFullApdu());
+			if (nfcResultBean.getFullApdu() != null) {
+				if (!"END".equals(nfcResultBean.getFullApdu())) {
+					try {
+						result = PcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
+						//updateProgress((long)this.getProgress()+1, (long)this.getTotalWork()+1);
+					} catch (CardException e) {
+						throw new PcscException("pcsc send apdu error", e);
+					}
+				} else {
+					log.info("Encoding  : OK");
+					encodeCnousIfNeeded(csn);
+					return;
+				}
+			} else {
+				throw new EncodingException("NFC APDU gived by nfctag is null ?!");
+			}
+		}
+
+	}
+
+	public static void encodeCnousIfNeeded(String csn) throws EncodingException, CnousFournisseurCarteException {
+		if (isCnousOK() && isEncodeCnous()) {
+			log.info("Cnous Encoding :  Start");
+			delCnousCsv();
+			if (cnousEncoding(csn)) {
+				log.info("cnous encoding : OK");
+				if (EncodingService.sendCnousCsv(csn)) {
+					log.info("cnous csv send : OK");
+				} else {
+					log.warn("Cnous csv send :  Failed");
+				}
+			} else {
+				log.warn("cnous csv send : Failed for csn " + csn, null);
+			}
+		} else {
+			log.info("Cnous Encoding :  Skipped");
+			log.info("Encodage terminé");
+		}
+	}
 }

@@ -4,6 +4,7 @@ import com.github.sarxos.webcam.WebcamException;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.webcam.QRCodeReader;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -31,27 +32,40 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 		Task<String> qrcodeEncodeTask = new Task<String>() {
 			@Override
 			protected String call() throws Exception {
+				updateTitle("En attente...");
 				updateProgress(0, 2);
-				String qrcode = null;
-				while (true) {
-					updateTitle("En attente...");
-					if (isCancelled()) break;
-					BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(taskParamBean.webcamImageProperty.get(), null);
-					qrcode = QRCodeReader.readQrCode(webcamBufferedImage);
-					if(webcamBufferedImage != null) {
-						if (qrcode != null) {
-							updateProgress(2, 2);
-							break;
-						}
-					} else {
-						throw new WebcamException("no image");
+				String qrcode = getQrcode();
+				try {
+					EncodingService.encode(qrcode);
+				} catch (Exception e) {
+					updateTitle("Exception : " + e.getMessage());
+					updateTitle("Merci de retirer cette carte");
+					while (!EncodingService.waitForCardAbsent(1000)) {
+						// Utils.sleep(1000); -  sleep non nécessaire : EncodingService.waitForCardAbsent l'intègre
 					}
-					Utils.sleep(1000);
+					updateTitle("Carte retirée");
 				}
-				return qrcode;
+				return null;
 			}
 		};
 		return qrcodeEncodeTask;
+	}
+
+	public String getQrcode() {
+		String qrcode = null;
+		while (true) {
+			BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(taskParamBean.webcamImageProperty.get(), null);
+			qrcode = QRCodeReader.readQrCode(webcamBufferedImage);
+			if(webcamBufferedImage != null) {
+				if (qrcode != null) {
+					break;
+				}
+			} else {
+				throw new WebcamException("no image");
+			}
+			Utils.sleep(1000);
+		}
+		return qrcode;
 	}
 
 	public void setUiStepSuccess() {
@@ -65,16 +79,6 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 				UiStep.send_csv}) {
 			taskParamBean.uiSteps.get(step).setVisible(true);
 		}
-		super.setUiStepSuccess();
-	}
-
-	@Override
-	public EsupSgcTaskService getNextWhenSuccess() {
-		String qrcode = this.getValue();
-		return new EncodingTaskService(new TaskParamBean(taskParamBean.uiSteps, taskParamBean.rootType, qrcode, taskParamBean.webcamImageProperty, taskParamBean.csn,
-				taskParamBean.bmpType, taskParamBean.bmpColorImageView, taskParamBean.bmpBlackImageView,
-				taskParamBean.bmpColorAsBase64, taskParamBean.bmpBlackAsBase64,
-				taskParamBean.eject4success, taskParamBean.fromPrinter));
 	}
 
 }

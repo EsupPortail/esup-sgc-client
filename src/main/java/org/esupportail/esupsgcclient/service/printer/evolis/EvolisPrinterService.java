@@ -29,8 +29,8 @@ public class EvolisPrinterService {
 	
 	final static Logger log = LoggerFactory.getLogger(EvolisPrinterService.class);
 
-	static String ip = "10.197.1.71";
-	//static String ip = "127.0.0.1";
+	//static String ip = "10.197.1.71";
+	static String ip = "127.0.0.1";
 
 	static int port = 18000;
 
@@ -66,7 +66,7 @@ public class EvolisPrinterService {
 		}
 	}
 
-	static synchronized EvolisResponse sendRequest(EvolisRequest req) {
+	static EvolisResponse sendRequest(EvolisRequest req) {
 		try {
 			initSocket(true);
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));

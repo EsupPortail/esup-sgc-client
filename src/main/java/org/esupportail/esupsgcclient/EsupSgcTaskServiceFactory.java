@@ -11,7 +11,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
-import org.esupportail.esupsgcclient.taskencoding.EsupSgcLongPollTaskService;
+import org.esupportail.esupsgcclient.taskencoding.EvolisTaskService;
 import org.esupportail.esupsgcclient.taskencoding.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.taskencoding.QrCodeTaskService;
 import org.esupportail.esupsgcclient.taskencoding.TaskParamBean;
@@ -43,10 +43,9 @@ public class EsupSgcTaskServiceFactory {
 
     final Label textPrincipal;
 
-
     QrCodeTaskService qrCodeTaskService;
 
-    EsupSgcLongPollTaskService evolisEsupSgcLongPollTaskService;
+    EvolisTaskService evolisEvolisTaskService;
 
     Map<UiStep, TextFlow> uiSteps = new HashMap<>();
 
@@ -87,70 +86,51 @@ public class EsupSgcTaskServiceFactory {
         if(qrCodeTaskService!=null && qrCodeTaskService.isRunning()) {
             qrCodeTaskService.cancel();
         }
-        qrCodeTaskService = new QrCodeTaskService(new TaskParamBean(uiSteps, TaskParamBean.RootType.qrcode, null, webcamImageView.imageProperty(), null,
-                null, bmpColorImageView, bmpBlackImageView,
-                null,null,
-                true, false));
-        setupFlowEsupSgcTaskService(qrCodeTaskService);
+        qrCodeTaskService = new QrCodeTaskService(new TaskParamBean(uiSteps,  webcamImageView.imageProperty(), bmpColorImageView, bmpBlackImageView));
+        // TODO setupFlowEsupSgcTaskService(qrCodeTaskService);
     }
 
     /*
     must be run from App JFX Thread
     */
     public void runEvolisEsupSgcLongPollTaskService() {
-        if(evolisEsupSgcLongPollTaskService !=null && evolisEsupSgcLongPollTaskService.isRunning()) {
-            evolisEsupSgcLongPollTaskService.cancel();
+        if(evolisEvolisTaskService !=null && evolisEvolisTaskService.isRunning()) {
+            evolisEvolisTaskService.cancel();
         }
-        evolisEsupSgcLongPollTaskService = new EsupSgcLongPollTaskService(new TaskParamBean(uiSteps, TaskParamBean.RootType.evolis, null, webcamImageView.imageProperty(), null,
-                EncodingService.BmpType.black, bmpColorImageView, bmpBlackImageView,
-                null,null,
-                true, true));
-        setupFlowEsupSgcTaskService(evolisEsupSgcLongPollTaskService);
-    }
-
-    /*
-    Permet de mettre en oeuvre un flow (circulaire) de tâches
-    en s'appuyant sur la méthode  EsupSgcTaskService.next()
-    qui donne la tâche suivant à effectuer
- */
-    void setupFlowEsupSgcTaskService(EsupSgcTaskService esupSgcTaskService) {
-        esupSgcTaskService.setOnRunning(new EventHandler<WorkerStateEvent>() {
+        evolisEvolisTaskService = new EvolisTaskService(new TaskParamBean(uiSteps,  webcamImageView.imageProperty(), bmpColorImageView, bmpBlackImageView));
+        evolisEvolisTaskService.setOnRunning(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                esupSgcTaskService.setUiStepRunning();
+                evolisEvolisTaskService.setUiStepRunning();
             }
         });
-        esupSgcTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+        evolisEvolisTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                esupSgcTaskService.setUiStepSuccess();
                 progressBar.setStyle("");
-                setupFlowEsupSgcTaskService(esupSgcTaskService.getNextWhenSuccess());
+                evolisEvolisTaskService.restart();
             }
         });
 
-        esupSgcTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+        evolisEvolisTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                log.error("Exception when procressing card ...", esupSgcTaskService.getException());
-                esupSgcTaskService.setUiStepFailed(esupSgcTaskService.getException());
+                log.error("Exception when procressing card ...", evolisEvolisTaskService.getException());
+                evolisEvolisTaskService.setUiStepFailed(UiStep.printer_print, evolisEvolisTaskService.getException());
                 progressBar.setStyle("-fx-accent:red");
-                setupFlowEsupSgcTaskService(esupSgcTaskService.getNextWhenFail());
-                if(esupSgcTaskService.getException() != null && esupSgcTaskService.getException().getMessage()!=null) {
-                    logTextarea.appendText(esupSgcTaskService.getException().getMessage());
+                if(evolisEvolisTaskService.getException() != null && evolisEvolisTaskService.getException().getMessage()!=null) {
+                    logTextarea.appendText(evolisEvolisTaskService.getException().getMessage());
                 }
             }
         });
 
-        textPrincipal.textProperty().bind(esupSgcTaskService.titleProperty());
-        esupSgcTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
-        progressBar.progressProperty().bind(esupSgcTaskService.progressProperty());
-        log.debug("restart " + esupSgcTaskService);
-        if(esupSgcTaskService.isRoot()) {
-            resetUiSteps();
-        }
-        esupSgcTaskService.restart();
+        textPrincipal.textProperty().bind(evolisEvolisTaskService.titleProperty());
+        evolisEvolisTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
+        progressBar.progressProperty().bind(evolisEvolisTaskService.progressProperty());
+        resetUiSteps();
+        evolisEvolisTaskService.restart();
     }
+
 
     public TextFlow getTaskUiTemplate() {
         URL fxmlUrl = this.getClass().getClassLoader().getResource("esup-sgc-client-action-template.fxml");
