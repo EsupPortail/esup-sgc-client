@@ -281,6 +281,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		Webcam.getWebcams(); // with this webcams are discovered and listener works at startup
 
+		appSession.nfcReady.set(true);
 	}
 
 	public synchronized void addWebcamComboBox(String webcamName) {

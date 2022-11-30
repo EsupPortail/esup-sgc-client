@@ -26,6 +26,8 @@ public abstract class EsupSgcTask extends Task<String> {
 
     Map<UiStep, TextFlow> uiSteps = new HashMap<>();
 
+    UiStep lastUiStepSuccess = null;
+
     public EsupSgcTask(Map<UiStep, TextFlow> uiSteps) {
         this.uiSteps = uiSteps;
     }
@@ -59,6 +61,7 @@ public abstract class EsupSgcTask extends Task<String> {
             uiSteps.get(step).getStyleClass().clear();
             uiSteps.get(step).getStyleClass().add("alert-info");
         }
+        lastUiStepSuccess = null;
     }
 
 	void setUiStepSuccess(UiStep uiStep) {
@@ -75,6 +78,19 @@ public abstract class EsupSgcTask extends Task<String> {
                 updateTitle(newtUiStep.toString());
             }
         }
+        lastUiStepSuccess = uiStep;
 	}
+
+    void setCurrentUiStepFailed(Throwable exception) {
+        UiStep currentUiStep = null;
+        if(lastUiStepSuccess==null) {
+            currentUiStep = getUiStepsList().get(0);
+        } else if(lastUiStepSuccess!=null && getUiStepsList().indexOf(lastUiStepSuccess)+1<getUiStepsList().size()) {
+            currentUiStep = (UiStep) getUiStepsList().get(getUiStepsList().indexOf(lastUiStepSuccess) + 1);
+        }
+         if(currentUiStep!=null) {
+             setUiStepFailed(currentUiStep, exception);
+         }
+    }
 
 }
