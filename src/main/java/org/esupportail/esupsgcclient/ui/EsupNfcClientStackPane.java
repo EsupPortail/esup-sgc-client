@@ -31,7 +31,7 @@ public class EsupNfcClientStackPane extends StackPane {
 
     private final static Logger log = Logger.getLogger(EsupNfcClientStackPane.class);
 
-    public static WebView webView = new WebView();
+    WebView webView = new WebView();
 
     @Resource
     JavaScriptConsoleBridge javaScriptConsoleBridge;

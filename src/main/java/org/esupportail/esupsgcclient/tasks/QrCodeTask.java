@@ -24,11 +24,13 @@ public class QrCodeTask extends EsupSgcTask {
 	private final static Logger log = Logger.getLogger(QrCodeTask.class);
 	ObjectProperty<Image> webcamImageProperty;
 	EncodingService encodingService;
+	QRCodeReader qRCodeReader;
 
-	public QrCodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, EncodingService encodingService) {
+	public QrCodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, EncodingService encodingService, QRCodeReader qRCodeReader) {
 		super(uiSteps);
 		this.webcamImageProperty = webcamImageProperty;
 		this.encodingService = encodingService;
+		this.qRCodeReader = qRCodeReader;
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class QrCodeTask extends EsupSgcTask {
 				return null;
 			}
 			BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(webcamImageProperty.get(), null);
-			qrcode = QRCodeReader.readQrCode(webcamBufferedImage);
+			qrcode = qRCodeReader.readQrCode(webcamBufferedImage);
 			if(webcamBufferedImage != null) {
 				if (qrcode != null) {
 					break;

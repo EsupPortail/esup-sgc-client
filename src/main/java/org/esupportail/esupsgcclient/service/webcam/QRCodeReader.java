@@ -24,7 +24,7 @@ public class QRCodeReader {
 
 	private final static Logger log = Logger.getLogger(QRCodeReader.class);
 
-	public static String readQrCode(BufferedImage esupSGCClientJFrame) {
+	public String readQrCode(BufferedImage esupSGCClientJFrame) {
 		Result result = null;
 		LuminanceSource source = new BufferedImageLuminanceSource(esupSGCClientJFrame);
 		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));

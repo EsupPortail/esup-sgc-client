@@ -26,9 +26,9 @@ public class EvolisPrinterService {
 	
 	final static Logger log = LoggerFactory.getLogger(EvolisPrinterService.class);
 
-	static Socket socket;
+	Socket socket;
 
-	static ObjectMapper objectMapper = new ObjectMapper();
+	ObjectMapper objectMapper = new ObjectMapper();
 
 	@Resource
 	AppConfig appConfig;

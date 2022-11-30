@@ -15,7 +15,8 @@ import javax.annotation.Resource;
 public class EsupNgcTagService {
 
 	private final static Logger log = Logger.getLogger(EsupNgcTagService.class);
-	private static RestTemplate restTemplate =  new RestTemplate(Utils.clientHttpRequestFactory());
+
+	private RestTemplate restTemplate =  new RestTemplate(Utils.clientHttpRequestFactory());
 
 	@Resource
 	AppConfig appConfig;

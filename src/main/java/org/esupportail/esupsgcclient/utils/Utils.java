@@ -31,23 +31,6 @@ public class Utils {
         factory.setConnectTimeout(10000);
         return factory;
     }
-    
-	public static String getExceptionString(Throwable throwable) {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		throwable.printStackTrace(pw);
-		return sw.toString();
-	}
-	
-	public static void playSound(String soundFile) {
-		try {
-			Media audio = new Media(EsupSgcClientApplication.class.getResource("/sound/" + soundFile).toString());
-            MediaPlayer mediaPlayer = new MediaPlayer(audio);
-            mediaPlayer.play();
-		} catch (Exception e) {
-			log.error("error on playSound", e);
-		}
-	}
 
 
 	public static String getMacAddress() {

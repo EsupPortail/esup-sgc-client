@@ -38,11 +38,11 @@ public class EncodingService {
 	private final static Logger log = Logger.getLogger(EncodingService.class);
 
 	public enum BmpType {color, black}
-	private static RestTemplate restTemplate = new RestTemplate(Utils.clientHttpRequestFactory());
-	private static String pathToExe = "c:\\cnousApi\\";
-	private static String csvPath = "c:\\cnousApi\\csv_out.csv";
-	private static CnousFournisseurCarteRunExe cnousFournisseurCarteRunExe;
-	private static boolean cnousOK = false;
+	private RestTemplate restTemplate = new RestTemplate(Utils.clientHttpRequestFactory());
+	private String pathToExe = "c:\\cnousApi\\";
+	private String csvPath = "c:\\cnousApi\\csv_out.csv";
+	private CnousFournisseurCarteRunExe cnousFournisseurCarteRunExe;
+	private boolean cnousOK = false;
 
 	@Resource
 	AppConfig appConfig;
@@ -82,7 +82,7 @@ public class EncodingService {
 		return false;
 	}
 
-	public static String readCsn() throws PcscException {
+	public String readCsn() throws PcscException {
 		try {
 			String csn = PcscUsbService.byteArrayToHexString(PcscUsbService.hexStringToByteArray(PcscUsbService.getCardId()));
 			log.info("csn : " + csn);
@@ -219,7 +219,7 @@ public class EncodingService {
 		while (!pcscConnection()) {
 			Utils.sleep(1000);
 		}
-		String csn = EncodingService.readCsn();
+		String csn = readCsn();
 		checkBeforeEncoding(qrcode, csn);
 		log.info("Encoding : Start");
 		String result = "";
