@@ -55,9 +55,6 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Resource
 	NfcHeartbeatTaskService nfcHeartbeatTaskService;
 
-	@Resource
-	EsupSgcClientApplication esupSgcClientApplication;
-
 	@FXML
 	private FlowPane actionsPane;
 
@@ -151,7 +148,7 @@ public class EsupSgcClientJfxController implements Initializable {
 					logTextarea.setManaged(true);
 					buttonLogs.setText("Masquer les logs");
 				}
-				esupSgcClientApplication.getPrimaryStage().sizeToScene();
+				EsupSgcClientApplication.getPrimaryStage().sizeToScene();
 			}
 		});
 
@@ -167,7 +164,7 @@ public class EsupSgcClientJfxController implements Initializable {
 					nfcTagPane.setManaged(true);
 					buttonNfcTag.setText("Masquer EsupNfcTag");
 				}
-				esupSgcClientApplication.getPrimaryStage().sizeToScene();
+				EsupSgcClientApplication.getPrimaryStage().sizeToScene();
 			}
 		});
 

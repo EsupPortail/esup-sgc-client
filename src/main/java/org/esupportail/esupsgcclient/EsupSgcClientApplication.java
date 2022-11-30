@@ -13,13 +13,14 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
 @ComponentScan
 public class EsupSgcClientApplication extends Application {
 
 	private final static Logger log = Logger.getLogger(EsupSgcClientApplication.class);
 
-	Stage pStage;
+	static Stage pStage;
 
 	public void start(final Stage primaryStage) throws IOException {
 
@@ -34,10 +35,10 @@ public class EsupSgcClientApplication extends Application {
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		this.pStage = primaryStage;
+		pStage = primaryStage;
 	}
 
-	public Stage getPrimaryStage() {
+	public static Stage getPrimaryStage() {
 		return pStage;
 	}
     
