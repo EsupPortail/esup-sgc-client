@@ -5,11 +5,13 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTaskService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
@@ -17,7 +19,6 @@ import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
 
 import com.github.sarxos.webcam.Webcam;
 
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -29,14 +30,37 @@ import javafx.scene.layout.Pane;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.stereotype.Component;
 
-public class EsupSgcClientJfxController {
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+@Component
+public class EsupSgcClientJfxController implements Initializable {
 
 	final static Logger log = Logger.getLogger(EsupSgcClientJfxController.class);
 
 	public enum StyleLevel {success, danger, warning, primary, info};
 
-	public Stage primaryStage;
+	@Resource
+	AppConfig appConfig;
+
+	@Resource
+	AppSession appSession;
+
+	@Resource
+	EvolisPrinterService evolisPrinterService;
+
+	@Resource
+	EvolisHeartbeatTaskService evolisHeartbeatTaskService;
+
+	@Resource
+	NfcHeartbeatTaskService nfcHeartbeatTaskService;
+
+	@Resource
+	EsupSgcClientApplication esupSgcClientApplication;
 
 	@FXML
 	private FlowPane actionsPane;
@@ -92,28 +116,28 @@ public class EsupSgcClientJfxController {
 	@FXML
 	private ProgressBar progressBar;
 
-	public static SimpleBooleanProperty webcamReady = new SimpleBooleanProperty(false);
-
-	public SimpleBooleanProperty nfcReady = new SimpleBooleanProperty();
-
-	public static SimpleBooleanProperty authReady = new SimpleBooleanProperty();
-
+	@Resource
 	WebcamTaskService webcamTaskService;
 
+	@Resource
 	EsupSgcTaskServiceFactory esupSgcTaskServiceFactory;
 
-	public void init(String esupNfcTagServerUrl) {
+	@Resource
+	EsupNfcClientStackPane esupNfcClientStackPane;
 
-		esupSgcTaskServiceFactory = new EsupSgcTaskServiceFactory(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane);
+	@Override
+	public void initialize(URL url, ResourceBundle resourceBundle) {
 
-		nfcTagPane.getChildren().add(new EsupNfcClientStackPane(esupNfcTagServerUrl, Utils.getMacAddress()));
+		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane);
+
+		nfcTagPane.getChildren().add(esupNfcClientStackPane);
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldWebcamName, newWebcamName) -> {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldWebcamName + " - " + newWebcamName);
 			if(options.getValue()!=null && newWebcamName!=null && !newWebcamName.equals(oldWebcamName)) {
 				if(webcamTaskService != null && webcamTaskService.isRunning()) {
 					webcamTaskService.cancel();
 				}
-				webcamTaskService = new WebcamTaskService(newWebcamName, webcamImageView);
+				webcamTaskService.init(newWebcamName, webcamImageView);
 				webcamTaskService.start();
 				checkCamera.getTooltip().setText(newWebcamName);
 			}
@@ -131,7 +155,7 @@ public class EsupSgcClientJfxController {
 					logTextarea.setManaged(true);
 					buttonLogs.setText("Masquer les logs");
 				}
-				primaryStage.sizeToScene();
+				esupSgcClientApplication.getPrimaryStage().sizeToScene();
 			}
 		});
 
@@ -147,12 +171,12 @@ public class EsupSgcClientJfxController {
 					nfcTagPane.setManaged(true);
 					buttonNfcTag.setText("Masquer EsupNfcTag");
 				}
-				primaryStage.sizeToScene();
+				esupSgcClientApplication.getPrimaryStage().sizeToScene();
 			}
 		});
 
 
-		nfcReady.addListener(new ChangeListener<Boolean>() {
+		appSession.getNfcReady().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
@@ -167,14 +191,14 @@ public class EsupSgcClientJfxController {
 			}
 		});
 
-		authReady.addListener(new ChangeListener<Boolean>() {
+		appSession.getAuthReady().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
 					checkAuth.getStyleClass().clear();
 					checkAuth.getStyleClass().add("btn-success");
-					checkAuth.getTooltip().setText(FileLocalStorage.eppnInit);
-					logTextarea.appendText("Authentification OK : " + FileLocalStorage.eppnInit + "\n");
+					checkAuth.getTooltip().setText(appSession.eppnInit);
+					logTextarea.appendText("Authentification OK : " + appSession.eppnInit + "\n");
 					startLoopServiceIfPossible();
 				} else {
 					checkAuth.getStyleClass().clear();
@@ -189,7 +213,7 @@ public class EsupSgcClientJfxController {
 				Thread th = new Thread(new Task<>() {
 					@Override
 					protected Object call() throws Exception {
-						EvolisPrinterService.reject();
+						evolisPrinterService.reject();
 						return null;
 					}
 				});
@@ -203,7 +227,7 @@ public class EsupSgcClientJfxController {
 				Thread th = new Thread(new Task<>() {
 					@Override
 					protected Object call() throws Exception {
-						EvolisPrinterService.printEnd();
+						evolisPrinterService.printEnd();
 						return null;
 					}
 				});
@@ -212,7 +236,7 @@ public class EsupSgcClientJfxController {
 			}
 		});
 
-		EvolisHeartbeatTaskService.printerReady.addListener(new ChangeListener<Boolean>() {
+		appSession.getPrinterReady().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
@@ -235,7 +259,7 @@ public class EsupSgcClientJfxController {
 		});
 
 
-		webcamReady.addListener(new ChangeListener<Boolean>() {
+		appSession.webcamReady.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
@@ -252,17 +276,14 @@ public class EsupSgcClientJfxController {
 			}
 		});
 
-		EvolisHeartbeatTaskService evolisHeartbeatTaskService = new EvolisHeartbeatTaskService();
 		checkPrinter.getTooltip().textProperty().bind(evolisHeartbeatTaskService.titleProperty());
 		evolisHeartbeatTaskService.start();
 
+		checkNfc.getTooltip().textProperty().bind(nfcHeartbeatTaskService.titleProperty());
+		nfcHeartbeatTaskService.start();
+
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		Webcam.getWebcams(); // with this webcams are discovered and listener works at startup
-
-		/* just for testing ...
-		WaitTaskService waitTaskService = new WaitTaskService();
-		setupFlowEsupSgcTaskService(waitTaskService, null);
-		*/
 
 	}
 
@@ -280,7 +301,7 @@ public class EsupSgcClientJfxController {
 
 	private void startLoopServiceIfPossible() {
 		log.debug("startLoopServiceIfPossible ...");
-		if(authReady.getValue() && nfcReady.getValue() && webcamReady.getValue()) {
+		if(appSession.isAuthReady() && appSession.isNfcReady() && appSession.isWebcamReady()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
@@ -289,7 +310,7 @@ public class EsupSgcClientJfxController {
 				}
 			});
 		}
-		if(authReady.getValue() && nfcReady.getValue() && EvolisHeartbeatTaskService.printerReady.getValue()) {
+		if(appSession.isAuthReady() && appSession.isNfcReady() && appSession.isPrinterReady()) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {

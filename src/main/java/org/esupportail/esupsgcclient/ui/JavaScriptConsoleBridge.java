@@ -1,14 +1,21 @@
 package org.esupportail.esupsgcclient.ui;
 
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+
+@Component
 public class JavaScriptConsoleBridge {
+
+    @Resource
+    FileLocalStorage fileLocalStorage;
 	
 	private final static Logger log = Logger.getLogger(JavaScriptConsoleBridge.class);
 
 	public void disconnect() {
 		log.info("Javascript exit !");
-		FileLocalStorage.removeItem("numeroId");
+        fileLocalStorage.removeItem("numeroId");
 		System.exit(0);
     }
 	

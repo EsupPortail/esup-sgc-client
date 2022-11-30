@@ -17,37 +17,44 @@ import javafx.concurrent.Worker.State;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
+import org.esupportail.esupsgcclient.AppConfig;
+import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.EsupSgcClientApplication;
+import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+@Component
 public class EsupNfcClientStackPane extends StackPane {
 
     private final static Logger log = Logger.getLogger(EsupNfcClientStackPane.class);
 
-    private String esupNfcTagServerUrl;
-
-    private static String numeroId = "";
-    public static String sgcAuthToken = "";
-    private static String eppnInit;
-    private static String authType;
-    private static String readyToScan;
-
     public static WebView webView = new WebView();
 
-    private JavaScriptConsoleBridge javaScriptConsoleBridge;
+    @Resource
+    JavaScriptConsoleBridge javaScriptConsoleBridge;
 
+    @Resource
+    FileLocalStorage fileLocalStorage;
 
-    public EsupNfcClientStackPane(String esupNfcTagUrl, final String macAdress) throws HeadlessException {
+    @Resource
+    AppSession appSession;
 
-        esupNfcTagServerUrl = esupNfcTagUrl;
+    @Resource
+    AppConfig appConfig;
+
+    @PostConstruct
+    public void init() throws HeadlessException {
 
         Platform.runLater(() -> {
             webView.setPrefWidth(500);
             webView.getEngine().setJavaScriptEnabled(true);
-            javaScriptConsoleBridge = new JavaScriptConsoleBridge();
-            if (FileLocalStorage.getItem("numeroId") != null) {
-                numeroId = FileLocalStorage.getItem("numeroId");
+            if (fileLocalStorage.getItem("numeroId") != null) {
+                appSession.setNumeroId(fileLocalStorage.getItem("numeroId"));
             }
-            String url = esupNfcTagServerUrl + "/nfc-index?numeroId=" + numeroId + "&jarVersion=" + getJarVersion() + "&imei=esupSgcClient&macAddress=" + macAdress;
+            String url = appConfig.getEsupNfcTagServerUrl() + "/nfc-index?numeroId=" + appSession.getNumeroId() + "&jarVersion=" + getJarVersion() + "&imei=esupSgcClient&macAddress=" + Utils.getMacAddress();
             log.info("webView load : " + url);
             webView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
 				if (newValue == State.SUCCEEDED) {
@@ -87,23 +94,20 @@ public class EsupNfcClientStackPane extends StackPane {
         getChildren().add(webviewPane);
     }
 
-    public static void readLocalStorage() {
+    public void readLocalStorage() {
         Platform.runLater(() -> {
             JSObject window = (JSObject) webView.getEngine().executeScript("window");
-            numeroId = window.getMember("numeroId").toString();
-            sgcAuthToken = window.getMember("sgcAuthToken").toString();
-            eppnInit = window.getMember("eppnInit").toString();
-            authType = window.getMember("authType").toString();
-            if (numeroId != null && !numeroId.equals("") && !"undefined".equals(numeroId)) {
-                FileLocalStorage.setItem("numeroId", numeroId);
-                EsupSgcClientApplication.numeroId = numeroId;
+            appSession.setNumeroId(window.getMember("numeroId").toString());
+            appSession.setSgcAuthToken(window.getMember("sgcAuthToken").toString());
+            appSession.setEppnInit(window.getMember("eppnInit").toString());
+            if (appSession.getNumeroId() != null && !appSession.getNumeroId().equals("") && !"undefined".equals(appSession.getNumeroId())) {
+                fileLocalStorage.setItem("numeroId", appSession.getNumeroId());
             }
-            if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken)) {
-                FileLocalStorage.setItem("sgcAuthToken", sgcAuthToken);
-                EsupSgcClientApplication.sgcAuthToken = sgcAuthToken;
+            if (appSession.getSgcAuthToken() != null && !appSession.getSgcAuthToken().equals("") && !"undefined".equals(appSession.getSgcAuthToken())) {
+                fileLocalStorage.setItem("sgcAuthToken", appSession.getSgcAuthToken());
             }
-            if (eppnInit != null && !eppnInit.equals("") && !"undefined".equals(eppnInit)) {
-                FileLocalStorage.setItem("eppnInit", eppnInit);
+            if (appSession.getEppnInit() != null && !appSession.getEppnInit().equals("") && !"undefined".equals(appSession.getEppnInit())) {
+                fileLocalStorage.setItem("eppnInit", appSession.getEppnInit());
             }
         });
     }

@@ -74,15 +74,11 @@ public class PcscUsbService {
 		return terminalsNames.toString();
 	}
 
-	public boolean isCardPresent() throws CardException{
+	public static String getTerminalName() throws CardException{
 		for (CardTerminal terminal : terminals.list()) {
-		try {
-			if(!terminal.getName().contains("6121") && terminal.isCardPresent()) return true; 
-		} catch (CardException e) {
-			log.warn("Pas de carte");
+			if(!terminal.getName().contains("6121")) return terminal.getName();
 		}
-		}
-		return false;
+		return null;
 	}
 	
 	public static String sendAPDU(String apdu) throws CardException{

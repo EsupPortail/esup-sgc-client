@@ -13,40 +13,43 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
 import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-    Permet de créer les chaines (boulces) de EsupSgcTaskService
- */
+
+@Component
 public class EsupSgcTaskServiceFactory {
 
     final static Logger log = Logger.getLogger(EsupSgcTaskServiceFactory.class);
 
-    final FlowPane actionsPane;
+    FlowPane actionsPane;
 
-    final ImageView webcamImageView;
+    ImageView webcamImageView;
 
-    final ImageView bmpColorImageView;
+    ImageView bmpColorImageView;
 
-    final ImageView bmpBlackImageView;
+    ImageView bmpBlackImageView;
 
-    final TextArea logTextarea;
+    TextArea logTextarea;
 
-    final ProgressBar progressBar;
+    ProgressBar progressBar;
 
-    final Label textPrincipal;
+    Label textPrincipal;
 
+    @Resource
     QrCodeTaskService qrCodeTaskService;
 
+    @Resource
     EvolisTaskService evolisEvolisTaskService;
 
     Map<UiStep, TextFlow> uiSteps = new HashMap<>();
 
-    public EsupSgcTaskServiceFactory(ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView,
+    public void init(ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView,
                                      TextArea logTextarea, ProgressBar progressBar, Label textPrincipal,
                                      FlowPane actionsPane) {
         this.actionsPane = actionsPane;
@@ -80,10 +83,7 @@ public class EsupSgcTaskServiceFactory {
      must be run from App JFX Thread
      */
     public void runQrCodeTaskService() {
-        if(qrCodeTaskService!=null && qrCodeTaskService.isRunning()) {
-            qrCodeTaskService.cancel();
-        }
-        qrCodeTaskService = new QrCodeTaskService(uiSteps,  webcamImageView.imageProperty());
+        qrCodeTaskService.init(uiSteps,  webcamImageView.imageProperty());
         // TODO setupFlowEsupSgcTaskService(qrCodeTaskService);
     }
 
@@ -91,10 +91,7 @@ public class EsupSgcTaskServiceFactory {
     must be run from App JFX Thread
     */
     public void runEvolisEsupSgcLongPollTaskService() {
-        if(evolisEvolisTaskService !=null && evolisEvolisTaskService.isRunning()) {
-            evolisEvolisTaskService.cancel();
-        }
-        evolisEvolisTaskService = new EvolisTaskService(uiSteps, bmpColorImageView, bmpBlackImageView);
+        evolisEvolisTaskService.init(uiSteps, bmpColorImageView, bmpBlackImageView);
         evolisEvolisTaskService.setOnRunning(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {

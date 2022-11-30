@@ -1,5 +1,7 @@
 package org.esupportail.esupsgcclient.service.sgc;
 
+import org.esupportail.esupsgcclient.AppConfig;
+import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
@@ -7,11 +9,20 @@ import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
+
+@Component
 public class EsupSgcLongPollService {
     final static Logger log = LoggerFactory.getLogger(EsupSgcLongPollService.class);
+
+    @Resource
+    AppConfig appConfig;
+    @Resource
+    AppSession appSession;
     RestTemplate restTemplate;
     public EsupSgcLongPollService() {
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
@@ -23,11 +34,11 @@ public class EsupSgcLongPollService {
 
     public String getQrCode() {
         while (true) {
-            String sgcAuthToken = EsupNfcClientStackPane.sgcAuthToken;
-            if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken) && EvolisPrinterService.initSocket(false)) {
+            String sgcAuthToken = appSession.getSgcAuthToken();
+            if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken)) {
                 try {
-                    log.debug("Call " + EncodingService.esupSgcUrl + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken);
-                    String qrcode = restTemplate.getForObject(EncodingService.esupSgcUrl + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken, String.class);
+                    log.debug("Call " + appConfig.getEsupSgcUrl() + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken);
+                    String qrcode = restTemplate.getForObject(appConfig.getEsupSgcUrl() + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken, String.class);
                     if (qrcode != null) {
                         log.debug("qrcode : " + qrcode);
                         if("stop".equals(qrcode)) {

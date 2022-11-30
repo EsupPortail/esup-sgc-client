@@ -13,18 +13,24 @@ import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.webcam.QRCodeReader;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
+@Component
 public class QrCodeTaskService extends EsupSgcTaskService<String> {
 
 	private final static Logger log = Logger.getLogger(QrCodeTaskService.class);
 
 	ObjectProperty<Image> webcamImageProperty;
 
-	public QrCodeTaskService(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty) {
-		super(uiSteps);
+	@Resource
+	EncodingService encodingService;
+
+	public void init(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty) {
+		super.init(uiSteps);
 		this.webcamImageProperty = webcamImageProperty;
 	}
 
@@ -37,11 +43,11 @@ public class QrCodeTaskService extends EsupSgcTaskService<String> {
 				updateProgress(0, 2);
 				String qrcode = getQrcode();
 				try {
-					EncodingService.encode(qrcode);
+					encodingService.encode(qrcode);
 				} catch (Exception e) {
 					updateTitle("Exception : " + e.getMessage());
 					updateTitle("Merci de retirer cette carte");
-					while (!EncodingService.waitForCardAbsent(1000)) {
+					while (!encodingService.waitForCardAbsent(1000)) {
 						// Utils.sleep(1000); -  sleep non nécessaire : EncodingService.waitForCardAbsent l'intègre
 					}
 					updateTitle("Carte retirée");

@@ -13,28 +13,25 @@ import java.util.Properties;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.AppSession;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
+@Component
 public class FileLocalStorage {
 
 	private final static Logger log = Logger.getLogger(FileLocalStorage.class);
 
-	private static File file = initLocalStorageFile();
+	private File file;
 
-	static SimpleBooleanProperty authReady;
+	@javax.annotation.Resource
+	AppSession appSession;
 
-	static String numeroId;
-
-	static String sgcAuthToken;
-
-	public static String eppnInit;
-
-	public static void setAuthReady(SimpleBooleanProperty ar) {
-		authReady = ar;
-	}
-
-	private static File initLocalStorageFile() {
+	@PostConstruct
+	void initLocalStorageFile() {
 		String localStorageName = "esupSgcLocalStorage";
 		Properties prop = new Properties();
 		Resource resource = new ClassPathResource("esupsgcclient.properties");
@@ -46,7 +43,6 @@ public class FileLocalStorage {
 		}
 		String localStorageDir = System.getProperty("localStorageDir", prop.getProperty("localStorageDir"));
 		String OS = System.getProperty("os.name").toLowerCase();
-		File file;
 		if (OS.indexOf("win") >= 0) {
 			File directory = new File(String.valueOf(System.getProperty("user.home")+ localStorageDir));
 			if(!directory.exists()){
@@ -61,11 +57,9 @@ public class FileLocalStorage {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		return file;
 	}
 
-	public static String getItem(String key) {
+	public String getItem(String key) {
 		log.info("get key : " + key);
 		String value = "";
 		try {
@@ -83,7 +77,7 @@ public class FileLocalStorage {
 		return value;
 	}
 
-	public static void setItem(String key, String value) {
+	public void setItem(String key, String value) {
 		log.info("init write : " + key);
 
 		Map<String, String> item = new HashMap<String, String>();
@@ -106,23 +100,23 @@ public class FileLocalStorage {
 			fos.close();
 			log.info(key + "=" + value + " write to localstorage");
 			if(key.equals("numeroId")) {
-				numeroId = value;
+				appSession.setNumeroId(value);
 			}
 			if(key.equals("sgcAuthToken")) {
-				sgcAuthToken = value;
+				appSession.setSgcAuthToken(value);
 			}
 			if(key.equals("eppnInit")) {
-				eppnInit = value;
+				appSession.setEppnInit(value);
 			}
-			if(numeroId!=null && sgcAuthToken!=null && eppnInit!=null) {
-				authReady.setValue(true);
+			if(appSession.getNumeroId() !=null && appSession.getSgcAuthToken() !=null && appSession.getEppnInit() !=null) {
+				appSession.setAuthReady(true);
 			}
 		} catch (IOException e) {
 			log.error("error on write to localstorage", e);
 		}
 	}
 
-	public static void removeItem(String key) {
+	public void removeItem(String key) {
 		log.info("remove : " + key);
 		Map<String, String> item = new HashMap<String, String>();
 		try {

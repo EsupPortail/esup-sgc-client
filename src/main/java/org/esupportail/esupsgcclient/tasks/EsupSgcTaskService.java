@@ -10,7 +10,7 @@ public abstract class EsupSgcTaskService<S> extends Service<S> {
 
 	Map<UiStep, TextFlow> uiSteps;
 
-	public EsupSgcTaskService(Map<UiStep, TextFlow> uiSteps) {
+	public void init(Map<UiStep, TextFlow> uiSteps) {
 		this.uiSteps = uiSteps;
 	}
 

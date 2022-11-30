@@ -1,10 +1,13 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.esupportail.esupsgcclient.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,30 +21,29 @@ import java.net.SocketTimeoutException;
  * This Service provides commands for interaction with sgc from evolis printers
  * It computes JSON-RPC commands to send to Evolis Services Provider 2
  */
+@Component
 public class EvolisPrinterService {
 	
 	final static Logger log = LoggerFactory.getLogger(EvolisPrinterService.class);
-
-	//static String ip = "10.197.1.71";
-	static String ip = "127.0.0.1";
-
-	static int port = 18000;
 
 	static Socket socket;
 
 	static ObjectMapper objectMapper = new ObjectMapper();
 
-	public static boolean initSocket(boolean exceptionIfFailed) {
+	@Resource
+	AppConfig appConfig;
+
+	public boolean initSocket(boolean exceptionIfFailed) {
 		if(socket == null || socket.isClosed() || !socket.isConnected() || socket.isClosed() || !socket.isBound()) {
 			try {
-				socket = new Socket(ip, port);
+				socket = new Socket(appConfig.getPrinterEvolisIp(), appConfig.getPrinterEvolisPort());
 				socket.setSoTimeout(100);
 				return true;
 			} catch (IOException e) {
 				if (exceptionIfFailed) {
-					throw new RuntimeException("Can't connect to evolis printer on " + ip + ":" + port);
+					throw new RuntimeException("Can't connect to evolis printer on " + appConfig.getPrinterEvolisIp() + ":" + appConfig.getPrinterEvolisPort());
 				} else{
-					log.debug("Can't connect to evolis printer on {}:{}", ip, port);
+					log.debug("Can't connect to evolis printer on {}:{}", appConfig.getPrinterEvolisIp(), appConfig.getPrinterEvolisPort());
 				}
 			}
 			return false;
@@ -49,7 +51,7 @@ public class EvolisPrinterService {
 		return true;
 	}
 
-	public static void closeSocket() {
+	public void closeSocket() {
 		try {
 			if(socket!=null) {
 				socket.close();
@@ -59,7 +61,7 @@ public class EvolisPrinterService {
 		}
 	}
 
-	static EvolisResponse sendRequest(EvolisRequest req) {
+	EvolisResponse sendRequest(EvolisRequest req) {
 		try {
 			initSocket(true);
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -96,68 +98,68 @@ public class EvolisPrinterService {
 			closeSocket();
 		}
 	}
-	static EvolisResponse sendRequestAndLog(EvolisRequest evolisRequest) {
+	EvolisResponse sendRequestAndLog(EvolisRequest evolisRequest) {
 		log.trace("Request : {}", evolisRequest);
 		EvolisResponse response = sendRequest(evolisRequest);
 		log.trace("Response : {}", response);
 		return response;
 	}
 
-	public static EvolisResponse insertCard() {
+	public EvolisResponse insertCard() {
 		return sendRequestAndLog(EvolisPrinterCommands.insertCard());
 	}
 
-	public static EvolisResponse getPrinterStatus() {
+	public EvolisResponse getPrinterStatus() {
 		return sendRequestAndLog(EvolisPrinterCommands.getPrinterStatus());
 	}
 
-	public static EvolisResponse printBegin() {
+	public EvolisResponse printBegin() {
 		return sendRequestAndLog(EvolisPrinterCommands.printBegin());
 	}
 
-	public static void printSet() {
+	public void printSet() {
 		sendRequestAndLog(EvolisPrinterCommands.printSet());
 	}
 
-	public static void printEnd() {
+	public void printEnd() {
 		sendRequestAndLog(EvolisPrinterCommands.printEnd());
 	}
 
 
-	public static void printFrontColorBmp(String bmpColorAsBase64) {
+	public void printFrontColorBmp(String bmpColorAsBase64) {
 		sendRequestAndLog(EvolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
 	}
 
-	public static void printFrontBlackBmp(String bmpBlackAsBase64) {
+	public void printFrontBlackBmp(String bmpBlackAsBase64) {
 		sendRequestAndLog(EvolisPrinterCommands.printFrontBlackBmp(bmpBlackAsBase64));
 	}
 
-	public static void printFrontVarnish(String bmpVarnishAsBase64) {
+	public void printFrontVarnish(String bmpVarnishAsBase64) {
 		sendRequestAndLog(EvolisPrinterCommands.printFrontVarnish(bmpVarnishAsBase64));
 	}
 
-	public static void print() {
+	public void print() {
 		sendRequestAndLog(EvolisPrinterCommands.print());
 	}
 
-	public static EvolisResponse insertCardToContactLessStation() {
+	public EvolisResponse insertCardToContactLessStation() {
 		return sendRequestAndLog(EvolisPrinterCommands.insertCardToContactLessStation());
 	}
 
 
-	public static void eject() {
+	public void eject() {
 		sendRequestAndLog(EvolisPrinterCommands.eject());
 	}
 
-	public static void reject() {
+	public void reject() {
 		sendRequestAndLog(EvolisPrinterCommands.reject());
 	}
 
-	public static void startSequence() {
+	public void startSequence() {
 		sendRequestAndLog(EvolisPrinterCommands.startSequence());
 	}
 
-	public static void endSequence() {
+	public void endSequence() {
 		sendRequestAndLog(EvolisPrinterCommands.endSequence());
 	}
 }

@@ -1,6 +1,7 @@
 package org.esupportail.esupsgcclient.tasks;
 
 import javafx.concurrent.Task;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
@@ -10,24 +11,39 @@ import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisResponse;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcLongPollService;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 import java.util.Map;
 
+@Service
 public class EvolisTaskService extends EsupSgcTaskService<String> {
 
 	private final static Logger log = Logger.getLogger(EvolisTaskService.class);
-
-	EsupSgcLongPollService esupSgcLongPollService;
 
 	ImageView bmpColorImageView;
 
 	ImageView bmpBlackImageView;
 
-	public EvolisTaskService(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-		super(uiSteps);
+
+	@Resource
+	EsupSgcLongPollService esupSgcLongPollService;
+
+	@Resource
+	EncodingService encodingService;
+
+	@Resource
+	EvolisPrinterService evolisPrinterService;
+
+	public void init(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+		super.init(uiSteps);
 		this.bmpColorImageView = bmpColorImageView;
 		this.bmpBlackImageView = bmpBlackImageView;
-		esupSgcLongPollService = new EsupSgcLongPollService();
 	}
 
 	@Override
@@ -40,41 +56,43 @@ public class EvolisTaskService extends EsupSgcTaskService<String> {
 					updateProgress(0, 2);
 					String qrcode = esupSgcLongPollService.getQrCode();
 					setUiStepSuccess(UiStep.long_poll);
-					String bmpBlackAsBase64 = EncodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.black);
+					String bmpBlackAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.black);
+					updateBmpUi(bmpBlackAsBase64, bmpBlackImageView);
 					setUiStepSuccess(UiStep.bmp_black);
-					String bmpColorAsBase64 = EncodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.color);
+					String bmpColorAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.color);
+					updateBmpUi(bmpColorAsBase64, bmpColorImageView);
 					setUiStepSuccess(UiStep.bmp_color);
 					updateProgress(1, 10);
-					EvolisResponse resp = EvolisPrinterService.insertCardToContactLessStation();
+					EvolisResponse resp = evolisPrinterService.insertCardToContactLessStation();
 					setUiStepSuccess(UiStep.printer_nfc);
-					EncodingService.encode(qrcode);
+					encodingService.encode(qrcode);
 					setUiStepSuccess(UiStep.encode);
 					updateProgress(1, 10);
 					updateTitle("Impression ...");
-					EvolisPrinterService.printBegin();
-					EvolisPrinterService.printSet();
+					evolisPrinterService.printBegin();
+					evolisPrinterService.printSet();
 					updateProgress(2, 10);
 					updateTitle("Panneau couleur");
-					EvolisPrinterService.printFrontColorBmp(bmpColorAsBase64);
+					evolisPrinterService.printFrontColorBmp(bmpColorAsBase64);
 					setUiStepSuccess(UiStep.printer_color);
 					updateProgress(3, 10);
 					updateTitle("Panneau noir");
-					EvolisPrinterService.printFrontBlackBmp(bmpBlackAsBase64);
+					evolisPrinterService.printFrontBlackBmp(bmpBlackAsBase64);
 					setUiStepSuccess(UiStep.printer_black);
 					updateProgress(4, 10);
 					updateTitle("Overlay");
-					EvolisPrinterService.printFrontVarnish(bmpBlackAsBase64);
+					evolisPrinterService.printFrontVarnish(bmpBlackAsBase64);
 					setUiStepSuccess(UiStep.printer_overlay);
 					updateProgress(5, 10);
 					updateTitle("Impression...");
-					EvolisPrinterService.print();
+					evolisPrinterService.print();
 					setUiStepSuccess(UiStep.printer_print);
 					updateProgress(10, 10);
 				} catch(EvolisException evolisException) {
 					updateTitle(evolisException.getMessage());
 					log.error("Exception with evolis : " + evolisException.getMessage(), evolisException);
 				} finally {
-					EvolisPrinterService.printEnd();
+					evolisPrinterService.printEnd();
 				}
 				return null;
 			}
@@ -82,6 +100,17 @@ public class EvolisTaskService extends EsupSgcTaskService<String> {
 		return esupSgcLongPollTask;
 	}
 
+	private void updateBmpUi(String bmpAsBase64, ImageView bmpImageView) {
+		try {
+			byte[] bmp = Base64.getDecoder().decode(bmpAsBase64.getBytes());
+			BufferedImage input_image = ImageIO.read(new ByteArrayInputStream(bmp));
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			ImageIO.write(input_image, "PNG", out);
+			bmpImageView.setImage(new Image(new ByteArrayInputStream(out.toByteArray()), 200, 200, true, true));
+		}catch(Exception e) {
+			log.warn("pb refreshing bmpImageView with bmpAsBase64", e);
+		}
+	}
 
 
 	public void setUiStepRunning() {
