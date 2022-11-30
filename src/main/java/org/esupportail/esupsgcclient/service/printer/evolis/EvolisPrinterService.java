@@ -79,8 +79,8 @@ public class EvolisPrinterService {
 					responseStr = responseStr + new String(buffer);
 				} catch(SocketTimeoutException | SocketException ex){
 					if(StringUtils.hasText(responseStr)) {
-						log.debug("SocketTimeoutException - response received - we stop it");
-						log.warn(responseStr.length() > 200 ? responseStr.substring(0, 200) : responseStr);
+						log.trace("SocketTimeoutException - response received - we stop it");
+						log.debug(responseStr.length() > 200 ? responseStr.substring(0, 200) : responseStr);
 						break;
 					}
 				}
