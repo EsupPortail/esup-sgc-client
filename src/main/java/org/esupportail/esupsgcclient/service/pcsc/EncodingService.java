@@ -54,9 +54,7 @@ public class EncodingService {
 	EsupNgcTagService esupNgcTagService;
 
 	@PostConstruct
-	void init() throws EncodingException, PcscException, CnousFournisseurCarteException {
-
-		PcscUsbService.init();
+	void init() throws CnousFournisseurCarteException {
 
 		if (appConfig.isEncodeCnous()) {
 			try {
