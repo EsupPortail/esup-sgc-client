@@ -16,6 +16,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <VBox stylesheets="@/org/kordamp/bootstrapfx/bootstrapfx.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.esupportail.esupsgcclient.EsupSgcClientJfxController">
    <children>
@@ -56,8 +57,14 @@
                            <children>
                               <FlowPane prefHeight="42.0" prefWidth="631.0" styleClass="panel-heading">
                                  <children>
-                                    <Label fx:id="title" text="Status : " />
-                                    <Label fx:id="textPrincipal" styleClass="text-success" />
+                                    <Label fx:id="title" text="Status : ">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font></Label>
+                                    <Label fx:id="textPrincipal" styleClass="text-success">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font></Label>
                                  </children>
                               </FlowPane>
                               <FlowPane fx:id="actionsPane" orientation="VERTICAL" prefHeight="249.0" prefWidth="629.0" />
