@@ -38,11 +38,6 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	final static Logger log = Logger.getLogger(EsupSgcClientJfxController.class);
 
-	public enum StyleLevel {success, danger, warning, primary, info};
-
-	@Resource
-	AppConfig appConfig;
-
 	@Resource
 	AppSession appSession;
 
@@ -123,6 +118,12 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane);
 
+		logTextarea.managedProperty().bind(logTextarea.visibleProperty());
+		nfcTagPane.managedProperty().bind(nfcTagPane.visibleProperty());
+		webcamImageView.managedProperty().bind(webcamImageView.visibleProperty());
+		bmpBlackImageView.managedProperty().bind(bmpBlackImageView.visibleProperty());
+		bmpColorImageView.managedProperty().bind(bmpColorImageView.visibleProperty());
+
 		nfcTagPane.getChildren().add(esupNfcClientStackPane);
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldWebcamName, newWebcamName) -> {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldWebcamName + " - " + newWebcamName);
@@ -141,11 +142,9 @@ public class EsupSgcClientJfxController implements Initializable {
 			public void handle(ActionEvent e) {
 				if (logTextarea.isVisible()) {
 					logTextarea.setVisible(false);
-					logTextarea.setManaged(false);
 					buttonLogs.setText("Afficher les logs");
 				} else {
 					logTextarea.setVisible(true);
-					logTextarea.setManaged(true);
 					buttonLogs.setText("Masquer les logs");
 				}
 				EsupSgcClientApplication.getPrimaryStage().sizeToScene();
@@ -157,11 +156,9 @@ public class EsupSgcClientJfxController implements Initializable {
 			public void handle(ActionEvent e) {
 				if (nfcTagPane.isVisible()) {
 					nfcTagPane.setVisible(false);
-					nfcTagPane.setManaged(false);
 					buttonNfcTag.setText("Afficher EsupNfcTag");
 				} else {
 					nfcTagPane.setVisible(true);
-					nfcTagPane.setManaged(true);
 					buttonNfcTag.setText("Masquer EsupNfcTag");
 				}
 				EsupSgcClientApplication.getPrimaryStage().sizeToScene();
@@ -237,11 +234,8 @@ public class EsupSgcClientJfxController implements Initializable {
 					checkPrinter.getStyleClass().add("btn-success");
 					logTextarea.appendText("imprimante evolis OK\n");
 					bmpBlackImageView.setVisible(true);
-					bmpBlackImageView.setManaged(true);
 					bmpColorImageView.setVisible(true);
-					bmpColorImageView.setManaged(true);
 					// webcamImageView.setVisible(false);
-					// webcamImageView.setManaged(false);
 					// primaryStage.sizeToScene();
 					startLoopServiceIfPossible();
 				} else {

@@ -67,6 +67,7 @@ public class EsupSgcTaskServiceFactory {
             label.setText(step.toString());
             actionsPane.getChildren().add(actionsPane.getChildren().size(), textFlow);
             uiSteps.put(step, textFlow);
+            textFlow.setVisible(false);
         }
 
         initQrCodeTaskService();
