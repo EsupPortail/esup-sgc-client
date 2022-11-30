@@ -45,7 +45,7 @@ public class EsupSgcTaskServiceFactory {
     QrCodeTaskService qrCodeTaskService;
 
     @Resource
-    EvolisTaskService evolisEvolisTaskService;
+    EvolisTaskService evolisTaskService;
 
     Map<UiStep, TextFlow> uiSteps = new HashMap<>();
 
@@ -68,61 +68,77 @@ public class EsupSgcTaskServiceFactory {
             actionsPane.getChildren().add(actionsPane.getChildren().size(), textFlow);
             uiSteps.put(step, textFlow);
         }
-        resetUiSteps();
+
+        initQrCodeTaskService();
+
+        initEvolisTaskService();
     }
 
-    private void resetUiSteps() {
-        for(UiStep step : uiSteps.keySet()) {
-            uiSteps.get(step).setVisible(false);
-            uiSteps.get(step).getStyleClass().clear();
-            uiSteps.get(step).getStyleClass().add("alert-info");
-        }
+     void initQrCodeTaskService() {
+        qrCodeTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+                progressBar.setStyle("");
+                qrCodeTaskService.restart();
+            }
+        });
+
+        qrCodeTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+                log.error("Exception when procressing card ...", qrCodeTaskService.getException());
+                progressBar.setStyle("-fx-accent:red");
+                if(qrCodeTaskService.getException() != null && qrCodeTaskService.getException().getMessage()!=null) {
+                    logTextarea.appendText(qrCodeTaskService.getException().getMessage());
+                }
+            }
+        });
+
+        textPrincipal.textProperty().bind(qrCodeTaskService.titleProperty());
+        qrCodeTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
+        progressBar.progressProperty().bind(qrCodeTaskService.progressProperty());
+    }
+
+    void initEvolisTaskService() {
+        evolisTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+                progressBar.setStyle("");
+                evolisTaskService.restart();
+            }
+        });
+
+        evolisTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+                log.error("Exception when procressing card ...", evolisTaskService.getException());
+                // evolisTaskService.setUiStepFailed(UiStep.printer_print, evolisTaskService.getException());
+                progressBar.setStyle("-fx-accent:red");
+                if(evolisTaskService.getException() != null && evolisTaskService.getException().getMessage()!=null) {
+                    logTextarea.appendText(evolisTaskService.getException().getMessage());
+                }
+            }
+        });
+
+        textPrincipal.textProperty().bind(evolisTaskService.titleProperty());
+        evolisTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
+        progressBar.progressProperty().bind(evolisTaskService.progressProperty());
     }
 
     /*
      must be run from App JFX Thread
      */
     public void runQrCodeTaskService() {
-        qrCodeTaskService.init(uiSteps,  webcamImageView.imageProperty());
-        // TODO setupFlowEsupSgcTaskService(qrCodeTaskService);
+        qrCodeTaskService.setup(uiSteps,  webcamImageView.imageProperty());
+        qrCodeTaskService.restart();
     }
 
     /*
     must be run from App JFX Thread
     */
-    public void runEvolisEsupSgcLongPollTaskService() {
-        evolisEvolisTaskService.init(uiSteps, bmpColorImageView, bmpBlackImageView);
-        evolisEvolisTaskService.setOnRunning(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent t) {
-                evolisEvolisTaskService.setUiStepRunning();
-            }
-        });
-        evolisEvolisTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent t) {
-                progressBar.setStyle("");
-                evolisEvolisTaskService.restart();
-            }
-        });
-
-        evolisEvolisTaskService.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent t) {
-                log.error("Exception when procressing card ...", evolisEvolisTaskService.getException());
-                evolisEvolisTaskService.setUiStepFailed(UiStep.printer_print, evolisEvolisTaskService.getException());
-                progressBar.setStyle("-fx-accent:red");
-                if(evolisEvolisTaskService.getException() != null && evolisEvolisTaskService.getException().getMessage()!=null) {
-                    logTextarea.appendText(evolisEvolisTaskService.getException().getMessage());
-                }
-            }
-        });
-
-        textPrincipal.textProperty().bind(evolisEvolisTaskService.titleProperty());
-        evolisEvolisTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
-        progressBar.progressProperty().bind(evolisEvolisTaskService.progressProperty());
-        resetUiSteps();
-        evolisEvolisTaskService.restart();
+    public void runEvolisTaskService() {
+        evolisTaskService.setup(uiSteps, bmpColorImageView, bmpBlackImageView);
+        evolisTaskService.restart();
     }
 
 

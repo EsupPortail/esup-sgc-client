@@ -54,6 +54,7 @@ public class WebcamTaskService extends Service<Void> {
                             imageProperty.unbind();
                             webcam.close();
                             log.info("webcam canceled");
+                            appSession.setWebcamReady(false);
                             return null;
                         }
                         if ((newWebcamBufferedImage = webcam.getImage()) != null) {
@@ -61,6 +62,7 @@ public class WebcamTaskService extends Service<Void> {
                             ref.set(SwingFXUtils.toFXImage(webcamBufferedImage, ref.get()));
                             webcamBufferedImage.flush();
                             imageProperty.set(ref.get());
+                            appSession.setWebcamReady(true);
                         } else {
                             log.warn("image is null");
                             this.cancel();

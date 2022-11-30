@@ -9,7 +9,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.FlowPane;
-import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTaskService;
@@ -28,11 +27,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
-import org.esupportail.esupsgcclient.ui.FileLocalStorage;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -138,7 +134,7 @@ public class EsupSgcClientJfxController implements Initializable {
 					webcamTaskService.cancel();
 				}
 				webcamTaskService.init(newWebcamName, webcamImageView);
-				webcamTaskService.start();
+				webcamTaskService.restart();
 				checkCamera.getTooltip().setText(newWebcamName);
 			}
 		});
@@ -314,7 +310,7 @@ public class EsupSgcClientJfxController implements Initializable {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					esupSgcTaskServiceFactory.runEvolisEsupSgcLongPollTaskService();
+					esupSgcTaskServiceFactory.runEvolisTaskService();
 					logTextarea.appendText("evolisEsupSgcLongPollTaskService is now running\n");
 				}
 			});

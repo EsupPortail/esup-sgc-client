@@ -2,9 +2,7 @@ package org.esupportail.esupsgcclient.service.sgc;
 
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
-import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
-import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
+import org.esupportail.esupsgcclient.tasks.EvolisTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +30,11 @@ public class EsupSgcLongPollService {
         restTemplate = new RestTemplate(httpRequestFactory);
     }
 
-    public String getQrCode() {
+    public String getQrCode(EvolisTask evolisTask) {
         while (true) {
+            if(evolisTask.isCancelled()) {
+                throw new RuntimeException("EvolisTask is cancelled");
+            }
             String sgcAuthToken = appSession.getSgcAuthToken();
             if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken)) {
                 try {

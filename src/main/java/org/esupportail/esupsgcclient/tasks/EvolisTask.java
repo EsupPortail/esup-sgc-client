@@ -18,58 +18,87 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
-@Service
-public class EvolisTask extends Task<String> {
+public class EvolisTask extends EsupSgcTask {
 
     private final static Logger log = Logger.getLogger(EvolisTaskService.class);
-    EvolisTaskService evolisTaskService;
 
-    public EvolisTask(EvolisTaskService evolisTaskService) {
-        this.evolisTaskService = evolisTaskService;
+    ImageView bmpColorImageView;
+
+    ImageView bmpBlackImageView;
+    EsupSgcLongPollService esupSgcLongPollService;
+    EvolisPrinterService evolisPrinterService;
+    EncodingService encodingService;
+    public EvolisTask(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView,
+                      EsupSgcLongPollService esupSgcLongPollService, EvolisPrinterService evolisPrinterService, EncodingService encodingService) {
+        super(uiSteps);
+        this.bmpColorImageView = bmpColorImageView;
+        this.bmpBlackImageView = bmpBlackImageView;
+        this.esupSgcLongPollService = esupSgcLongPollService;
+        this.evolisPrinterService = evolisPrinterService;
+        this.encodingService = encodingService;
+    }
+
+    @Override
+    List<UiStep> getUiStepsList() {
+        return Arrays.asList(new UiStep[]{
+                UiStep.long_poll,
+                UiStep.bmp_black,
+                UiStep.bmp_color,
+                UiStep.printer_nfc,
+                UiStep.encode,
+                UiStep.printer_color,
+                UiStep.printer_black,
+                UiStep.printer_overlay,
+                UiStep.encode,
+                UiStep.printer_print});
     }
 
     @Override
     protected String call() throws Exception {
         try {
+            setUiStepRunning();
             setUiStepSuccess(null);
-            String qrcode = evolisTaskService.esupSgcLongPollService.getQrCode();
+            String qrcode = esupSgcLongPollService.getQrCode(this);
+            setUiStepRunning();
             setUiStepSuccess(UiStep.long_poll);
-            String bmpBlackAsBase64 = evolisTaskService.encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.black);
-            updateBmpUi(bmpBlackAsBase64, evolisTaskService.bmpBlackImageView);
+            String bmpBlackAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.black);
+            updateBmpUi(bmpBlackAsBase64, bmpBlackImageView);
             setUiStepSuccess(UiStep.bmp_black);
-            String bmpColorAsBase64 = evolisTaskService.encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.color);
-            updateBmpUi(bmpColorAsBase64, evolisTaskService.bmpColorImageView);
+            String bmpColorAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.color);
+            updateBmpUi(bmpColorAsBase64, bmpColorImageView);
             setUiStepSuccess(UiStep.bmp_color);
-            EvolisResponse resp = evolisTaskService.evolisPrinterService.insertCardToContactLessStation();
+            EvolisResponse resp = evolisPrinterService.insertCardToContactLessStation();
             setUiStepSuccess(UiStep.printer_nfc);
-            evolisTaskService.encodingService.encode(qrcode);
+            encodingService.encode(qrcode);
             setUiStepSuccess(UiStep.encode);
-            evolisTaskService.evolisPrinterService.printBegin();
-            evolisTaskService.evolisPrinterService.printSet();
-            evolisTaskService.evolisPrinterService.printFrontColorBmp(bmpColorAsBase64);
+            evolisPrinterService.printBegin();
+            evolisPrinterService.printSet();
+            evolisPrinterService.printFrontColorBmp(bmpColorAsBase64);
             setUiStepSuccess(UiStep.printer_color);
-            evolisTaskService.evolisPrinterService.printFrontBlackBmp(bmpBlackAsBase64);
+            evolisPrinterService.printFrontBlackBmp(bmpBlackAsBase64);
             setUiStepSuccess(UiStep.printer_black);
-            evolisTaskService.evolisPrinterService.printFrontVarnish(bmpBlackAsBase64);
+            evolisPrinterService.printFrontVarnish(bmpBlackAsBase64);
             setUiStepSuccess(UiStep.printer_overlay);
-            evolisTaskService.evolisPrinterService.print();
+            evolisPrinterService.print();
             setUiStepSuccess(UiStep.printer_print);
-        } catch (EvolisException evolisException) {
-            updateTitle(evolisException.getMessage());
-            log.error("Exception with evolis : " + evolisException.getMessage(), evolisException);
+        } catch (Exception e) {
+            updateTitle(e.getMessage());
+            log.error("Exception on  EvolisTaskService : " + e.getMessage(), e);
         } finally {
-            evolisTaskService.evolisPrinterService.printEnd();
+            evolisPrinterService.printEnd();
             resetBmpUi();
         }
 		return null;
 	}
 
     private void resetBmpUi() {
-        evolisTaskService.bmpColorImageView.setImage(null);
-        evolisTaskService.bmpBlackImageView.setImage(null);
+        bmpColorImageView.setImage(null);
+        bmpBlackImageView.setImage(null);
     }
 
     private void updateBmpUi(String bmpAsBase64, ImageView bmpImageView) {
@@ -83,20 +112,5 @@ public class EvolisTask extends Task<String> {
             log.warn("pb refreshing bmpImageView with bmpAsBase64", e);
         }
     }
-
-	public void setUiStepSuccess(UiStep uiStep) {
-        if(uiStep == null) {
-            updateProgress(0, evolisTaskService.uiStepsList.size());
-            updateTitle("En attente ...");
-        } else {
-            evolisTaskService.uiSteps.get(uiStep).getStyleClass().clear();
-            evolisTaskService.uiSteps.get(uiStep).getStyleClass().add("alert-success");
-            updateProgress(evolisTaskService.uiStepsList.indexOf(uiStep), evolisTaskService.uiStepsList.size());
-            if(evolisTaskService.uiStepsList.indexOf(uiStep)+1<evolisTaskService.uiStepsList.size()) {
-                UiStep newtUiStep = evolisTaskService.uiStepsList.get(evolisTaskService.uiStepsList.indexOf(uiStep) + 1);
-                updateTitle(newtUiStep.toString());
-            }
-        }
-	}
 
 }
