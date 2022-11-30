@@ -90,7 +90,7 @@ public class EvolisTask extends EsupSgcTask {
             updateTitle(e.getMessage());
             log.error("Exception on  EvolisTaskService : " + e.getMessage(), e);
         } finally {
-            evolisPrinterService.printEnd();
+            //evolisPrinterService.printEnd();
             resetBmpUi();
         }
 		return null;

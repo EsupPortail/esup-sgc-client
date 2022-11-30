@@ -317,10 +317,5 @@ public class EsupSgcClientJfxController implements Initializable {
 		}
 	}
 
-	public void changeTextPrincipal(String text, StyleLevel styleLevel) {
-		textPrincipal.setText(text);
-		panePrincipal.getStyleClass().clear();
-		panePrincipal.getStyleClass().add("panel-" + styleLevel);
-	}
 
 }

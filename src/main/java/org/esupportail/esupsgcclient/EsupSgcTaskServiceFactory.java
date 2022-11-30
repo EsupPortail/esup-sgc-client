@@ -96,7 +96,6 @@ public class EsupSgcTaskServiceFactory {
 
         textPrincipal.textProperty().bind(qrCodeTaskService.titleProperty());
         qrCodeTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
-        progressBar.progressProperty().bind(qrCodeTaskService.progressProperty());
     }
 
     void initEvolisTaskService() {
@@ -122,7 +121,6 @@ public class EsupSgcTaskServiceFactory {
 
         textPrincipal.textProperty().bind(evolisTaskService.titleProperty());
         evolisTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
-        progressBar.progressProperty().bind(evolisTaskService.progressProperty());
     }
 
     /*
@@ -130,6 +128,7 @@ public class EsupSgcTaskServiceFactory {
      */
     public void runQrCodeTaskService() {
         qrCodeTaskService.setup(uiSteps,  webcamImageView.imageProperty());
+        progressBar.progressProperty().bind(qrCodeTaskService.progressProperty());
         qrCodeTaskService.restart();
     }
 
@@ -138,6 +137,7 @@ public class EsupSgcTaskServiceFactory {
     */
     public void runEvolisTaskService() {
         evolisTaskService.setup(uiSteps, bmpColorImageView, bmpBlackImageView);
+        progressBar.progressProperty().bind(evolisTaskService.progressProperty());
         evolisTaskService.restart();
     }
 
