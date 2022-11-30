@@ -299,21 +299,15 @@ public class EsupSgcClientJfxController implements Initializable {
 	private void startLoopServiceIfPossible() {
 		log.debug("startLoopServiceIfPossible ...");
 		if(appSession.isAuthReady() && appSession.isNfcReady() && appSession.isWebcamReady()) {
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
+			Platform.runLater(() -> {
 					esupSgcTaskServiceFactory.runQrCodeTaskService();
 					logTextarea.appendText("qrCodeTaskService is now running\n");
-				}
 			});
 		}
 		if(appSession.isAuthReady() && appSession.isNfcReady() && appSession.isPrinterReady()) {
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
+			Platform.runLater(() -> {
 					esupSgcTaskServiceFactory.runEvolisTaskService();
 					logTextarea.appendText("evolisEsupSgcLongPollTaskService is now running\n");
-				}
 			});
 		}
 	}
