@@ -53,8 +53,9 @@ public class QrCodeTask extends EsupSgcTask {
 			encodingService.encode(qrcode);
 			setUiStepSuccess(UiStep.encode);
 		} catch (Exception e) {
+			log.debug("Exception on QrCodeTask", e);
 			setUiStepFailed(UiStep.encode, e);
-			updateTitle("Merci de retirer cette carte");
+			updateTitle("PB :" +  e.getMessage() + "\nMerci de retirer cette carte");
 			while (!encodingService.waitForCardAbsent(1000)) {
 				// Utils.sleep(1000); -  sleep non nécessaire : EncodingService.waitForCardAbsent l'intègre
 			}
