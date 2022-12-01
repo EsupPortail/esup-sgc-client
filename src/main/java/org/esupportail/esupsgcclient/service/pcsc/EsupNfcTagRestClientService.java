@@ -3,7 +3,6 @@ package org.esupportail.esupsgcclient.service.pcsc;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
-import org.esupportail.esupsgcclient.EsupSgcClientApplication;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -12,9 +11,9 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.Resource;
 
 @Component
-public class EsupNgcTagService {
+public class EsupNfcTagRestClientService {
 
-	private final static Logger log = Logger.getLogger(EsupNgcTagService.class);
+	private final static Logger log = Logger.getLogger(EsupNfcTagRestClientService.class);
 
 	private RestTemplate restTemplate =  new RestTemplate(Utils.clientHttpRequestFactory());
 

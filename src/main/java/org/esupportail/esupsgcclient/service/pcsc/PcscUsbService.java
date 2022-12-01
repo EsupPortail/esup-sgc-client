@@ -74,7 +74,10 @@ public class PcscUsbService {
 		return terminalsNames.toString();
 	}
 
-	public static String getTerminalName() throws CardException{
+	public static String getTerminalName() throws CardException, PcscException {
+		if(terminals==null || terminals.list().isEmpty()) {
+			init();
+		}
 		for (CardTerminal terminal : terminals.list()) {
 			if(!terminal.getName().contains("6121")) return terminal.getName();
 		}
