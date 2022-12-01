@@ -89,8 +89,12 @@ public class EvolisTask extends EsupSgcTask {
             setCurrentUiStepFailed(e);
             throw new RuntimeException("Exception on  EvolisTaskService : " + e.getMessage(), e);
         } finally {
-            evolisPrinterService.printEnd();
-            resetBmpUi();
+            try {
+                evolisPrinterService.printEnd();
+                resetBmpUi();
+            } catch (Exception e) {
+                log.info("Can't reset printing session after exception", e);
+            }
         }
 		return null;
 	}

@@ -4,8 +4,6 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisResponse;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +20,8 @@ public class NfcHeartbeatTaskService extends Service<Void> {
     @Resource
     AppSession appSession;
 
+    String lastTerminalName = "...";
+
     @Override
     protected Task<Void> createTask() {
         return new Task<Void>() {
@@ -31,7 +31,10 @@ public class NfcHeartbeatTaskService extends Service<Void> {
                     try {
                         String terminalName =  encodingService.getTerminalName();
                         appSession.setNfcReady(terminalName!=null);
-                        updateTitle(terminalName!=null ? terminalName : "...");
+                       if(terminalName!=null && !terminalName.equals(lastTerminalName)) {
+                           lastTerminalName = terminalName;
+                           updateTitle("Nom du terminal NFC : " + lastTerminalName);
+                       }
                     } catch(Exception e) {
                         log.debug("b with nfc ...", e);
                     }

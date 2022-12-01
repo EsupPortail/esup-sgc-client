@@ -264,9 +264,11 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		checkPrinter.getTooltip().textProperty().bind(evolisHeartbeatTaskService.titleProperty());
 		evolisHeartbeatTaskService.start();
+		evolisHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
 
 		checkNfc.getTooltip().textProperty().bind(nfcHeartbeatTaskService.titleProperty());
 		nfcHeartbeatTaskService.start();
+		nfcHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		Webcam.getWebcams(); // with this webcams are discovered and listener works at startup

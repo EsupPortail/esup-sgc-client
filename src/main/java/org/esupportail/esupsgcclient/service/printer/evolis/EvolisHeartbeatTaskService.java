@@ -21,6 +21,8 @@ public class EvolisHeartbeatTaskService extends Service<Void> {
     @Resource
     AppSession appSession;
 
+    String lastPrinterStatus = "...";
+
     @Override
     protected Task<Void> createTask() {
         return new Task<Void>() {
@@ -30,7 +32,11 @@ public class EvolisHeartbeatTaskService extends Service<Void> {
                     try {
                         EvolisResponse status = evolisPrinterService.getPrinterStatus();
                         appSession.setPrinterReady(true);
-                        updateTitle(status.getResult());
+                        String printerStatus = status.getResult();
+                        if(printerStatus!=null && !printerStatus.equals(lastPrinterStatus)) {
+                            lastPrinterStatus = printerStatus;
+                            updateTitle("Statut Evolis : " + lastPrinterStatus);
+                        }
                     } catch(Exception e) {
                         log.debug("b with evolisPrinterService ...", e);
                     }
