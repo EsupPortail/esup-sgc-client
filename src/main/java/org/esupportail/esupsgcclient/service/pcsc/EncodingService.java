@@ -211,7 +211,7 @@ public class EncodingService {
 		return cnousOK;
 	}
 
-	public void encode(String qrcode) throws Exception {
+	public String encode(String qrcode) throws Exception {
 		long start = System.currentTimeMillis();
 		long t;
 		while (!pcscConnection()) {
@@ -237,7 +237,7 @@ public class EncodingService {
 				} else {
 					log.info("Encoding  : OK");
 					encodeCnousIfNeeded(csn);
-					return;
+					return csn;
 				}
 			} else {
 				throw new EncodingException("NFC APDU gived by nfctag is null ?!");

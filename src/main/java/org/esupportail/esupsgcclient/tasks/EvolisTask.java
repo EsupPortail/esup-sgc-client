@@ -1,19 +1,15 @@
 package org.esupportail.esupsgcclient.tasks;
 
-import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisException;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisResponse;
-import org.esupportail.esupsgcclient.service.sgc.EsupSgcLongPollService;
+import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
 import org.esupportail.esupsgcclient.ui.UiStep;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -30,15 +26,15 @@ public class EvolisTask extends EsupSgcTask {
     ImageView bmpColorImageView;
 
     ImageView bmpBlackImageView;
-    EsupSgcLongPollService esupSgcLongPollService;
+    EsupSgcRestClientService esupSgcRestClientService;
     EvolisPrinterService evolisPrinterService;
     EncodingService encodingService;
     public EvolisTask(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView,
-                      EsupSgcLongPollService esupSgcLongPollService, EvolisPrinterService evolisPrinterService, EncodingService encodingService) {
+                      EsupSgcRestClientService esupSgcRestClientService, EvolisPrinterService evolisPrinterService, EncodingService encodingService) {
         super(uiSteps);
         this.bmpColorImageView = bmpColorImageView;
         this.bmpBlackImageView = bmpBlackImageView;
-        this.esupSgcLongPollService = esupSgcLongPollService;
+        this.esupSgcRestClientService = esupSgcRestClientService;
         this.evolisPrinterService = evolisPrinterService;
         this.encodingService = encodingService;
     }
@@ -55,7 +51,8 @@ public class EvolisTask extends EsupSgcTask {
                 UiStep.printer_black,
                 UiStep.printer_overlay,
                 UiStep.encode,
-                UiStep.printer_print});
+                UiStep.printer_print,
+                UiStep.sgc_ok});
     }
 
     @Override
@@ -63,7 +60,7 @@ public class EvolisTask extends EsupSgcTask {
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
-            String qrcode = esupSgcLongPollService.getQrCode(this);
+            String qrcode = esupSgcRestClientService.getQrCode(this);
             setUiStepRunning();
             setUiStepSuccess(UiStep.long_poll);
             String bmpBlackAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.black);
@@ -74,7 +71,7 @@ public class EvolisTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.bmp_color);
             EvolisResponse resp = evolisPrinterService.insertCardToContactLessStation();
             setUiStepSuccess(UiStep.printer_nfc);
-            encodingService.encode(qrcode);
+            String csn = encodingService.encode(qrcode);
             setUiStepSuccess(UiStep.encode);
             evolisPrinterService.printBegin();
             evolisPrinterService.printSet();
@@ -86,6 +83,8 @@ public class EvolisTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.printer_overlay);
             evolisPrinterService.print();
             setUiStepSuccess(UiStep.printer_print);
+            esupSgcRestClientService.setCardEncodedPrinted(csn, qrcode);
+            setUiStepSuccess(UiStep.sgc_ok);
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
             throw new RuntimeException("Exception on  EvolisTaskService : " + e.getMessage(), e);

@@ -12,17 +12,19 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
-public class EsupSgcLongPollService {
-    final static Logger log = LoggerFactory.getLogger(EsupSgcLongPollService.class);
+public class EsupSgcRestClientService {
+    final static Logger log = LoggerFactory.getLogger(EsupSgcRestClientService.class);
 
     @Resource
     AppConfig appConfig;
     @Resource
     AppSession appSession;
     RestTemplate restTemplate;
-    public EsupSgcLongPollService() {
+    public EsupSgcRestClientService() {
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
         httpRequestFactory.setConnectionRequestTimeout(300000);
         httpRequestFactory.setConnectTimeout(300000);
@@ -57,4 +59,14 @@ public class EsupSgcLongPollService {
         }
     }
 
+
+    public void setCardEncodedPrinted(String csn, String qrcode) {
+        String sgcAuthToken = appSession.getSgcAuthToken();
+        log.debug("Call " + appConfig.getEsupSgcUrl() + "/wsrest/nfc/card-encoded-printed?authToken=" + sgcAuthToken);
+        Map<String, String> qrcodeAndCsn = new HashMap<>();
+        qrcodeAndCsn.put("csn", csn);
+        qrcodeAndCsn.put("qrcode", qrcode);
+        String result = restTemplate.postForObject(appConfig.getEsupSgcUrl() + "/wsrest/nfc/card-encoded-printed?authToken=" + sgcAuthToken, qrcodeAndCsn, String.class);
+        log.info("result of setCardEncodedPrinted of " + qrcodeAndCsn + " : " + result);
+    }
 }

@@ -15,7 +15,8 @@ public enum UiStep {
         printer_color("Envoi Panneau Couleur"),
         printer_black("Envoi Panneau Noir et Blanc"),
         printer_overlay("Envoi Panneau Overlay"),
-        printer_print("Impression");
+        printer_print("Impression"),
+        sgc_ok("Noté comme encodé dans ESUP-SGC");
 
         private String name;
 

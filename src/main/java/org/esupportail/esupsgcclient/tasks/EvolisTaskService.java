@@ -6,13 +6,11 @@ import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
-import org.esupportail.esupsgcclient.service.sgc.EsupSgcLongPollService;
+import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -26,7 +24,7 @@ public class EvolisTaskService extends javafx.concurrent.Service<String> {
 	ImageView bmpBlackImageView;
 
 	@Resource
-	EsupSgcLongPollService esupSgcLongPollService;
+	EsupSgcRestClientService esupSgcRestClientService;
 
 	@Resource
 	EncodingService encodingService;
@@ -42,7 +40,7 @@ public class EvolisTaskService extends javafx.concurrent.Service<String> {
 
 	@Override
 	protected Task<String> createTask() {
-		return new EvolisTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcLongPollService, evolisPrinterService, encodingService);
+		return new EvolisTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcRestClientService, evolisPrinterService, encodingService);
 	}
 
 
