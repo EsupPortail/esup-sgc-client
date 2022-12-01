@@ -253,7 +253,6 @@ public class EsupSgcClientJfxController implements Initializable {
 					checkCamera.getStyleClass().clear();
 					checkCamera.getStyleClass().add("btn-success");
 					webcamImageView.setVisible(true);
-					webcamImageView.setManaged(true);
 					startLoopServiceIfPossible();
 				} else {
 					checkCamera.getStyleClass().clear();

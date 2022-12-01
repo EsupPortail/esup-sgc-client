@@ -26,44 +26,25 @@ public class EvolisPrinterService {
 	
 	final static Logger log = LoggerFactory.getLogger(EvolisPrinterService.class);
 
-	Socket socket;
-
 	ObjectMapper objectMapper = new ObjectMapper();
 
 	@Resource
 	AppConfig appConfig;
 
-	public boolean initSocket(boolean exceptionIfFailed) {
-		if(socket == null || socket.isClosed() || !socket.isConnected() || socket.isClosed() || !socket.isBound()) {
-			try {
-				socket = new Socket(appConfig.getPrinterEvolisIp(), appConfig.getPrinterEvolisPort());
-				socket.setSoTimeout(100);
-				return true;
-			} catch (IOException e) {
-				if (exceptionIfFailed) {
-					throw new RuntimeException("Can't connect to evolis printer on " + appConfig.getPrinterEvolisIp() + ":" + appConfig.getPrinterEvolisPort());
-				} else{
-					log.debug("Can't connect to evolis printer on {}:{}", appConfig.getPrinterEvolisIp(), appConfig.getPrinterEvolisPort());
-				}
-			}
-			return false;
-		}
-		return true;
-	}
-
-	public void closeSocket() {
+	public Socket getSocket() {
 		try {
-			if(socket!=null) {
-				socket.close();
-			}
+			Socket socket = new Socket(appConfig.getPrinterEvolisIp(), appConfig.getPrinterEvolisPort());
+			socket.setSoTimeout(100);
+			return socket;
 		} catch (IOException e) {
-			log.debug("Can't close socket");
+			throw new RuntimeException("Can't connect to evolis printer on " + appConfig.getPrinterEvolisIp() + ":" + appConfig.getPrinterEvolisPort());
 		}
 	}
 
 	EvolisResponse sendRequest(EvolisRequest req) {
+		Socket socket = null;
 		try {
-			initSocket(true);
+			socket = getSocket();
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 			String cmdString = objectMapper.writeValueAsString(req) ;
 			writer.write(cmdString);
@@ -95,7 +76,13 @@ public class EvolisPrinterService {
 		} catch (IOException e) {
 			throw new RuntimeException("IOException seding Request to evolis : " + req, e);
 		} finally {
-			closeSocket();
+			if(socket!=null) {
+				try {
+					socket.close();
+				} catch (IOException e) {
+					log.debug("can't close evolis socket", e);
+				}
+			}
 		}
 	}
 	EvolisResponse sendRequestAndLog(EvolisRequest evolisRequest) {
