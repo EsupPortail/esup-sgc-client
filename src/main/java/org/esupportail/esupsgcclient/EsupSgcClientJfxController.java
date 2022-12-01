@@ -104,6 +104,12 @@ public class EsupSgcClientJfxController implements Initializable {
 	@FXML
 	private ProgressBar progressBar;
 
+	@FXML
+	private Button restartEvolis;
+
+	@FXML
+	private Button restartQrCode;
+
 	@Resource
 	WebcamTaskService webcamTaskService;
 
@@ -116,7 +122,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
-		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane);
+		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane, restartEvolis, restartQrCode);
 
 		logTextarea.managedProperty().bind(logTextarea.visibleProperty());
 		nfcTagPane.managedProperty().bind(nfcTagPane.visibleProperty());
@@ -261,6 +267,7 @@ public class EsupSgcClientJfxController implements Initializable {
 				}
 			}
 		});
+
 
 		checkPrinter.getTooltip().textProperty().bind(evolisHeartbeatTaskService.titleProperty());
 		evolisHeartbeatTaskService.start();

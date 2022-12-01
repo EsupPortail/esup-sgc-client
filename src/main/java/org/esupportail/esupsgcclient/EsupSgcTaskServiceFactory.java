@@ -1,8 +1,11 @@
 package org.esupportail.esupsgcclient;
 
 import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
@@ -41,6 +44,10 @@ public class EsupSgcTaskServiceFactory {
 
     Label textPrincipal;
 
+    private Button restartEvolis;
+
+    private Button restartQrCode;
+
     @Resource
     QrCodeTaskService qrCodeTaskService;
 
@@ -51,7 +58,7 @@ public class EsupSgcTaskServiceFactory {
 
     public void init(ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView,
                                      TextArea logTextarea, ProgressBar progressBar, Label textPrincipal,
-                                     FlowPane actionsPane) {
+                                     FlowPane actionsPane, Button restartEvolis, Button restartQrCode) {
         this.actionsPane = actionsPane;
         this.webcamImageView = webcamImageView;
         this.bmpColorImageView = bmpColorImageView;
@@ -59,6 +66,8 @@ public class EsupSgcTaskServiceFactory {
         this.logTextarea = logTextarea;
         this.progressBar = progressBar;
         this.textPrincipal = textPrincipal;
+        this.restartEvolis = restartEvolis;
+        this.restartQrCode = restartQrCode;
 
         for(UiStep step : UiStep.values()) {
             TextFlow textFlow = getTaskUiTemplate();
@@ -71,16 +80,44 @@ public class EsupSgcTaskServiceFactory {
         }
 
         initQrCodeTaskService();
-
         initEvolisTaskService();
+
+        restartEvolis.setDisable(true);
+        restartQrCode.setDisable(true);
+
+        restartEvolis.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                restartEvolisTaskService();
+            }
+        });
+
+        restartQrCode.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                restartQrCodeTaskService();
+            }
+        });
+
+    }
+
+    void restartQrCodeTaskService() {
+        progressBar.setStyle("");
+        restartQrCode.setDisable(true);
+        qrCodeTaskService.restart();
+    }
+
+    void restartEvolisTaskService() {
+        progressBar.setStyle("");
+        restartEvolis.setDisable(true);
+        evolisTaskService.restart();
     }
 
      void initQrCodeTaskService() {
         qrCodeTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                progressBar.setStyle("");
-                qrCodeTaskService.restart();
+                restartQrCodeTaskService();
             }
         });
 
@@ -89,6 +126,7 @@ public class EsupSgcTaskServiceFactory {
             public void handle(WorkerStateEvent t) {
                 log.error("Exception when procressing card ...", qrCodeTaskService.getException());
                 progressBar.setStyle("-fx-accent:red");
+                restartQrCode.setDisable(false);
                 if(qrCodeTaskService.getException() != null && qrCodeTaskService.getException().getMessage()!=null) {
                     logTextarea.appendText(qrCodeTaskService.getException().getMessage());
                 }
@@ -103,8 +141,7 @@ public class EsupSgcTaskServiceFactory {
         evolisTaskService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                progressBar.setStyle("");
-                evolisTaskService.restart();
+                restartEvolisTaskService();
             }
         });
 
@@ -114,6 +151,7 @@ public class EsupSgcTaskServiceFactory {
                 log.error("Exception when procressing card ...", evolisTaskService.getException());
                 // evolisTaskService.setUiStepFailed(UiStep.printer_print, evolisTaskService.getException());
                 progressBar.setStyle("-fx-accent:red");
+                restartEvolis.setDisable(false);
                 if(evolisTaskService.getException() != null && evolisTaskService.getException().getMessage()!=null) {
                     logTextarea.appendText(evolisTaskService.getException().getMessage());
                 }
