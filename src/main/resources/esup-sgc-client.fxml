@@ -71,7 +71,7 @@
                            </children>
                         </FlowPane>
                         <ProgressBar fx:id="progressBar" prefHeight="20.0" prefWidth="630.0" progress="0.0" />
-                        <TextArea fx:id="logTextarea" prefHeight="316.0" prefWidth="628.0" />
+                        <TextArea fx:id="logTextarea" editable="false" prefHeight="316.0" prefWidth="628.0" />
                      </children>
                   </FlowPane>
                   <FlowPane alignment="TOP_CENTER" vgap="10.0">
