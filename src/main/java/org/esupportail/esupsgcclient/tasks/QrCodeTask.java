@@ -46,6 +46,7 @@ public class QrCodeTask extends EsupSgcTask {
 		setUiStepSuccess(null);
 		String qrcode = getQrcode();
 		if(qrcode == null) return null;
+		updateTitle("qrcode détecté : " + qrcode);
 		setUiStepRunning();
 		setUiStepSuccess(UiStep.qrcode_read);
 		try {

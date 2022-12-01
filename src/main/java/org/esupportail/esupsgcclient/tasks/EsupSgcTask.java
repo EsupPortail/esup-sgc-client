@@ -64,6 +64,10 @@ public abstract class EsupSgcTask extends Task<String> {
         lastUiStepSuccess = null;
     }
 
+   public void  updateTitle4thisTask(String title) {
+        updateTitle(title);
+    }
+
 	void setUiStepSuccess(UiStep uiStep) {
         if(uiStep == null) {
             updateProgress(0, getUiStepsList().size());

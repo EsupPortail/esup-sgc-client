@@ -40,8 +40,10 @@ public class EsupSgcRestClientService {
             String sgcAuthToken = appSession.getSgcAuthToken();
             if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken)) {
                 try {
-                    log.debug("Call " + appConfig.getEsupSgcUrl() + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken);
-                    String qrcode = restTemplate.getForObject(appConfig.getEsupSgcUrl() + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken, String.class);
+                    String sgcUrl = appConfig.getEsupSgcUrl() + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken;
+                    log.debug("Call " + sgcUrl);
+                    evolisTask.updateTitle4thisTask("Call " + sgcUrl);
+                    String qrcode = restTemplate.getForObject(sgcUrl, String.class);
                     if (qrcode != null) {
                         log.debug("qrcode : " + qrcode);
                         if("stop".equals(qrcode)) {
