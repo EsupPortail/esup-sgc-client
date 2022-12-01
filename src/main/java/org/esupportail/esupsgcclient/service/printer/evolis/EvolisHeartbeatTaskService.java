@@ -40,7 +40,7 @@ public class EvolisHeartbeatTaskService extends Service<Void> {
                     } catch(Exception e) {
                         log.debug("b with evolisPrinterService ...", e);
                     }
-                    Utils.sleep(5000);
+                    Utils.sleep(2000);
                 }
             }
         };
