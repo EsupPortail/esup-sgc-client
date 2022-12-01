@@ -23,6 +23,9 @@ public class AppConfig {
     @Value("${printerEvolisPort}")
     int printerEvolisPort = 18000;
 
+    @Value("${printerEvolisSet}")
+    String printerEvolisSet = "GRibbonType=RC_YMCKO;Duplex=NONE";
+
     public String getEsupNfcTagServerUrl() {
         return esupNfcTagServerUrl;
     }
@@ -69,5 +72,13 @@ public class AppConfig {
 
     public void setPrinterEvolisPort(int printerEvolisPort) {
         this.printerEvolisPort = printerEvolisPort;
+    }
+
+    public String getPrinterEvolisSet() {
+        return printerEvolisSet;
+    }
+
+    public void setPrinterEvolisSet(String printerEvolisSet) {
+        this.printerEvolisSet = printerEvolisSet;
     }
 }

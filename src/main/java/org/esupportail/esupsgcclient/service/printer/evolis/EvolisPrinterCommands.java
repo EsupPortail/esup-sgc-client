@@ -44,10 +44,10 @@ public class EvolisPrinterCommands {
 		return req;
 	}
 
-	static EvolisRequest printSet() {
+	static EvolisRequest printSet(String printerEvolisSet) {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.Set");
-		req.getParams().put("data", "GRibbonType=RC_YMCKO;Duplex=NONE");
+		req.getParams().put("data", printerEvolisSet);
 		req.getParams().put("session", JOB_ID);
 		return req;
 	}

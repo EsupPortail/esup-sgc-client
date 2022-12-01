@@ -105,7 +105,7 @@ public class EvolisPrinterService {
 	}
 
 	public void printSet() {
-		sendRequestAndLog(EvolisPrinterCommands.printSet());
+		sendRequestAndLog(EvolisPrinterCommands.printSet(appConfig.getPrinterEvolisSet()));
 	}
 
 	public void printEnd() {
