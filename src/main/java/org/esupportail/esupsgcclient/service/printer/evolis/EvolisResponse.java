@@ -1,10 +1,16 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class EvolisResponse {
-
+    final static Logger log = LoggerFactory.getLogger(EvolisResponse.class);
+    static ObjectMapper objectMapper = new ObjectMapper();
     String jsonrpc;
 
     String id;
@@ -48,12 +54,13 @@ public class EvolisResponse {
 
     @Override
     public String toString() {
-        return "EvolisResponse{" +
-                "jsonrpc='" + jsonrpc + '\'' +
-                ", id='" + id + '\'' +
-                ", result='" + result + '\'' +
-                ", error=" + error +
-                '}';
+        try {
+            String cmdString = objectMapper.writeValueAsString(this);
+            return cmdString.length()>200 ? cmdString.substring(0,200) + "..." + cmdString.substring(cmdString.length()-199) : cmdString;
+        } catch (JsonProcessingException e) {
+            log.info("Exception on EvolisResponse.toString via json mapper",  e);
+        }
+        return super.toString();
     }
 
 }

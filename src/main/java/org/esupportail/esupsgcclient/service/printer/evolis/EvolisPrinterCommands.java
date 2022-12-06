@@ -134,4 +134,5 @@ public class EvolisPrinterCommands {
 		req.getParams().put("command", "Se");
 		return req;
 	}
+
 }

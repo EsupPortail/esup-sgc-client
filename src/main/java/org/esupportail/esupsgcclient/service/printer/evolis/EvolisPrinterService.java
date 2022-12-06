@@ -2,6 +2,7 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.esupportail.esupsgcclient.AppConfig;
+import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -41,7 +42,7 @@ public class EvolisPrinterService {
 		}
 	}
 
-	EvolisResponse sendRequest(EvolisRequest req) {
+	EvolisResponse sendRequest(EvolisRequest req) throws EvolisSocketException {
 		Socket socket = null;
 		try {
 			socket = getSocket();
@@ -49,7 +50,6 @@ public class EvolisPrinterService {
 			String cmdString = objectMapper.writeValueAsString(req) ;
 			writer.write(cmdString);
 			writer.flush();
-			log.debug(cmdString.length()>200 ? cmdString.substring(0,200) + "..." + cmdString.substring(cmdString.length()-199) : cmdString);
 			InputStream socketInputStream= socket.getInputStream();
 			String responseStr ="";
 			while (true) {
@@ -74,7 +74,7 @@ public class EvolisPrinterService {
 			}
 			return response;
 		} catch (IOException e) {
-			throw new RuntimeException("IOException seding Request to evolis : " + req, e);
+			throw new EvolisSocketException("IOException sending Request to evolis : " + req, e);
 		} finally {
 			if(socket!=null) {
 				try {
@@ -85,68 +85,75 @@ public class EvolisPrinterService {
 			}
 		}
 	}
-	EvolisResponse sendRequestAndLog(EvolisRequest evolisRequest) {
-		log.trace("Request : {}", evolisRequest);
-		EvolisResponse response = sendRequest(evolisRequest);
-		log.trace("Response : {}", response);
+	EvolisResponse sendRequestAndRetryIfFailed(EvolisRequest evolisRequest) {
+		log.debug("Request : {}", evolisRequest);
+		EvolisResponse response = null;
+		try {
+			response = sendRequest(evolisRequest);
+		} catch (EvolisSocketException e) {
+			log.warn("Exception when sending evolis request (we retry it in 2 sec) : " + evolisRequest, e);
+			Utils.sleep(2000);
+			sendRequestAndRetryIfFailed(evolisRequest);
+		}
+		log.debug("Response : {}", response);
 		return response;
 	}
 
 	public EvolisResponse insertCard() {
-		return sendRequestAndLog(EvolisPrinterCommands.insertCard());
+		return sendRequestAndRetryIfFailed(EvolisPrinterCommands.insertCard());
 	}
 
 	public EvolisResponse getPrinterStatus() {
-		return sendRequestAndLog(EvolisPrinterCommands.getPrinterStatus());
+		return sendRequestAndRetryIfFailed(EvolisPrinterCommands.getPrinterStatus());
 	}
 
 	public EvolisResponse printBegin() {
-		return sendRequestAndLog(EvolisPrinterCommands.printBegin());
+		return sendRequestAndRetryIfFailed(EvolisPrinterCommands.printBegin());
 	}
 
 	public void printSet() {
-		sendRequestAndLog(EvolisPrinterCommands.printSet(appConfig.getPrinterEvolisSet()));
+		sendRequestAndRetryIfFailed(EvolisPrinterCommands.printSet(appConfig.getPrinterEvolisSet()));
 	}
 
 	public void printEnd() {
-		sendRequestAndLog(EvolisPrinterCommands.printEnd());
+		sendRequestAndRetryIfFailed(EvolisPrinterCommands.printEnd());
 	}
 
 
 	public void printFrontColorBmp(String bmpColorAsBase64) {
-		sendRequestAndLog(EvolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
+		sendRequestAndRetryIfFailed(EvolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
 	}
 
 	public void printFrontBlackBmp(String bmpBlackAsBase64) {
-		sendRequestAndLog(EvolisPrinterCommands.printFrontBlackBmp(bmpBlackAsBase64));
+		sendRequestAndRetryIfFailed(EvolisPrinterCommands.printFrontBlackBmp(bmpBlackAsBase64));
 	}
 
 	public void printFrontVarnish(String bmpVarnishAsBase64) {
-		sendRequestAndLog(EvolisPrinterCommands.printFrontVarnish(bmpVarnishAsBase64));
+		sendRequestAndRetryIfFailed(EvolisPrinterCommands.printFrontVarnish(bmpVarnishAsBase64));
 	}
 
 	public void print() {
-		sendRequestAndLog(EvolisPrinterCommands.print());
+		sendRequestAndRetryIfFailed(EvolisPrinterCommands.print());
 	}
 
 	public EvolisResponse insertCardToContactLessStation() {
-		return sendRequestAndLog(EvolisPrinterCommands.insertCardToContactLessStation());
+		return sendRequestAndRetryIfFailed(EvolisPrinterCommands.insertCardToContactLessStation());
 	}
 
 
 	public void eject() {
-		sendRequestAndLog(EvolisPrinterCommands.eject());
+		sendRequestAndRetryIfFailed(EvolisPrinterCommands.eject());
 	}
 
 	public void reject() {
-		sendRequestAndLog(EvolisPrinterCommands.reject());
+		sendRequestAndRetryIfFailed(EvolisPrinterCommands.reject());
 	}
 
 	public void startSequence() {
-		sendRequestAndLog(EvolisPrinterCommands.startSequence());
+		sendRequestAndRetryIfFailed(EvolisPrinterCommands.startSequence());
 	}
 
 	public void endSequence() {
-		sendRequestAndLog(EvolisPrinterCommands.endSequence());
+		sendRequestAndRetryIfFailed(EvolisPrinterCommands.endSequence());
 	}
 }
