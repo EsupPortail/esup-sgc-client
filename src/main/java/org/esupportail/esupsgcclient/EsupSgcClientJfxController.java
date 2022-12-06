@@ -1,11 +1,12 @@
 package org.esupportail.esupsgcclient;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.FlowPane;
@@ -66,6 +67,9 @@ public class EsupSgcClientJfxController implements Initializable {
 	private MenuItem evolisPrintEnd;
 
 	@FXML
+	private Menu camerasMenu;
+
+	@FXML
 	private Button checkAuth;
 
 	@FXML
@@ -105,10 +109,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	private ProgressBar progressBar;
 
 	@FXML
-	private Button restartEvolis;
-
-	@FXML
-	private Button restartQrCode;
+	private Pane restartButtons;
 
 	@Resource
 	WebcamTaskService webcamTaskService;
@@ -122,7 +123,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
-		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane, restartEvolis, restartQrCode);
+		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane, restartButtons);
 
 		logTextarea.managedProperty().bind(logTextarea.visibleProperty());
 		nfcTagPane.managedProperty().bind(nfcTagPane.visibleProperty());
@@ -131,15 +132,11 @@ public class EsupSgcClientJfxController implements Initializable {
 		bmpColorImageView.managedProperty().bind(bmpColorImageView.visibleProperty());
 
 		nfcTagPane.getChildren().add(esupNfcClientStackPane);
-		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldWebcamName, newWebcamName) -> {
-			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldWebcamName + " - " + newWebcamName);
-			if(options.getValue()!=null && newWebcamName!=null && !newWebcamName.equals(oldWebcamName)) {
-				if(webcamTaskService != null && webcamTaskService.isRunning()) {
-					webcamTaskService.cancel();
-				}
-				webcamTaskService.init(newWebcamName, webcamImageView);
-				webcamTaskService.restart();
-				checkCamera.getTooltip().setText(newWebcamName);
+		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldServiceName, newServiceName) -> {
+			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldServiceName + " - " + newServiceName);
+			if(options.getValue()!=null && newServiceName!=null && !newServiceName.equals(oldServiceName)) {
+				esupSgcTaskServiceFactory.cancelService(oldServiceName);
+				esupSgcTaskServiceFactory.runService(newServiceName);
 			}
 		});
 
@@ -179,7 +176,6 @@ public class EsupSgcClientJfxController implements Initializable {
 					checkNfc.getStyleClass().clear();
 					checkNfc.getStyleClass().add("btn-success");
 					logTextarea.appendText("PC/SC OK\n");
-					startLoopServiceIfPossible();
 				} else {
 					checkNfc.getStyleClass().clear();
 					checkNfc.getStyleClass().add("btn-danger");
@@ -195,7 +191,6 @@ public class EsupSgcClientJfxController implements Initializable {
 					checkAuth.getStyleClass().add("btn-success");
 					checkAuth.getTooltip().setText(appSession.eppnInit);
 					logTextarea.appendText("Authentification OK : " + appSession.eppnInit + "\n");
-					startLoopServiceIfPossible();
 				} else {
 					checkAuth.getStyleClass().clear();
 					checkAuth.getStyleClass().add("btn-danger");
@@ -241,9 +236,6 @@ public class EsupSgcClientJfxController implements Initializable {
 					logTextarea.appendText("imprimante evolis OK\n");
 					bmpBlackImageView.setVisible(true);
 					bmpColorImageView.setVisible(true);
-					// webcamImageView.setVisible(false);
-					// primaryStage.sizeToScene();
-					startLoopServiceIfPossible();
 				} else {
 					checkPrinter.getStyleClass().clear();
 					checkPrinter.getStyleClass().add("btn-danger");
@@ -259,7 +251,6 @@ public class EsupSgcClientJfxController implements Initializable {
 					checkCamera.getStyleClass().clear();
 					checkCamera.getStyleClass().add("btn-success");
 					webcamImageView.setVisible(true);
-					startLoopServiceIfPossible();
 				} else {
 					checkCamera.getStyleClass().clear();
 					checkCamera.getStyleClass().add("btn-danger");
@@ -282,33 +273,60 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	}
 
-	public synchronized void addWebcamComboBox(String webcamName) {
-		if(!comboBox.getItems().contains(webcamName)) {
-			comboBox.getItems().add(webcamName);
+	public synchronized void addWebcamMenuItem(String webcamName) {
+		boolean alreadyOk = false;
+		boolean webcamSelected = false;
+		for(MenuItem menuItem : camerasMenu.getItems()) {
+			if(menuItem.getText().equals(webcamName)) {
+				alreadyOk = true;
+			}
+			if(((CheckMenuItem)menuItem).isSelected()) {
+				webcamSelected = true;
+			}
 		}
-		if(comboBox.getSelectionModel().getSelectedItem() == null && comboBox.getItems().size()>0) {
-			comboBox.getSelectionModel().select(0);
+		if(!alreadyOk) {
+			CheckMenuItem webcamMenuItem = new CheckMenuItem();
+			webcamMenuItem.setText(webcamName);
+			webcamMenuItem.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+				if(isSelected) {
+					String newWebcamName = webcamName;
+					if (webcamTaskService != null && webcamTaskService.isRunning()) {
+						webcamTaskService.cancel();
+					}
+					webcamTaskService.init(newWebcamName, webcamImageView);
+					webcamTaskService.restart();
+					checkCamera.getTooltip().setText(newWebcamName);
+					for (MenuItem menuItem : camerasMenu.getItems()) {
+						if (!menuItem.getText().equals(newWebcamName) && ((CheckMenuItem) menuItem).isSelected()) {
+							((CheckMenuItem) menuItem).setSelected(false);
+							menuItem.setDisable(false);
+						}
+					}
+					webcamMenuItem.setDisable(true);
+				}
+			});
+			camerasMenu.getItems().add(webcamMenuItem);
+		}
+		if(!webcamSelected && camerasMenu.getItems().size()>0) {
+			((CheckMenuItem)camerasMenu.getItems().get(0)).selectedProperty().setValue(true);
 		}
 	}
-	public synchronized void removeWebcamComboBox(String webcamName) {
-		comboBox.getItems().remove(webcamName);
+	public synchronized void removeWebcamMenuItem(String webcamName) {
+		MenuItem webcamMenuItem = null;
+		for(MenuItem menuItem : camerasMenu.getItems()) {
+			if(menuItem.getText().equals(webcamName)) {
+				webcamMenuItem = menuItem;
+				break;
+			}
+		}
+		if(webcamMenuItem != null) {
+			camerasMenu.getItems().remove(webcamMenuItem);
+		}
 	}
 
 	private void startLoopServiceIfPossible() {
 		log.debug("startLoopServiceIfPossible ...");
-		if(appSession.isAuthReady() && appSession.isNfcReady() && appSession.isWebcamReady()) {
-			Platform.runLater(() -> {
-					esupSgcTaskServiceFactory.runQrCodeTaskService();
-					logTextarea.appendText("qrCodeTaskService is now running\n");
-			});
-		}
-		if(appSession.isAuthReady() && appSession.isNfcReady() && appSession.isPrinterReady()) {
-			Platform.runLater(() -> {
-					esupSgcTaskServiceFactory.runEvolisTaskService();
-					logTextarea.appendText("evolisEsupSgcLongPollTaskService is now running\n");
-			});
-		}
+		esupSgcTaskServiceFactory.startLoopServiceIfPossible(appSession, comboBox.getSelectionModel().getSelectedItem());
 	}
-
 
 }

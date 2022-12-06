@@ -4,6 +4,7 @@ import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
@@ -14,14 +15,9 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 @Service
-public class EvolisTaskService extends javafx.concurrent.Service<String> {
+public class EvolisTaskService extends EsupSgcTaskService {
 
 	private final static Logger log = Logger.getLogger(EvolisTaskService.class);
-
-	Map<UiStep, TextFlow> uiSteps;
-	ImageView bmpColorImageView;
-
-	ImageView bmpBlackImageView;
 
 	@Resource
 	EsupSgcRestClientService esupSgcRestClientService;
@@ -32,16 +28,14 @@ public class EvolisTaskService extends javafx.concurrent.Service<String> {
 	@Resource
 	EvolisPrinterService evolisPrinterService;
 
-	public void setup(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-		this.uiSteps = uiSteps;
-		this.bmpColorImageView = bmpColorImageView;
-		this.bmpBlackImageView = bmpBlackImageView;
-	}
-
 	@Override
 	protected Task<String> createTask() {
 		return new EvolisTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcRestClientService, evolisPrinterService, encodingService);
 	}
 
 
+	@Override
+	public boolean isReadyToRun(AppSession appSession) {
+		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isPrinterReady();
+	}
 }
