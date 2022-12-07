@@ -22,9 +22,6 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 
 	private final static Logger log = Logger.getLogger(QrCodeTaskService.class);
 
-	Map<UiStep, TextFlow> uiSteps;
-	ObjectProperty<Image> webcamImageProperty;
-
 	@Resource
 	EncodingService encodingService;
 
@@ -33,7 +30,7 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return new QrCodeTask(uiSteps, webcamImageProperty, encodingService, qRCodeReader);
+		return new QrCodeTask(uiSteps, webcamImageView.imageProperty(), encodingService, qRCodeReader);
 	}
 
 	@Override

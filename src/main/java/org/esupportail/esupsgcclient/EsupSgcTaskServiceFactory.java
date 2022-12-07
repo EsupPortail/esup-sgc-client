@@ -78,12 +78,8 @@ public class EsupSgcTaskServiceFactory {
         }
 
 
-        esupSgcTaskUis.put("Encodage par scan de QRCode", new EsupSgcTaskUi("qrcode", "Encodage par scan de QRCode", "Redémarrage QRCode", qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
-        esupSgcTaskUis.put("Encodage et impression via Evolis Primacy", new EsupSgcTaskUi("evolis", "Encodage et impression via Evolis Primacy", "Redémarrage Evolis", evolisTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
-
-        for(EsupSgcTaskUi esupSgcTaskUi: esupSgcTaskUis.values()) {
-            esupSgcTaskUi.init(restartButtons);
-        }
+        esupSgcTaskUis.put("Encodage par scan de QRCode", new EsupSgcTaskUi("Redémarrage QRCode", qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, restartButtons));
+        esupSgcTaskUis.put("Encodage et impression via Evolis Primacy", new EsupSgcTaskUi("Redémarrage Evolis", evolisTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, restartButtons));
 
     }
 
@@ -97,13 +93,8 @@ public class EsupSgcTaskServiceFactory {
         }
     }
 
-    public void startLoopServiceIfPossible(AppSession appSession, String serviceName) {
-        if(esupSgcTaskUis.get(serviceName).isReadyToRun(appSession)) {
-            Platform.runLater(() -> {
-                esupSgcTaskUis.get(serviceName).runTaskService();
-                logTextarea.appendText(serviceName + " is now running\n");
-            });
-        }
+    public boolean isReadyToRun(AppSession appSession, String serviceName) {
+        return esupSgcTaskUis.get(serviceName).isReadyToRun(appSession);
     }
 
     public void cancelService(String oldServiceName) {
@@ -116,5 +107,9 @@ public class EsupSgcTaskServiceFactory {
         Platform.runLater(() -> {
             esupSgcTaskUis.get(newServiceName).runTaskService();
         });
+    }
+
+    public List<String> getServicesNames() {
+        return new ArrayList<>(esupSgcTaskUis.keySet());
     }
 }

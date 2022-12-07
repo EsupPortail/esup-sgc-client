@@ -21,8 +21,6 @@ import java.util.Map;
 
 public class EsupSgcTaskUi {
     final static Logger log = Logger.getLogger(EsupSgcTaskUi.class);
-    String id;
-    String name;
     String restartName;
     EsupSgcTaskService service;
     Button restartButton;
@@ -34,10 +32,8 @@ public class EsupSgcTaskUi {
     ImageView bmpColorImageView;
     ImageView bmpBlackImageView;
 
-    public EsupSgcTaskUi(String id, String name, String restartName, EsupSgcTaskService service, ProgressBar progressBar, TextArea logTextarea, Label textPrincipal,
-                         Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-        this.id = id;
-        this.name = name;
+    public EsupSgcTaskUi(String restartName, EsupSgcTaskService service, ProgressBar progressBar, TextArea logTextarea, Label textPrincipal,
+                         Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, Pane restartButtons) {
         this.restartName = restartName;
         this.service = service;
         this.progressBar = progressBar;
@@ -47,9 +43,7 @@ public class EsupSgcTaskUi {
         this.webcamImageView = webcamImageView;
         this.bmpColorImageView = bmpColorImageView;
         this.bmpBlackImageView = bmpBlackImageView;
-    }
 
-    public void init(Pane restartButtons) {
         restartButton = new Button();
         restartButton.setText(restartName);
         restartButton.setDisable(true);

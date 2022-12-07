@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -132,11 +133,22 @@ public class EsupSgcClientJfxController implements Initializable {
 		bmpColorImageView.managedProperty().bind(bmpColorImageView.visibleProperty());
 
 		nfcTagPane.getChildren().add(esupNfcClientStackPane);
+
+		comboBox.getItems().addAll(esupSgcTaskServiceFactory.getServicesNames());
+
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldServiceName, newServiceName) -> {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldServiceName + " - " + newServiceName);
 			if(options.getValue()!=null && newServiceName!=null && !newServiceName.equals(oldServiceName)) {
-				esupSgcTaskServiceFactory.cancelService(oldServiceName);
-				esupSgcTaskServiceFactory.runService(newServiceName);
+				Platform.runLater(() -> {
+					if(esupSgcTaskServiceFactory.isReadyToRun(appSession, newServiceName)) {
+						esupSgcTaskServiceFactory.cancelService(oldServiceName);
+						esupSgcTaskServiceFactory.runService(newServiceName);
+						logTextarea.appendText(String.format("Service '%s' démarré.\n", newServiceName));
+					} else {
+						comboBox.getSelectionModel().select(oldServiceName);
+						logTextarea.appendText(String.format("Impossible de démarrer le service '%s' actuellement.\n", newServiceName));
+					}
+				});
 			}
 		});
 
@@ -322,11 +334,6 @@ public class EsupSgcClientJfxController implements Initializable {
 		if(webcamMenuItem != null) {
 			camerasMenu.getItems().remove(webcamMenuItem);
 		}
-	}
-
-	private void startLoopServiceIfPossible() {
-		log.debug("startLoopServiceIfPossible ...");
-		esupSgcTaskServiceFactory.startLoopServiceIfPossible(appSession, comboBox.getSelectionModel().getSelectedItem());
 	}
 
 }
