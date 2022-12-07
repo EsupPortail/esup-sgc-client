@@ -101,14 +101,14 @@ public class FileLocalStorage {
 			log.info(key + "=" + value + " write to localstorage");
 			if(key.equals("numeroId")) {
 				appSession.setNumeroId(value);
-			}
-			if(key.equals("sgcAuthToken")) {
+			} else if(key.equals("sgcAuthToken")) {
 				appSession.setSgcAuthToken(value);
-			}
-			if(key.equals("eppnInit")) {
+			} else if(key.equals("eppnInit")) {
 				appSession.setEppnInit(value);
+			} else if(key.equals("authType")) {
+				appSession.setAuthType(value);
 			}
-			if(appSession.getNumeroId() !=null && appSession.getSgcAuthToken() !=null && appSession.getEppnInit() !=null) {
+			if(appSession.getNumeroId() !=null && appSession.getSgcAuthToken() !=null && appSession.getEppnInit() !=null && appSession.getAuthType() !=null) {
 				appSession.setAuthReady(true);
 			}
 		} catch (IOException e) {

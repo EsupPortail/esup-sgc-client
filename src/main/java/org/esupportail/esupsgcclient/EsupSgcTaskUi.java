@@ -70,7 +70,7 @@ public class EsupSgcTaskUi {
                 progressBar.setStyle("-fx-accent:red");
                 restartButton.setDisable(false);
                 if(service.getException() != null && service.getException().getMessage()!=null) {
-                    logTextarea.appendText(service.getException().getMessage());
+                    logTextarea.appendText(service.getException().getMessage() + "\n");
                 }
             }
         });

@@ -100,6 +100,7 @@ public class EsupNfcClientStackPane extends StackPane {
             appSession.setNumeroId(window.getMember("numeroId").toString());
             appSession.setSgcAuthToken(window.getMember("sgcAuthToken").toString());
             appSession.setEppnInit(window.getMember("eppnInit").toString());
+            appSession.setAuthType(window.getMember("authType").toString());
             if (appSession.getNumeroId() != null && !appSession.getNumeroId().equals("") && !"undefined".equals(appSession.getNumeroId())) {
                 fileLocalStorage.setItem("numeroId", appSession.getNumeroId());
             }
@@ -108,6 +109,9 @@ public class EsupNfcClientStackPane extends StackPane {
             }
             if (appSession.getEppnInit() != null && !appSession.getEppnInit().equals("") && !"undefined".equals(appSession.getEppnInit())) {
                 fileLocalStorage.setItem("eppnInit", appSession.getEppnInit());
+            }
+            if (appSession.getAuthType() != null && !appSession.getAuthType().equals("") && !"undefined".equals(appSession.getAuthType())) {
+                fileLocalStorage.setItem("authType", appSession.getAuthType());
             }
         });
     }

@@ -44,7 +44,7 @@ public class EvolisReadNfcTask extends EsupSgcTask {
             setUiStepSuccess(null);
             evolisPrinterService.insertCardToContactLessStation(this);
             setUiStepSuccess(UiStep.printer_nfc);
-            encodingService.encode(this, null);
+            encodingService.encode(this);
             setUiStepSuccess(UiStep.encode);
             evolisPrinterService.eject();
         } catch (Exception e) {

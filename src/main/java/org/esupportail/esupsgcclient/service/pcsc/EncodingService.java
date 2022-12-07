@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.smartcardio.CardException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
@@ -15,6 +16,7 @@ import org.esupportail.esupsgcclient.service.SgcCheckException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteRunExe;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
+import org.esupportail.esupsgcclient.tasks.EvolisReadNfcTask;
 import org.esupportail.esupsgcclient.tasks.EvolisTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.core.io.FileSystemResource;
@@ -34,7 +36,6 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class EncodingService {
 	private final static Logger log = Logger.getLogger(EncodingService.class);
-
 	public enum BmpType {color, black}
 	private RestTemplate restTemplate = new RestTemplate(Utils.clientHttpRequestFactory());
 	private String pathToExe = "c:\\cnousApi\\";
@@ -273,4 +274,21 @@ public class EncodingService {
 	public String getTerminalName() throws CardException, PcscException {
 		return PcscUsbService.getTerminalName();
 	}
+
+
+	public void encode(EsupSgcTask esupSgcTask) throws Exception {
+		if(appSession.getAuthType().equals("CSN")) {
+			while (!pcscConnection()) {
+				if(esupSgcTask.isCancelled()) {
+					throw new RuntimeException("EvolisTask is cancelled");
+				}
+				esupSgcTask.updateTitle4thisTask("En attente d'une carte sur le lecteur NFC");
+				Utils.sleep(1000);
+			}
+			esupNfcTagRestClientService.csnNfcComm(readCsn());
+		} else {
+			encode(esupSgcTask, null);
+		}
+	}
+
 }

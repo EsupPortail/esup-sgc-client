@@ -13,6 +13,8 @@ public class AppSession {
     String sgcAuthToken = "";
     String eppnInit;
 
+    String authType;
+
     SimpleBooleanProperty webcamReady = new SimpleBooleanProperty(false);
 
     SimpleBooleanProperty nfcReady = new SimpleBooleanProperty();
@@ -43,6 +45,14 @@ public class AppSession {
 
     public void setEppnInit(String eppnInit) {
         this.eppnInit = eppnInit;
+    }
+
+    public String getAuthType() {
+        return authType;
+    }
+
+    public void setAuthType(String authType) {
+        this.authType = authType;
     }
 
     public boolean isWebcamReady() {
