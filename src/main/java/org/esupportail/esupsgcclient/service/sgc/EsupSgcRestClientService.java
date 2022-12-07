@@ -47,7 +47,7 @@ public class EsupSgcRestClientService {
                     if (qrcode != null) {
                         log.debug("qrcode : " + qrcode);
                         if("stop".equals(qrcode)) {
-                            throw new RuntimeException("Un esup-sg-client avec le même utilisateur est déjà démarré ??");
+                            throw new RuntimeException("Un esup-sg-client avec le même utilisateur vient d'être relancé.");
                         }
                         return qrcode;
                     }

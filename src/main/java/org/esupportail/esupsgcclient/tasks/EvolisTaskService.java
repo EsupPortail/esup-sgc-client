@@ -38,4 +38,12 @@ public class EvolisTaskService extends EsupSgcTaskService {
 	public boolean isReadyToRun(AppSession appSession) {
 		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isPrinterReady();
 	}
+
+	@Override
+	public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+		super.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
+		webcamImageView.setVisible(false);
+		bmpColorImageView.setVisible(true);
+		bmpBlackImageView.setVisible(true);
+	}
 }

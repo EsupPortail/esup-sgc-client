@@ -81,7 +81,7 @@ public class EvolisTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.printer_black);
             evolisPrinterService.printFrontVarnish(bmpBlackAsBase64);
             setUiStepSuccess(UiStep.printer_overlay);
-            evolisPrinterService.print();
+            //evolisPrinterService.print();
             setUiStepSuccess(UiStep.printer_print);
             esupSgcRestClientService.setCardEncodedPrinted(csn, qrcode);
             setUiStepSuccess(UiStep.sgc_ok);

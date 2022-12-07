@@ -61,7 +61,7 @@ public class EvolisPrinterService {
 				} catch(SocketTimeoutException | SocketException ex){
 					if(StringUtils.hasText(responseStr)) {
 						log.trace("SocketTimeoutException - response received - we stop it");
-						log.debug(responseStr.length() > 200 ? responseStr.substring(0, 200) : responseStr);
+						log.trace(responseStr.length() > 200 ? responseStr.substring(0, 200) : responseStr);
 						break;
 					}
 				}
@@ -103,8 +103,8 @@ public class EvolisPrinterService {
 		return sendRequestAndRetryIfFailed(EvolisPrinterCommands.insertCard());
 	}
 
-	public EvolisResponse getPrinterStatus() {
-		return sendRequestAndRetryIfFailed(EvolisPrinterCommands.getPrinterStatus());
+	public EvolisResponse getPrinterStatus() throws EvolisSocketException {
+		return sendRequest(EvolisPrinterCommands.getPrinterStatus());
 	}
 
 	public EvolisResponse printBegin() {
@@ -137,7 +137,13 @@ public class EvolisPrinterService {
 	}
 
 	public EvolisResponse insertCardToContactLessStation() {
-		return sendRequestAndRetryIfFailed(EvolisPrinterCommands.insertCardToContactLessStation());
+		EvolisResponse response = sendRequestAndRetryIfFailed(EvolisPrinterCommands.insertCardToContactLessStation());
+		while(!"OK".equals(response.getResult())) {
+			log.warn("Pb inserting card to caonctact less stattion : " + response);
+			Utils.sleep(2000);
+			response = sendRequestAndRetryIfFailed(EvolisPrinterCommands.insertCardToContactLessStation());;
+		}
+		return response;
 	}
 
 

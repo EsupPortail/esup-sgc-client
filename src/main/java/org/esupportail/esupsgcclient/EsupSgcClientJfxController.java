@@ -158,9 +158,11 @@ public class EsupSgcClientJfxController implements Initializable {
 				if (logTextarea.isVisible()) {
 					logTextarea.setVisible(false);
 					buttonLogs.setText("Afficher les logs");
+					logTextarea.appendText("logs masqués\n");
 				} else {
 					logTextarea.setVisible(true);
 					buttonLogs.setText("Masquer les logs");
+					logTextarea.appendText("logs affichés\n");
 				}
 				EsupSgcClientApplication.getPrimaryStage().sizeToScene();
 			}
@@ -172,9 +174,11 @@ public class EsupSgcClientJfxController implements Initializable {
 				if (nfcTagPane.isVisible()) {
 					nfcTagPane.setVisible(false);
 					buttonNfcTag.setText("Afficher EsupNfcTag");
+					logTextarea.appendText("EsupNfcTag masqué\n");
 				} else {
 					nfcTagPane.setVisible(true);
 					buttonNfcTag.setText("Masquer EsupNfcTag");
+					logTextarea.appendText("EsupNfcTag affiché\n");
 				}
 				EsupSgcClientApplication.getPrimaryStage().sizeToScene();
 			}
@@ -191,6 +195,7 @@ public class EsupSgcClientJfxController implements Initializable {
 				} else {
 					checkNfc.getStyleClass().clear();
 					checkNfc.getStyleClass().add("btn-danger");
+					logTextarea.appendText("PC/SC KO\n");
 				}
 			}
 		});
@@ -246,11 +251,10 @@ public class EsupSgcClientJfxController implements Initializable {
 					checkPrinter.getStyleClass().clear();
 					checkPrinter.getStyleClass().add("btn-success");
 					logTextarea.appendText("imprimante evolis OK\n");
-					bmpBlackImageView.setVisible(true);
-					bmpColorImageView.setVisible(true);
 				} else {
 					checkPrinter.getStyleClass().clear();
 					checkPrinter.getStyleClass().add("btn-danger");
+					logTextarea.appendText("imprimante evolis KO\n");
 				}
 			}
 		});
@@ -262,7 +266,7 @@ public class EsupSgcClientJfxController implements Initializable {
 				if(newValue) {
 					checkCamera.getStyleClass().clear();
 					checkCamera.getStyleClass().add("btn-success");
-					webcamImageView.setVisible(true);
+					logTextarea.appendText("Caméra OK.\n");
 				} else {
 					checkCamera.getStyleClass().clear();
 					checkCamera.getStyleClass().add("btn-danger");

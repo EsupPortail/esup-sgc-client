@@ -4,6 +4,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
@@ -36,5 +37,13 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 	@Override
 	public boolean isReadyToRun(AppSession appSession) {
 		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isWebcamReady();
+	}
+
+	@Override
+	public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+		super.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
+		webcamImageView.setVisible(true);
+		bmpColorImageView.setVisible(false);
+		bmpBlackImageView.setVisible(false);
 	}
 }
