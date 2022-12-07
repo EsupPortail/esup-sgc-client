@@ -10,6 +10,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.tasks.EvolisReadNfcTaskService;
 import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
 import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
@@ -50,6 +51,8 @@ public class EsupSgcTaskServiceFactory {
 
     @Resource
     EvolisTaskService evolisTaskService;
+    @Resource
+    EvolisReadNfcTaskService evolisReadNfcTaskService;
 
     Map<UiStep, TextFlow> uiSteps = new HashMap<>();
 
@@ -80,6 +83,7 @@ public class EsupSgcTaskServiceFactory {
 
         esupSgcTaskUis.put("Encodage par scan de QRCode", new EsupSgcTaskUi("Redémarrage QRCode", qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, restartButtons));
         esupSgcTaskUis.put("Encodage et impression via Evolis Primacy", new EsupSgcTaskUi("Redémarrage Evolis", evolisTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, restartButtons));
+        esupSgcTaskUis.put("Badgeage via Evolis Primacy", new EsupSgcTaskUi("Redémarrage Badgeage Evolis", evolisReadNfcTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, restartButtons));
 
     }
 

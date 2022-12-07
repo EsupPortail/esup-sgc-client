@@ -220,7 +220,9 @@ public class EncodingService {
 			Utils.sleep(1000);
 		}
 		String csn = readCsn();
-		checkBeforeEncoding(qrcode, csn);
+		if(qrcode != null) {
+			checkBeforeEncoding(qrcode, csn);
+		}
 		log.info("Encoding : Start");
 		String result = "";
 		while (true) {

@@ -2,6 +2,7 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.esupportail.esupsgcclient.AppConfig;
+import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.tasks.EvolisTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
@@ -137,12 +138,12 @@ public class EvolisPrinterService {
 		sendRequestAndRetryIfFailed(EvolisPrinterCommands.print());
 	}
 
-	public EvolisResponse insertCardToContactLessStation(EvolisTask evolisTask) {
+	public EvolisResponse insertCardToContactLessStation(EsupSgcTask esupSgcTask) {
 		EvolisResponse response = sendRequestAndRetryIfFailed(EvolisPrinterCommands.insertCardToContactLessStation());
 		while(!"OK".equals(response.getResult())) {
 			log.warn("Pb inserting card to contactless station : " + response);
-			evolisTask.updateTitle4thisTask("Pb inserting card to contactless station : " + response.getResult());
-			if(evolisTask.isCancelled()) {
+			esupSgcTask.updateTitle4thisTask("Pb inserting card to contactless station : " + response.getResult());
+			if(esupSgcTask.isCancelled()) {
 				throw new RuntimeException("EvolisTask is cancelled");
 			}
 			Utils.sleep(2000);

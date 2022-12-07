@@ -50,7 +50,6 @@ public class EvolisTask extends EsupSgcTask {
                 UiStep.printer_color,
                 UiStep.printer_black,
                 UiStep.printer_overlay,
-                UiStep.encode,
                 UiStep.printer_print,
                 UiStep.sgc_ok});
     }
@@ -87,7 +86,7 @@ public class EvolisTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.sgc_ok);
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
-            throw new RuntimeException("Exception on  EvolisTaskService : " + e.getMessage(), e);
+            throw new RuntimeException("Exception on  EvolisTask : " + e.getMessage(), e);
         } finally {
             try {
                 evolisPrinterService.printEnd();
