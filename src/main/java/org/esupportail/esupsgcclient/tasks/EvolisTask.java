@@ -69,9 +69,9 @@ public class EvolisTask extends EsupSgcTask {
             String bmpColorAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.color);
             updateBmpUi(bmpColorAsBase64, bmpColorImageView);
             setUiStepSuccess(UiStep.bmp_color);
-            EvolisResponse resp = evolisPrinterService.insertCardToContactLessStation();
+            evolisPrinterService.insertCardToContactLessStation(this);
             setUiStepSuccess(UiStep.printer_nfc);
-            String csn = encodingService.encode(qrcode);
+            String csn = encodingService.encode(this, qrcode);
             setUiStepSuccess(UiStep.encode);
             evolisPrinterService.printBegin();
             evolisPrinterService.printSet();

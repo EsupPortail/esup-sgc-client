@@ -14,6 +14,8 @@ import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.SgcCheckException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteRunExe;
+import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
+import org.esupportail.esupsgcclient.tasks.EvolisTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
@@ -207,10 +209,14 @@ public class EncodingService {
 		return cnousOK;
 	}
 
-	public String encode(String qrcode) throws Exception {
+	public String encode(EsupSgcTask esupSgcTask, String qrcode) throws Exception {
 		long start = System.currentTimeMillis();
 		long t;
 		while (!pcscConnection()) {
+			if(esupSgcTask.isCancelled()) {
+				throw new RuntimeException("EvolisTask is cancelled");
+			}
+			esupSgcTask.updateTitle4thisTask("En attente d'une carte sur le lecteur NFC");
 			Utils.sleep(1000);
 		}
 		String csn = readCsn();

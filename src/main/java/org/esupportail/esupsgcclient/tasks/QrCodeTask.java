@@ -2,7 +2,6 @@ package org.esupportail.esupsgcclient.tasks;
 
 import com.github.sarxos.webcam.WebcamException;
 import javafx.beans.property.ObjectProperty;
-import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.text.TextFlow;
@@ -11,9 +10,7 @@ import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.webcam.QRCodeReader;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +47,7 @@ public class QrCodeTask extends EsupSgcTask {
 		setUiStepRunning();
 		setUiStepSuccess(UiStep.qrcode_read);
 		try {
-			encodingService.encode(qrcode);
+			encodingService.encode(this, qrcode);
 			setUiStepSuccess(UiStep.encode);
 		} catch (Exception e) {
 			log.debug("Exception on QrCodeTask", e);
