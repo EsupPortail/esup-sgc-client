@@ -60,7 +60,7 @@ public class FileLocalStorage {
 	}
 
 	public String getItem(String key) {
-		log.info("get key : " + key);
+		log.debug("get key : " + key);
 		String value = "";
 		try {
 			FileInputStream fis = new FileInputStream(file);

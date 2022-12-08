@@ -11,6 +11,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.FlowPane;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTaskService;
@@ -30,6 +31,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
+import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -169,18 +171,19 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		nfcTagPane.getChildren().add(esupNfcClientStackPane);
 
+		comboBox.getItems().add("");
 		comboBox.getItems().addAll(esupSgcTaskServiceFactory.getServicesNames());
 
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldServiceName, newServiceName) -> {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldServiceName + " - " + newServiceName);
-			if(options.getValue()!=null && newServiceName!=null && !newServiceName.equals(oldServiceName)) {
+			if(!StringUtils.isEmpty(newServiceName)) {
 				Platform.runLater(() -> {
 					if(esupSgcTaskServiceFactory.isReadyToRun(appSession, newServiceName)) {
-						esupSgcTaskServiceFactory.cancelService(oldServiceName);
 						esupSgcTaskServiceFactory.runService(newServiceName);
 						logTextarea.appendText(String.format("Service '%s' démarré.\n", newServiceName));
+						fileLocalStorage.setItem("esupsgcTask", newServiceName);
 					} else {
-						comboBox.getSelectionModel().select(oldServiceName);
+						comboBox.getSelectionModel().select("");
 						logTextarea.appendText(String.format("Impossible de démarrer le service '%s' actuellement.\n", newServiceName));
 					}
 				});
@@ -291,12 +294,20 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	}
 
-	public void initializeDisplayFromFileLocalStorage() {
+	public void initializeFromFileLocalStorage() {
+
 		// initialisation (dé)sélection menu affichage fonction du filelocalstorage
 		buttonDisplayEsupNfcTag.setSelected(!"false".equals(fileLocalStorage.getItem("displayEsupNfcTag")));
 		buttonDisplayStatut.setSelected(!"false".equals(fileLocalStorage.getItem("displayStatut")));
 		buttonDisplayLogs.setSelected(!"false".equals(fileLocalStorage.getItem("displayLogs")));
 		buttonDisplayControl.setSelected(!"false".equals(fileLocalStorage.getItem("displayControl")));
+
+		// initialisation tâche combobox après 2 secondes - temps d'initialisation auth/nfc/imprimante ...
+		log.info("Tâche au démarrage : " + fileLocalStorage.getItem("esupsgcTask"));
+		new Thread(() -> {
+			Utils.sleep(2000);
+			Platform.runLater(() -> {comboBox.getSelectionModel().select(fileLocalStorage.getItem("esupsgcTask"));});
+		}).start();
 	}
 
 	public synchronized void addWebcamMenuItem(String webcamName) {

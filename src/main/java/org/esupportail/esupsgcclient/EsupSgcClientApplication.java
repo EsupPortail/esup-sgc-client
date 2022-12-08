@@ -13,7 +13,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
 
 @ComponentScan
 public class EsupSgcClientApplication extends Application {
@@ -38,7 +37,7 @@ public class EsupSgcClientApplication extends Application {
 		pStage = primaryStage;
 
 		EsupSgcClientJfxController esupSgcClientJfxController = fxmlLoader.getController();
-		esupSgcClientJfxController.initializeDisplayFromFileLocalStorage();
+		esupSgcClientJfxController.initializeFromFileLocalStorage();
 
 	}
 
