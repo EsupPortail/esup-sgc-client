@@ -107,23 +107,6 @@ public class AppSession {
         this.printerReady.set(printerReady);
     }
 
-    public ObservableValue<Boolean> getNfcReady() {
-        return nfcReady;
-    }
-
-    public ObservableValue<Boolean> getAuthReady() {
-        return authReady;
-    }
-
-    public ObservableValue<Boolean> getWebcamReady() {
-        return webcamReady;
-    }
-
-
-    public ObservableValue<Boolean> getPrinterReady() {
-        return printerReady;
-    }
-
     public boolean isTaskIsRunning() {
         return taskIsRunning.get();
     }

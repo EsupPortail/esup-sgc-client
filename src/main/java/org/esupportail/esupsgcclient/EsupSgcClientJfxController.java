@@ -156,7 +156,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		logTextarea.visibleProperty().bind(buttonDisplayLogs.selectedProperty());
 		controlPane.visibleProperty().bind(buttonDisplayControl.selectedProperty());
 
-		// changement de la visibilité -> redimlensionnement effectif de l'application
+		// changement de la visibilité -> redimensionnement effectif de l'application
 		nfcTagPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
 		statutPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
 		logTextarea.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
@@ -198,7 +198,7 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
-		appSession.getNfcReady().addListener(new ChangeListener<Boolean>() {
+		appSession.nfcReadyProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
@@ -213,7 +213,7 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
-		appSession.getAuthReady().addListener(new ChangeListener<Boolean>() {
+		appSession.authReadyProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
@@ -259,7 +259,7 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
-		appSession.getPrinterReady().addListener(new ChangeListener<Boolean>() {
+		appSession.printerReadyProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
