@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient;
 
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -13,17 +14,20 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
+import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 
 public class EsupSgcTaskUi {
     final static Logger log = Logger.getLogger(EsupSgcTaskUi.class);
-    String restartName;
     EsupSgcTaskService service;
-    Button restartButton;
     ProgressBar progressBar;
     TextArea logTextarea;
     Label textPrincipal;
@@ -32,9 +36,8 @@ public class EsupSgcTaskUi {
     ImageView bmpColorImageView;
     ImageView bmpBlackImageView;
 
-    public EsupSgcTaskUi(String restartName, EsupSgcTaskService service, ProgressBar progressBar, TextArea logTextarea, Label textPrincipal,
-                         Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, Pane restartButtons) {
-        this.restartName = restartName;
+    public EsupSgcTaskUi(EsupSgcTaskService service, ProgressBar progressBar, TextArea logTextarea, Label textPrincipal,
+                         Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
         this.service = service;
         this.progressBar = progressBar;
         this.logTextarea = logTextarea;
@@ -43,17 +46,6 @@ public class EsupSgcTaskUi {
         this.webcamImageView = webcamImageView;
         this.bmpColorImageView = bmpColorImageView;
         this.bmpBlackImageView = bmpBlackImageView;
-
-        restartButton = new Button();
-        restartButton.setText(restartName);
-        restartButton.setDisable(true);
-        restartButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                restartTaskService();
-            }
-        });
-        restartButtons.getChildren().add(restartButton);
 
         service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
@@ -66,9 +58,7 @@ public class EsupSgcTaskUi {
             @Override
             public void handle(WorkerStateEvent t) {
                 log.error("Exception when procressing card ...", service.getException());
-                // evolisTaskService.setUiStepFailed(UiStep.printer_print, evolisTaskService.getException());
-                progressBar.setStyle("-fx-accent:red");
-                restartButton.setDisable(false);
+                progressBar.setStyle("-fx-accent:red");;
                 if(service.getException() != null && service.getException().getMessage()!=null) {
                     logTextarea.appendText(service.getException().getMessage() + "\n");
                 }
@@ -81,7 +71,6 @@ public class EsupSgcTaskUi {
 
     private void restartTaskService() {
         progressBar.setStyle("");
-        restartButton.setDisable(true);
         service.restart();
     }
 

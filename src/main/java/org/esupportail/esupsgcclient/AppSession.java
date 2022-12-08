@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 public class AppSession {
 
     String numeroId = "";
+
     String sgcAuthToken = "";
+
     String eppnInit;
 
     String authType;
@@ -22,6 +24,8 @@ public class AppSession {
     SimpleBooleanProperty authReady = new SimpleBooleanProperty();
 
     SimpleBooleanProperty printerReady = new SimpleBooleanProperty();
+
+    SimpleBooleanProperty taskIsRunning = new SimpleBooleanProperty();
 
     public String getNumeroId() {
         return numeroId;
@@ -119,4 +123,17 @@ public class AppSession {
     public ObservableValue<Boolean> getPrinterReady() {
         return printerReady;
     }
+
+    public boolean isTaskIsRunning() {
+        return taskIsRunning.get();
+    }
+
+    public SimpleBooleanProperty taskIsRunningProperty() {
+        return taskIsRunning;
+    }
+
+    public void setTaskIsRunning(boolean taskIsRunning) {
+        this.taskIsRunning.set(taskIsRunning);
+    }
+
 }

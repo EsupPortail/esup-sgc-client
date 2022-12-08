@@ -57,6 +57,23 @@
                               <String fx:value="btn-default" />
                            </styleClass>
                         </ComboBox>
+                        <FlowPane alignment="TOP_CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="25.0" prefWidth="629.0">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <children>
+                              <Button fx:id="startButton" disable="true" mnemonicParsing="false" text="Start">
+                                 <font>
+                                    <Font name="System Bold" size="13.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="stopButton" disable="true" mnemonicParsing="false" text="Stop">
+                                 <font>
+                                    <Font name="System Bold" size="13.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </FlowPane>
                         <FlowPane fx:id="panePrincipal" prefHeight="289.0" prefWidth="616.0" styleClass="panel-primary">
                            <children>
                               <FlowPane prefHeight="42.0" prefWidth="631.0" styleClass="panel-heading">
@@ -120,14 +137,6 @@
                                  <FlowPane.margin>
                                     <Insets bottom="5.0" top="5.0" />
                                  </FlowPane.margin></ImageView>
-                              <FlowPane fx:id="restartButtons" hgap="10.0">
-                                 <opaqueInsets>
-                                    <Insets />
-                                 </opaqueInsets>
-                                 <FlowPane.margin>
-                                    <Insets />
-                                 </FlowPane.margin>
-                              </FlowPane>
                            </children>
                         </FlowPane>
                      </children>

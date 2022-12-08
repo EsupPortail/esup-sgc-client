@@ -95,6 +95,12 @@ public class EsupSgcClientJfxController implements Initializable {
 	private Button checkPrinter;
 
 	@FXML
+	private Button startButton;
+
+	@FXML
+	private Button stopButton;
+
+	@FXML
 	private ComboBox<String> comboBox;
 
 	@FXML
@@ -124,9 +130,6 @@ public class EsupSgcClientJfxController implements Initializable {
 	@FXML
 	private ProgressBar progressBar;
 
-	@FXML
-	private Pane restartButtons;
-
 	@Resource
 	WebcamTaskService webcamTaskService;
 
@@ -139,7 +142,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
-		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane, restartButtons);
+		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane);
 
 		// redimensionnement possible en fonction de la visible
 		nfcTagPane.managedProperty().bind(nfcTagPane.visibleProperty());
@@ -170,6 +173,11 @@ public class EsupSgcClientJfxController implements Initializable {
 		bmpColorImageView.managedProperty().bind(bmpColorImageView.visibleProperty());
 
 		nfcTagPane.getChildren().add(esupNfcClientStackPane);
+
+		stopButton.disableProperty().bind(appSession.taskIsRunningProperty().not());
+		startButton.disableProperty().bind(appSession.taskIsRunningProperty());
+
+		comboBox.disableProperty().bind(appSession.taskIsRunningProperty());
 
 		comboBox.getItems().add("");
 		comboBox.getItems().addAll(esupSgcTaskServiceFactory.getServicesNames());
@@ -220,6 +228,7 @@ public class EsupSgcClientJfxController implements Initializable {
 				}
 			}
 		});
+
 		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -234,6 +243,7 @@ public class EsupSgcClientJfxController implements Initializable {
 				th.start();
 			}
 		});
+
 		evolisPrintEnd.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -280,6 +290,19 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
+		stopButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				esupSgcTaskServiceFactory.cancelService(comboBox.getSelectionModel().getSelectedItem());
+			}
+		});
+
+		startButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				esupSgcTaskServiceFactory.runService(comboBox.getSelectionModel().getSelectedItem());
+			}
+		});
 
 		checkPrinter.getTooltip().textProperty().bind(evolisHeartbeatTaskService.titleProperty());
 		evolisHeartbeatTaskService.start();
