@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import socket
@@ -12,12 +12,12 @@ sock.listen(30)
 try:
     while 1:
         newSocket, address = sock.accept(  )
-        print "Connected from", address
+        print("Connected from", address)
         while 1:
             receivedData = newSocket.recv(1024)
             if not receivedData: break
             newSocket.send(b'{"id":"1","jsonrpc":"2.0","result":"OK"}')
         newSocket.close(  )
-        print "Disconnected from", address
+        print("Disconnected from", address)
 finally:
     sock.close(  )
