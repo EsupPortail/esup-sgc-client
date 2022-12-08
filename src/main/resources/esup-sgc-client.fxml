@@ -3,6 +3,7 @@
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -24,8 +25,10 @@
         <menus>
           <Menu mnemonicParsing="false" text="Affichage">
             <items>
-              <MenuItem fx:id="buttonNfcTag" mnemonicParsing="false" text="Masquer EsupNfcTag" />
-              <MenuItem fx:id="buttonLogs" mnemonicParsing="false" text="Masquer les logs" />
+              <CheckMenuItem fx:id="buttonDisplayEsupNfcTag" mnemonicParsing="false" selected="true" text="EsupNfcTag" />
+	      <CheckMenuItem fx:id="buttonDisplayStatut" mnemonicParsing="false" selected="true" text="Statut" />	      
+	      <CheckMenuItem fx:id="buttonDisplayLogs" mnemonicParsing="false" selected="true" text="Logs" />	      
+	      <CheckMenuItem fx:id="buttonDisplayControl" mnemonicParsing="false" selected="true" text="Contrôle" />	      
             </items>
           </Menu>
             <Menu fx:id="camerasMenu" mnemonicParsing="false" text="Caméra" />
@@ -46,7 +49,7 @@
                </styleClass></Pane>
             <FlowPane orientation="VERTICAL">
                <children>
-                  <FlowPane vgap="10.0">
+                  <FlowPane fx:id="statutPane" vgap="10.0">
                      <children>
                         <ComboBox fx:id="comboBox" prefHeight="42.0" prefWidth="634.0">
                            <styleClass>
@@ -75,7 +78,7 @@
                         <TextArea fx:id="logTextarea" editable="false" prefHeight="316.0" prefWidth="628.0" />
                      </children>
                   </FlowPane>
-                  <FlowPane alignment="TOP_CENTER" vgap="10.0">
+                  <FlowPane fx:id="controlPane" alignment="TOP_CENTER" vgap="10.0">
                      <children>
                         <HBox alignment="CENTER" spacing="30.0">
                            <children>

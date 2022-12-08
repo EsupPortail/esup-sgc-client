@@ -56,10 +56,16 @@ public class EsupSgcClientJfxController implements Initializable {
 	private FlowPane actionsPane;
 
 	@FXML
-	private MenuItem buttonLogs;
+	private CheckMenuItem buttonDisplayStatut;
 
 	@FXML
-	private MenuItem buttonNfcTag;
+	private CheckMenuItem buttonDisplayEsupNfcTag;
+
+	@FXML
+	private CheckMenuItem buttonDisplayLogs;
+
+	@FXML
+	private CheckMenuItem buttonDisplayControl;
 
 	@FXML
 	private MenuItem evolisReject;
@@ -92,7 +98,10 @@ public class EsupSgcClientJfxController implements Initializable {
 	public Pane nfcTagPane;
 
 	@FXML
-	private FlowPane panePrincipal;
+	private FlowPane statutPane;
+
+	@FXML
+	public Pane controlPane;
 
 	@FXML
 	private Label textPrincipal;
@@ -126,8 +135,21 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane, restartButtons);
 
-		logTextarea.managedProperty().bind(logTextarea.visibleProperty());
 		nfcTagPane.managedProperty().bind(nfcTagPane.visibleProperty());
+		logTextarea.managedProperty().bind(logTextarea.visibleProperty());
+		statutPane.managedProperty().bind(statutPane.visibleProperty());
+		controlPane.managedProperty().bind(controlPane.visibleProperty());
+
+		nfcTagPane.visibleProperty().bind(buttonDisplayEsupNfcTag.selectedProperty());
+		statutPane.visibleProperty().bind(buttonDisplayStatut.selectedProperty());
+		logTextarea.visibleProperty().bind(buttonDisplayLogs.selectedProperty());
+		controlPane.visibleProperty().bind(buttonDisplayControl.selectedProperty());
+
+		nfcTagPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
+		statutPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
+		logTextarea.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
+		controlPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
+		
 		webcamImageView.managedProperty().bind(webcamImageView.visibleProperty());
 		bmpBlackImageView.managedProperty().bind(bmpBlackImageView.visibleProperty());
 		bmpColorImageView.managedProperty().bind(bmpColorImageView.visibleProperty());
@@ -151,39 +173,6 @@ public class EsupSgcClientJfxController implements Initializable {
 				});
 			}
 		});
-
-		buttonLogs.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				if (logTextarea.isVisible()) {
-					logTextarea.setVisible(false);
-					buttonLogs.setText("Afficher les logs");
-					logTextarea.appendText("logs masqués\n");
-				} else {
-					logTextarea.setVisible(true);
-					buttonLogs.setText("Masquer les logs");
-					logTextarea.appendText("logs affichés\n");
-				}
-				EsupSgcClientApplication.getPrimaryStage().sizeToScene();
-			}
-		});
-
-		buttonNfcTag.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				if (nfcTagPane.isVisible()) {
-					nfcTagPane.setVisible(false);
-					buttonNfcTag.setText("Afficher EsupNfcTag");
-					logTextarea.appendText("EsupNfcTag masqué\n");
-				} else {
-					nfcTagPane.setVisible(true);
-					buttonNfcTag.setText("Masquer EsupNfcTag");
-					logTextarea.appendText("EsupNfcTag affiché\n");
-				}
-				EsupSgcClientApplication.getPrimaryStage().sizeToScene();
-			}
-		});
-
 
 		appSession.getNfcReady().addListener(new ChangeListener<Boolean>() {
 			@Override
