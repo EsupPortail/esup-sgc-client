@@ -36,6 +36,10 @@ public class EsupSgcClientApplication extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 		pStage = primaryStage;
+
+		EsupSgcClientJfxController esupSgcClientJfxController = fxmlLoader.getController();
+		esupSgcClientJfxController.initializeDisplayFromFileLocalStorage();
+
 	}
 
 	public static Stage getPrimaryStage() {

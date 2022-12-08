@@ -29,6 +29,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
+import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -51,6 +52,9 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	@Resource
 	NfcHeartbeatTaskService nfcHeartbeatTaskService;
+
+	@Resource
+	FileLocalStorage fileLocalStorage;
 
 	@FXML
 	private FlowPane actionsPane;
@@ -135,21 +139,30 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane, restartButtons);
 
+		// redimensionnement possible en fonction de la visible
 		nfcTagPane.managedProperty().bind(nfcTagPane.visibleProperty());
 		logTextarea.managedProperty().bind(logTextarea.visibleProperty());
 		statutPane.managedProperty().bind(statutPane.visibleProperty());
 		controlPane.managedProperty().bind(controlPane.visibleProperty());
 
+		// affichage panes fonction de la (dé)sélection menus affichage
 		nfcTagPane.visibleProperty().bind(buttonDisplayEsupNfcTag.selectedProperty());
 		statutPane.visibleProperty().bind(buttonDisplayStatut.selectedProperty());
 		logTextarea.visibleProperty().bind(buttonDisplayLogs.selectedProperty());
 		controlPane.visibleProperty().bind(buttonDisplayControl.selectedProperty());
 
+		// changement de la visibilité -> redimlensionnement effectif de l'application
 		nfcTagPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
 		statutPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
 		logTextarea.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
 		controlPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
-		
+
+		// (dé)sélection menu affichage -> sauvegarde dans le filelocalstorage
+		buttonDisplayEsupNfcTag.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayEsupNfcTag", newValue.toString()));
+		buttonDisplayStatut.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayStatut", newValue.toString()));
+		buttonDisplayLogs.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayLogs", newValue.toString()));
+		buttonDisplayControl.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayControl", newValue.toString()));
+
 		webcamImageView.managedProperty().bind(webcamImageView.visibleProperty());
 		bmpBlackImageView.managedProperty().bind(bmpBlackImageView.visibleProperty());
 		bmpColorImageView.managedProperty().bind(bmpColorImageView.visibleProperty());
@@ -276,6 +289,14 @@ public class EsupSgcClientJfxController implements Initializable {
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		Webcam.getWebcams(); // with this webcams are discovered and listener works at startup
 
+	}
+
+	public void initializeDisplayFromFileLocalStorage() {
+		// initialisation (dé)sélection menu affichage fonction du filelocalstorage
+		buttonDisplayEsupNfcTag.setSelected(!"false".equals(fileLocalStorage.getItem("displayEsupNfcTag")));
+		buttonDisplayStatut.setSelected(!"false".equals(fileLocalStorage.getItem("displayStatut")));
+		buttonDisplayLogs.setSelected(!"false".equals(fileLocalStorage.getItem("displayLogs")));
+		buttonDisplayControl.setSelected(!"false".equals(fileLocalStorage.getItem("displayControl")));
 	}
 
 	public synchronized void addWebcamMenuItem(String webcamName) {
