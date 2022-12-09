@@ -24,7 +24,7 @@ public abstract class EsupSgcTask extends Task<String> {
 
     private final static Logger log = Logger.getLogger(EvolisTaskService.class);
 
-    Map<UiStep, TextFlow> uiSteps = new HashMap<>();
+    Map<UiStep, TextFlow> uiSteps;
 
     UiStep lastUiStepSuccess = null;
 
@@ -33,15 +33,6 @@ public abstract class EsupSgcTask extends Task<String> {
     }
 
     abstract List<UiStep> getUiStepsList();
-
-    public void setup(Map<UiStep, TextFlow> uiSteps) {
-        this.uiSteps = uiSteps;
-    }
-
-    void setUiStepRunning(UiStep uiStep) {
-        uiSteps.get(uiStep).getStyleClass().clear();
-        uiSteps.get(uiStep).getStyleClass().add("alert-warning");
-    }
 
     void setUiStepFailed(UiStep uiStep, Throwable exception) {
         uiSteps.get(uiStep).getStyleClass().clear();
