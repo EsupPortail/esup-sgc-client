@@ -29,13 +29,16 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 	@Resource
 	QRCodeReader qRCodeReader;
 
+	@Resource
+	AppSession appSession;
+
 	@Override
 	protected Task<String> createTask() {
 		return new QrCodeTask(uiSteps, webcamImageView.imageProperty(), encodingService, qRCodeReader);
 	}
 
 	@Override
-	public boolean isReadyToRun(AppSession appSession) {
+	public boolean isReadyToRun() {
 		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isWebcamReady();
 	}
 

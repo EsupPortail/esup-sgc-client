@@ -186,7 +186,7 @@ public class EsupSgcClientJfxController implements Initializable {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldServiceName + " - " + newServiceName);
 			if(!StringUtils.isEmpty(newServiceName)) {
 				Platform.runLater(() -> {
-					if(esupSgcTaskServiceFactory.isReadyToRun(appSession, newServiceName)) {
+					if(esupSgcTaskServiceFactory.isReadyToRun(newServiceName)) {
 						esupSgcTaskServiceFactory.runService(newServiceName);
 						logTextarea.appendText(String.format("Service '%s' démarré.\n", newServiceName));
 						fileLocalStorage.setItem("esupsgcTask", newServiceName);

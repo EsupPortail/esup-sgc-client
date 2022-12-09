@@ -114,8 +114,8 @@ public class EsupSgcTaskServiceFactory {
         }
     }
 
-    public boolean isReadyToRun(AppSession appSession, String serviceName) {
-        return esupSgcTaskUis.get(serviceName).isReadyToRun(appSession);
+    public boolean isReadyToRun(String serviceName) {
+        return esupSgcTaskUis.get(serviceName).isReadyToRun();
     }
 
     public void cancelService(String oldServiceName) {

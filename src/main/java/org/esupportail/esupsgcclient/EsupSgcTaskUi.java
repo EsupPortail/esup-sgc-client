@@ -81,8 +81,8 @@ public class EsupSgcTaskUi {
         service.restart();
     }
 
-    public boolean isReadyToRun(AppSession appSession) {
-        return service.isReadyToRun(appSession);
+    public boolean isReadyToRun() {
+        return service.isReadyToRun();
     }
 
     public void cancelTaskService() {

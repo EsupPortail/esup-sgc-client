@@ -28,6 +28,9 @@ public class EvolisTaskService extends EsupSgcTaskService {
 	@Resource
 	EvolisPrinterService evolisPrinterService;
 
+	@Resource
+	AppSession appSession;
+
 	@Override
 	protected Task<String> createTask() {
 		return new EvolisTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcRestClientService, evolisPrinterService, encodingService);
@@ -35,7 +38,7 @@ public class EvolisTaskService extends EsupSgcTaskService {
 
 
 	@Override
-	public boolean isReadyToRun(AppSession appSession) {
+	public boolean isReadyToRun() {
 		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isPrinterReady();
 	}
 

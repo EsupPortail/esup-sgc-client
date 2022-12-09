@@ -21,5 +21,5 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
         this.bmpBlackImageView = bmpBlackImageView;
     }
 
-    public abstract boolean isReadyToRun(AppSession appSession);
+    public abstract boolean isReadyToRun();
 }
