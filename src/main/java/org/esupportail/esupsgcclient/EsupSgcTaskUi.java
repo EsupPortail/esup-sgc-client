@@ -47,10 +47,18 @@ public class EsupSgcTaskUi {
             @Override
             public void handle(WorkerStateEvent t) {
                 log.error("Exception when procressing card ...", service.getException());
-                progressBar.setStyle("-fx-accent:red");;
+                progressBar.setStyle("-fx-accent:red");
                 if(service.getException() != null && service.getException().getMessage()!=null) {
                     logTextarea.appendText(service.getException().getMessage() + "\n");
                 }
+            }
+        });
+
+        service.setOnCancelled(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+                log.error("Cancel called");
+                progressBar.setStyle("-fx-accent:red");
             }
         });
 
