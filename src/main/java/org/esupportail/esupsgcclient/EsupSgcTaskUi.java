@@ -1,28 +1,17 @@
 package org.esupportail.esupsgcclient;
 
-import javafx.application.Platform;
-import javafx.concurrent.Service;
 import javafx.concurrent.WorkerStateEvent;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
-import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
-import org.esupportail.esupsgcclient.utils.Utils;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 
 public class EsupSgcTaskUi {
@@ -88,7 +77,7 @@ public class EsupSgcTaskUi {
         return service.isReadyToRun(appSession);
     }
 
-    public void cancelTaskervice() {
+    public void cancelTaskService() {
         this.service.cancel();
     }
 }

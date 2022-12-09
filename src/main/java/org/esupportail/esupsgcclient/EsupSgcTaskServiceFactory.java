@@ -2,20 +2,20 @@ package org.esupportail.esupsgcclient;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.tasks.EvolisReadNfcTaskService;
 import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
 import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -59,6 +59,9 @@ public class EsupSgcTaskServiceFactory {
 
     @Resource
     AppSession appSession;
+
+    @Resource
+    HttpComponentsClientHttpRequestFactory httpRequestFactory;
 
     ThreadPoolExecutor executorService =  (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 
@@ -123,7 +126,15 @@ public class EsupSgcTaskServiceFactory {
 
     public void cancelService(String oldServiceName) {
         if(oldServiceName != null) {
-            esupSgcTaskUis.get(oldServiceName).cancelTaskervice();
+            esupSgcTaskUis.get(oldServiceName).cancelTaskService();
+        }
+        // we destroy all http connections (used by RestTemplate used in all tasks) to help
+        try {
+            httpRequestFactory.destroy();
+        } catch (Exception e) {
+            log.debug("Exception destroying httpRequestFactory", e);
+        } finally {
+            httpRequestFactory.setHttpClient(HttpClients.createSystem());
         }
     }
 

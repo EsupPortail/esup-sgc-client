@@ -274,7 +274,6 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
-
 		appSession.webcamReady.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {

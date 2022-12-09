@@ -25,14 +25,6 @@ public class Utils {
 		}
 	}
 
-    public static HttpComponentsClientHttpRequestFactory clientHttpRequestFactory() {
-    	HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setReadTimeout(10000);
-        factory.setConnectTimeout(10000);
-        return factory;
-    }
-
-
 	public static String getMacAddress() {
 		Enumeration<NetworkInterface> netInts = null;
 		try {

@@ -21,16 +21,12 @@ public class EsupSgcRestClientService {
 
     @Resource
     AppConfig appConfig;
+
     @Resource
     AppSession appSession;
+
+    @Resource
     RestTemplate restTemplate;
-    public EsupSgcRestClientService() {
-        HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        httpRequestFactory.setConnectionRequestTimeout(300000);
-        httpRequestFactory.setConnectTimeout(300000);
-        httpRequestFactory.setReadTimeout(300000);
-        restTemplate = new RestTemplate(httpRequestFactory);
-    }
 
     public String getQrCode(EvolisTask evolisTask) {
         while (true) {

@@ -19,7 +19,8 @@ public class EsupNfcTagRestClientService {
 
 	private final static Logger log = Logger.getLogger(EsupNfcTagRestClientService.class);
 
-	private RestTemplate restTemplate =  new RestTemplate(Utils.clientHttpRequestFactory());
+	@Resource
+	RestTemplate restTemplate;
 
 	@Resource
 	AppConfig appConfig;
