@@ -3,8 +3,11 @@ package org.esupportail.esupsgcclient;
 import java.io.IOException;
 import java.net.URL;
 
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.VBox;
+import javafx.stage.WindowEvent;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -39,10 +42,21 @@ public class EsupSgcClientApplication extends Application {
 		EsupSgcClientJfxController esupSgcClientJfxController = fxmlLoader.getController();
 		esupSgcClientJfxController.initializeFromFileLocalStorage();
 
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent e) {
+				Platform.exit();
+				System.exit(0);
+			}
+		});
+		
 	}
 
 	public static Stage getPrimaryStage() {
 		return pStage;
 	}
-    
+
+
+
+
 }
