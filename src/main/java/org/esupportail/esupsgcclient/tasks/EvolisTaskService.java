@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.tasks;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
@@ -38,9 +39,10 @@ public class EvolisTaskService extends EsupSgcTaskService {
 
 
 	@Override
-	public boolean isReadyToRun() {
-		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isPrinterReady() && "DESFIRE".equals(appSession.getAuthType());
+	public BooleanBinding readyToRunProperty() {
+		return appSession.authReadyProperty().and(appSession.nfcReadyProperty()).and(appSession.printerReadyProperty()).and(appSession.authTypeProperty().isEqualTo("DESFIRE)"));
 	}
+
 
 	@Override
 	public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {

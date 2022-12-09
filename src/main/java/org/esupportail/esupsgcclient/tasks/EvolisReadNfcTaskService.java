@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.tasks;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
@@ -38,8 +39,8 @@ public class EvolisReadNfcTaskService extends EsupSgcTaskService {
 
 
 	@Override
-	public boolean isReadyToRun() {
-		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isPrinterReady();
+	public BooleanBinding readyToRunProperty() {
+		return appSession.authReadyProperty().and(appSession.nfcReadyProperty()).and(appSession.printerReadyProperty());
 	}
 
 	@Override

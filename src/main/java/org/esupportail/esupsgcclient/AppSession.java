@@ -1,6 +1,7 @@
 package org.esupportail.esupsgcclient;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -15,7 +16,7 @@ public class AppSession {
 
     String eppnInit;
 
-    String authType;
+    SimpleStringProperty authType = new SimpleStringProperty();
 
     SimpleBooleanProperty webcamReady = new SimpleBooleanProperty(false);
 
@@ -52,11 +53,15 @@ public class AppSession {
     }
 
     public String getAuthType() {
+        return authType.get();
+    }
+
+    public SimpleStringProperty authTypeProperty() {
         return authType;
     }
 
     public void setAuthType(String authType) {
-        this.authType = authType;
+        this.authType.set(authType);
     }
 
     public boolean isWebcamReady() {

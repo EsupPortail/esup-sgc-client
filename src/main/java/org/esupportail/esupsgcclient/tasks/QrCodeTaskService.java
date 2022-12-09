@@ -1,9 +1,7 @@
 package org.esupportail.esupsgcclient.tasks;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.concurrent.Service;
+import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.Task;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
@@ -14,8 +12,6 @@ import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -38,8 +34,8 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 	}
 
 	@Override
-	public boolean isReadyToRun() {
-		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isWebcamReady() && "DESFIRE".equals(appSession.getAuthType());
+	public BooleanBinding readyToRunProperty() {
+		return appSession.authReadyProperty().and(appSession.nfcReadyProperty()).and(appSession.webcamReadyProperty()).and(appSession.authTypeProperty().isEqualTo("DESFIRE)"));
 	}
 
 	@Override

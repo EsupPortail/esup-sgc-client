@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
@@ -51,6 +52,8 @@ public class EsupSgcTaskUi {
                 if(service.getException() != null && service.getException().getMessage()!=null) {
                     logTextarea.appendText(service.getException().getMessage() + "\n");
                 }
+                textPrincipal.textProperty().unbind();
+                textPrincipal.setText("...");
             }
         });
 
@@ -59,10 +62,10 @@ public class EsupSgcTaskUi {
             public void handle(WorkerStateEvent t) {
                 log.error("Cancel called");
                 progressBar.setStyle("-fx-accent:red");
+                textPrincipal.textProperty().unbind();
+                textPrincipal.setText("...");
             }
         });
-
-        textPrincipal.textProperty().bind(service.titleProperty());
         service.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
     }
 
@@ -75,14 +78,15 @@ public class EsupSgcTaskUi {
         must be run from App JFX Thread
     */
     public void runTaskService() {
+        textPrincipal.textProperty().bind(service.titleProperty());
         service.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
         progressBar.setStyle("");
         progressBar.progressProperty().bind(service.progressProperty());
         service.restart();
     }
 
-    public boolean isReadyToRun() {
-        return service.isReadyToRun();
+    public BooleanBinding readyToRunProperty() {
+        return service.readyToRunProperty();
     }
 
     public void cancelTaskService() {

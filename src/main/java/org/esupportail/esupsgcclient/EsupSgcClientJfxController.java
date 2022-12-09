@@ -31,6 +31,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
+import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
@@ -175,7 +176,6 @@ public class EsupSgcClientJfxController implements Initializable {
 		nfcTagPane.getChildren().add(esupNfcClientStackPane);
 
 		stopButton.disableProperty().bind(appSession.taskIsRunningProperty().not());
-		startButton.disableProperty().bind(appSession.taskIsRunningProperty());
 
 		comboBox.disableProperty().bind(appSession.taskIsRunningProperty());
 
@@ -186,15 +186,21 @@ public class EsupSgcClientJfxController implements Initializable {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldServiceName + " - " + newServiceName);
 			if(!StringUtils.isEmpty(newServiceName)) {
 				Platform.runLater(() -> {
-					if(esupSgcTaskServiceFactory.isReadyToRun(newServiceName)) {
+					esupSgcTaskServiceFactory.resetUiSteps();
+					if(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
+						startButton.disableProperty().bind(appSession.taskIsRunningProperty());
 						esupSgcTaskServiceFactory.runService(newServiceName);
 						logTextarea.appendText(String.format("Service '%s' démarré.\n", newServiceName));
 						fileLocalStorage.setItem("esupsgcTask", newServiceName);
 					} else {
 						comboBox.getSelectionModel().select("");
 						logTextarea.appendText(String.format("Impossible de démarrer le service '%s' actuellement.\n", newServiceName));
+						startButton.disableProperty().bind(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).not());
 					}
 				});
+			} else {
+				startButton.disableProperty().unbind();
+				startButton.setDisable(true);
 			}
 		});
 

@@ -1,8 +1,8 @@
 package org.esupportail.esupsgcclient.tasks;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
-import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
 import java.util.Map;
@@ -21,5 +21,5 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
         this.bmpBlackImageView = bmpBlackImageView;
     }
 
-    public abstract boolean isReadyToRun();
+    public abstract BooleanBinding readyToRunProperty();
 }

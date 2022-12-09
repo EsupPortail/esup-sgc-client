@@ -1,6 +1,7 @@
 package org.esupportail.esupsgcclient;
 
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -15,7 +16,6 @@ import org.esupportail.esupsgcclient.tasks.EvolisReadNfcTaskService;
 import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
 import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 
@@ -114,8 +113,8 @@ public class EsupSgcTaskServiceFactory {
         }
     }
 
-    public boolean isReadyToRun(String serviceName) {
-        return esupSgcTaskUis.get(serviceName).isReadyToRun();
+    public BooleanBinding readyToRunProperty(String serviceName) {
+        return esupSgcTaskUis.get(serviceName).readyToRunProperty();
     }
 
     public void cancelService(String oldServiceName) {
@@ -140,5 +139,11 @@ public class EsupSgcTaskServiceFactory {
 
     public List<String> getServicesNames() {
         return new ArrayList<>(esupSgcTaskUis.keySet());
+    }
+
+    public void resetUiSteps() {
+        for(UiStep step : uiSteps.keySet()) {
+            uiSteps.get(step).setVisible(false);
+        }
     }
 }
