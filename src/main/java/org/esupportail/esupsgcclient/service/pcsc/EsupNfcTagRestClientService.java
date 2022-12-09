@@ -28,7 +28,7 @@ public class EsupNfcTagRestClientService {
 	@Resource
 	AppSession appSession;
 
-    public  NfcResultBean getApdu(String csn, String result) throws Exception, EncodingException, PcscException {
+    public  NfcResultBean getApdu(String csn, String result) throws Exception {
 			String url = String.format("%s/desfire-ws/?result=%s&numeroId=%s&cardId=%s", appConfig.getEsupNfcTagServerUrl(), result, appSession.getNumeroId(), csn);
 			try {
 				return restTemplate.getForObject(url, NfcResultBean.class);

@@ -59,7 +59,6 @@ public class EsupSgcTaskUi {
     }
 
     private void restartTaskService() {
-        progressBar.setStyle("");
         service.restart();
     }
 
@@ -69,6 +68,7 @@ public class EsupSgcTaskUi {
     */
     public void runTaskService() {
         service.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
+        progressBar.setStyle("");
         progressBar.progressProperty().bind(service.progressProperty());
         service.restart();
     }

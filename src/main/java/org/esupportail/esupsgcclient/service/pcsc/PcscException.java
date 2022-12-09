@@ -12,5 +12,4 @@ public class PcscException extends Exception {
 		super(message, cause);
 	}
 
-	
 }
