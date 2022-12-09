@@ -30,13 +30,15 @@ public class NfcHeartbeatTaskService extends Service<Void> {
                 while(true) {
                     try {
                         String terminalName =  encodingService.getTerminalName();
+                        log.debug("terminalName ...");
                         appSession.setNfcReady(terminalName!=null);
-                       if(terminalName!=null && !terminalName.equals(lastTerminalName)) {
+                        if(terminalName!=null && !terminalName.equals(lastTerminalName)) {
                            lastTerminalName = terminalName;
                            updateTitle("Nom du terminal NFC : " + lastTerminalName);
-                       }
+                        }
                     } catch(Exception e) {
-                        log.debug("b with nfc ...", e);
+                        appSession.setNfcReady(false);
+                        log.debug("pb with nfc ...", e);
                     }
                     Utils.sleep(5000);
                 }

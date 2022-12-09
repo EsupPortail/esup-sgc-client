@@ -38,6 +38,7 @@ public class EvolisHeartbeatTaskService extends Service<Void> {
                             updateTitle("Statut Evolis : " + lastPrinterStatus);
                         }
                     } catch(Exception e) {
+                        appSession.setPrinterReady(false);
                         log.trace("pb with evolisPrinterService ...", e);
                         if( e.getMessage()!=null && ! e.getMessage().equals(lastPrinterStatus)) {
                             lastPrinterStatus = e.getMessage();
