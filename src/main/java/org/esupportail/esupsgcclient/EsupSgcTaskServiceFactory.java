@@ -10,6 +10,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.text.TextFlow;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.tasks.EsupSgcTaskSupervisionService;
 import org.esupportail.esupsgcclient.tasks.EvolisReadNfcTaskService;
 import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
 import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
@@ -58,12 +59,13 @@ public class EsupSgcTaskServiceFactory {
     EvolisReadNfcTaskService evolisReadNfcTaskService;
 
     @Resource
-    AppSession appSession;
+    EsupSgcTaskSupervisionService esupSgcTaskSupervisionService;
 
     @Resource
     HttpComponentsClientHttpRequestFactory httpRequestFactory;
 
-    ThreadPoolExecutor executorService =  (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+    @Resource
+    ThreadPoolExecutor sgcTaskExecutor;
 
     Map<UiStep, TextFlow> uiSteps = new HashMap<>();
 
@@ -90,19 +92,11 @@ public class EsupSgcTaskServiceFactory {
             textFlow.setVisible(false);
         }
 
-        // TODO - dans une autre classe
-        Thread t = new Thread(() -> {
-            while (true) {
-               appSession.setTaskIsRunning(executorService.getActiveCount()!=0);
-               Utils.sleep(1000);
-            }
-        });
-        t.setDaemon(true);
-        t.start();
+        esupSgcTaskSupervisionService.start();
 
-        qrCodeTaskService.setExecutor(executorService);
-        evolisTaskService.setExecutor(executorService);
-        evolisReadNfcTaskService.setExecutor(executorService);
+        qrCodeTaskService.setExecutor(sgcTaskExecutor);
+        evolisTaskService.setExecutor(sgcTaskExecutor);
+        evolisReadNfcTaskService.setExecutor(sgcTaskExecutor);
 
         esupSgcTaskUis.put("Encodage par scan de QRCode", new EsupSgcTaskUi(qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
         esupSgcTaskUis.put("Encodage et impression via Evolis Primacy", new EsupSgcTaskUi(evolisTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
