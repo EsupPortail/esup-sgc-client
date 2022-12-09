@@ -76,7 +76,7 @@ public class EncodingService {
 			log.debug("cardTerminal : " + cardTerminalName);
 			return true;
 		} catch (CardException e) {
-			log.warn("pcsc connection error : " + e.getMessage());
+			log.trace("pcsc connection error : " + e.getMessage());
 		}
 		return false;
 	}
@@ -212,7 +212,7 @@ public class EncodingService {
 		return cnousOK;
 	}
 
-	public String encode(EsupSgcTask esupSgcTask, String qrcode) throws Exception {
+	public NfcResultBean encode(EsupSgcTask esupSgcTask, String qrcode) throws Exception {
 		long start = System.currentTimeMillis();
 		long t;
 		while (!pcscConnection()) {
@@ -244,7 +244,7 @@ public class EncodingService {
 				} else {
 					log.info("Encoding  : OK");
 					encodeCnousIfNeeded(csn);
-					return csn;
+					return nfcResultBean;
 				}
 			} else {
 				throw new EncodingException("NFC APDU gived by nfctag is null ?!");
@@ -278,7 +278,7 @@ public class EncodingService {
 	}
 
 
-	public void encode(EsupSgcTask esupSgcTask) throws Exception {
+	public NfcResultBean encode(EsupSgcTask esupSgcTask) throws Exception {
 		if(appSession.getAuthType().equals("CSN")) {
 			while (!pcscConnection()) {
 				if(esupSgcTask.isCancelled()) {
@@ -287,9 +287,9 @@ public class EncodingService {
 				esupSgcTask.updateTitle4thisTask("En attente d'une carte sur le lecteur NFC");
 				Utils.sleep(1000);
 			}
-			esupNfcTagRestClientService.csnNfcComm(readCsn());
+			return esupNfcTagRestClientService.csnNfcComm(readCsn());
 		} else {
-			encode(esupSgcTask, null);
+			return encode(esupSgcTask, null);
 		}
 	}
 

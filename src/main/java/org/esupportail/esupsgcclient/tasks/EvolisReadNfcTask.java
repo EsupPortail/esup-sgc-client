@@ -5,6 +5,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
+import org.esupportail.esupsgcclient.service.pcsc.NfcResultBean;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
 import org.esupportail.esupsgcclient.ui.UiStep;
@@ -44,15 +45,22 @@ public class EvolisReadNfcTask extends EsupSgcTask {
             setUiStepSuccess(null);
             evolisPrinterService.insertCardToContactLessStation(this);
             setUiStepSuccess(UiStep.printer_nfc);
-            encodingService.encode(this);
-            setUiStepSuccess(UiStep.encode);
-            evolisPrinterService.eject();
+            NfcResultBean nfcResultBean = encodingService.encode(this);
+            if(!nfcResultBean.inError()) {
+                setUiStepSuccess(UiStep.encode);
+                evolisPrinterService.eject();
+            } else {
+                setUiStepFailed(UiStep.encode, null);
+                evolisPrinterService.reject();
+                updateTitle("Carte rejetée");
+            }
             if(!encodingService.waitForCardAbsent(5000)) {
                 throw new RuntimeException("La carte n'a pas été éjectée et est toujours sur le lecteur NFC de l'imprimante après 5 secondes ?");
             }
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
             evolisPrinterService.reject();
+            updateTitle("Carte rejetée");
             throw new RuntimeException("Exception on  EvolisReadNfcTask : " + e.getMessage(), e);
         }
 		return null;

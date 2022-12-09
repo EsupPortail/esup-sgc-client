@@ -37,24 +37,24 @@ public class EsupNfcTagRestClientService {
 			}
     }
 
-	public String csnNfcComm(String csn) throws EncodingException, PcscException {
+	public NfcResultBean csnNfcComm(String csn) throws EncodingException, PcscException {
 		CsnMessageBean nfcMsg = new CsnMessageBean();
 		nfcMsg.setNumeroId(appSession.getNumeroId());
 		nfcMsg.setCsn(csn);
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonInString = null;
 		String url =  appConfig.getEsupNfcTagServerUrl() + "/csn-ws";
-		String nfcComm;
+		NfcResultBean nfcResultBean  = null;
 		try{
 			jsonInString = mapper.writeValueAsString(nfcMsg);
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			HttpEntity<String> entity = new HttpEntity<String>(jsonInString, headers);
-			nfcComm = restTemplate.postForObject(url, entity, String.class);
+			nfcResultBean = restTemplate.postForObject(url, entity, NfcResultBean.class);
 		}catch (Exception e) {
 			throw new EncodingException("rest call error for : " + url, e);
 		}
-		return nfcComm;
+		return nfcResultBean;
 	}
 
 }

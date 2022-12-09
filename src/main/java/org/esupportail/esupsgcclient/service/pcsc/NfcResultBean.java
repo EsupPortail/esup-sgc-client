@@ -9,6 +9,10 @@ public class NfcResultBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public boolean inError() {
+		return CODE.ERROR.equals(this.getCode());
+	}
+
 	public static enum CODE {
         ERROR,
         OK,

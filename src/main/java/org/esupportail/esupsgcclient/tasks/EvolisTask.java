@@ -70,7 +70,8 @@ public class EvolisTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.bmp_color);
             evolisPrinterService.insertCardToContactLessStation(this);
             setUiStepSuccess(UiStep.printer_nfc);
-            String csn = encodingService.encode(this, qrcode);
+            String csn = encodingService.readCsn();
+            encodingService.encode(this, qrcode);
             setUiStepSuccess(UiStep.encode);
             evolisPrinterService.printBegin();
             evolisPrinterService.printSet();
