@@ -188,13 +188,14 @@ public class EsupSgcClientJfxController implements Initializable {
 				Platform.runLater(() -> {
 					esupSgcTaskServiceFactory.resetUiSteps();
 					if(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
-						startButton.disableProperty().bind(appSession.taskIsRunningProperty());
+						startButton.disableProperty().bind(appSession.taskIsRunningProperty().or(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).not()));
 						esupSgcTaskServiceFactory.runService(newServiceName);
 						logTextarea.appendText(String.format("Service '%s' démarré.\n", newServiceName));
 						fileLocalStorage.setItem("esupsgcTask", newServiceName);
 					} else {
 						comboBox.getSelectionModel().select("");
 						logTextarea.appendText(String.format("Impossible de démarrer le service '%s' actuellement.\n", newServiceName));
+						logTextarea.appendText(esupSgcTaskServiceFactory.readyToRunPropertyDisplayProblem(newServiceName));
 						startButton.disableProperty().bind(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).not());
 					}
 				});

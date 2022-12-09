@@ -1,14 +1,13 @@
 package org.esupportail.esupsgcclient.tasks;
 
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
+import org.esupportail.esupsgcclient.AppSession.READY_CONDITION;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
-import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.stereotype.Service;
 
@@ -31,10 +30,14 @@ public class ReadNfcTaskService extends EsupSgcTaskService {
 		return new ReadNfcTask(uiSteps, encodingService);
 	}
 
+	@Override
+	public AppSession getAppSession() {
+		return appSession;
+	}
 
 	@Override
-	public BooleanBinding readyToRunProperty() {
-		return appSession.authReadyProperty().and(appSession.nfcReadyProperty());
+	public READY_CONDITION[] readyToRunConditions() {
+		return new READY_CONDITION[]{READY_CONDITION.auth, READY_CONDITION.nfc};
 	}
 
 	@Override
@@ -44,4 +47,5 @@ public class ReadNfcTaskService extends EsupSgcTaskService {
 		bmpColorImageView.setVisible(false);
 		bmpBlackImageView.setVisible(false);
 	}
+
 }

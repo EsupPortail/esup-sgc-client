@@ -2,13 +2,20 @@ package org.esupportail.esupsgcclient;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class AppSession {
+
+    public enum READY_CONDITION {
+        webcam, auth, nfc, nfc_desfire, printer
+    }
 
     String numeroId = "";
 
@@ -27,6 +34,16 @@ public class AppSession {
     SimpleBooleanProperty printerReady = new SimpleBooleanProperty();
 
     SimpleBooleanProperty taskIsRunning = new SimpleBooleanProperty();
+
+    public Map<READY_CONDITION, ObservableBooleanValue> getReadyConditions() {
+        return Map.of(
+                READY_CONDITION.webcam, webcamReady,
+                READY_CONDITION.auth, authReady,
+                READY_CONDITION.nfc, nfcReady,
+                READY_CONDITION.nfc_desfire, authType.isEqualTo("DESFIRE"),
+                READY_CONDITION.printer, printerReady
+        );
+    }
 
     public String getNumeroId() {
         return numeroId;

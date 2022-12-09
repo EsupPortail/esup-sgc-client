@@ -85,6 +85,10 @@ public class EsupSgcTaskUi {
         return service.readyToRunProperty();
     }
 
+    public String readyToRunPropertyDisplayProblem() {
+        return service.readyToRunPropertyDisplayProblem();
+    }
+
     public void cancelTaskService() {
         this.service.cancel();
     }

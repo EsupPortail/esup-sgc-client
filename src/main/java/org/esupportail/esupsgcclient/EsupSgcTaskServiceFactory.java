@@ -123,6 +123,10 @@ public class EsupSgcTaskServiceFactory {
         return esupSgcTaskUis.get(serviceName).readyToRunProperty();
     }
 
+    public String readyToRunPropertyDisplayProblem(String serviceName) {
+        return esupSgcTaskUis.get(serviceName).readyToRunPropertyDisplayProblem();
+    }
+
     public void cancelService(String oldServiceName) {
         if(oldServiceName != null) {
             esupSgcTaskUis.get(oldServiceName).cancelTaskService();
