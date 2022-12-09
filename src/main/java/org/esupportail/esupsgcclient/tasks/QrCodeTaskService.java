@@ -39,7 +39,7 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 
 	@Override
 	public boolean isReadyToRun() {
-		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isWebcamReady();
+		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isWebcamReady() && "DESFIRE".equals(appSession.getAuthType());
 	}
 
 	@Override

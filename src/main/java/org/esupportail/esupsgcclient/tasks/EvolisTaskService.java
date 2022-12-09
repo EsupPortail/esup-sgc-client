@@ -39,7 +39,7 @@ public class EvolisTaskService extends EsupSgcTaskService {
 
 	@Override
 	public boolean isReadyToRun() {
-		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isPrinterReady();
+		return appSession.isAuthReady() && appSession.isNfcReady() && appSession.isPrinterReady() && "DESFIRE".equals(appSession.getAuthType());
 	}
 
 	@Override
