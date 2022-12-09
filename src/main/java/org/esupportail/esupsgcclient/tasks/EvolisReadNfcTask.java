@@ -52,6 +52,7 @@ public class EvolisReadNfcTask extends EsupSgcTask {
             }
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
+            evolisPrinterService.reject();
             throw new RuntimeException("Exception on  EvolisReadNfcTask : " + e.getMessage(), e);
         }
 		return null;
