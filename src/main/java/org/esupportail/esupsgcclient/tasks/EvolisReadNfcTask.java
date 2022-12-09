@@ -47,6 +47,9 @@ public class EvolisReadNfcTask extends EsupSgcTask {
             encodingService.encode(this);
             setUiStepSuccess(UiStep.encode);
             evolisPrinterService.eject();
+            if(!encodingService.waitForCardAbsent(5000)) {
+                throw new RuntimeException("La carte n'a pas été éjectée et est toujours sur le lecteur NFC de l'imprimante après 5 secondes ?");
+            }
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
             throw new RuntimeException("Exception on  EvolisReadNfcTask : " + e.getMessage(), e);
