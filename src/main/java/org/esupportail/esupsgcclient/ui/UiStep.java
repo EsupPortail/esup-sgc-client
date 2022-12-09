@@ -9,7 +9,7 @@ public enum UiStep {
         csn_read("Lecture du CSN"),
         sgc_select("Sélection dans le SGC"),
         printer_nfc("Positionnement de la carte sur lecteur NFC"),
-        encode("Encodage de la carte"),
+        encode("Encodage/Badgeage de la carte"),
         encode_cnous("Encodage CNOUS"),
         send_csv("Envoi du CSV"),
         printer_color("Envoi Panneau Couleur"),

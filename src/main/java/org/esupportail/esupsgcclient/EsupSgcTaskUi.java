@@ -40,7 +40,7 @@ public class EsupSgcTaskUi {
         service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                restartTaskService();
+                runTaskService();
             }
         });
 
@@ -69,20 +69,16 @@ public class EsupSgcTaskUi {
         service.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
     }
 
-    private void restartTaskService() {
-        service.restart();
-    }
-
 
     /*
         must be run from App JFX Thread
     */
     public void runTaskService() {
-        textPrincipal.textProperty().bind(service.titleProperty());
         service.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
+        service.restart();
         progressBar.setStyle("");
         progressBar.progressProperty().bind(service.progressProperty());
-        service.restart();
+        textPrincipal.textProperty().bind(service.titleProperty());
     }
 
     public BooleanBinding readyToRunProperty() {

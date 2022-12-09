@@ -15,6 +15,7 @@ import org.esupportail.esupsgcclient.tasks.EsupSgcTaskSupervisionService;
 import org.esupportail.esupsgcclient.tasks.EvolisReadNfcTaskService;
 import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
 import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
+import org.esupportail.esupsgcclient.tasks.ReadNfcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
@@ -61,6 +62,9 @@ public class EsupSgcTaskServiceFactory {
     EsupSgcTaskSupervisionService esupSgcTaskSupervisionService;
 
     @Resource
+    ReadNfcTaskService readNfcTaskService;
+
+    @Resource
     HttpComponentsClientHttpRequestFactory httpRequestFactory;
 
     @Resource
@@ -96,10 +100,12 @@ public class EsupSgcTaskServiceFactory {
         qrCodeTaskService.setExecutor(sgcTaskExecutor);
         evolisTaskService.setExecutor(sgcTaskExecutor);
         evolisReadNfcTaskService.setExecutor(sgcTaskExecutor);
+        readNfcTaskService.setExecutor(sgcTaskExecutor);
 
         esupSgcTaskUis.put("Encodage par scan de QRCode", new EsupSgcTaskUi(qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
         esupSgcTaskUis.put("Encodage et impression via Evolis Primacy", new EsupSgcTaskUi(evolisTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
         esupSgcTaskUis.put("Badgeage via Evolis Primacy", new EsupSgcTaskUi(evolisReadNfcTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
+        esupSgcTaskUis.put("Badgeage simple", new EsupSgcTaskUi(readNfcTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
 
     }
 
