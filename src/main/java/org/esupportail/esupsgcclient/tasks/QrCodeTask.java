@@ -76,7 +76,7 @@ public class QrCodeTask extends EsupSgcTask {
 			} else {
 				throw new WebcamException("no image");
 			}
-			Utils.sleep(1000);
+			Utils.sleep(200);
 		}
 		return qrcode;
 	}

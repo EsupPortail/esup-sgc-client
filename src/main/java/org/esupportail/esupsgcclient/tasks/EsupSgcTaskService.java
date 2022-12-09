@@ -51,7 +51,7 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
                 .stream()
                 .filter(a-> Arrays.asList(readyToRunConditions()).contains(a.getKey()) && !a.getValue().get())
                 .collect(Collectors.toMap(e->e.getKey(),e->e.getValue()));
-        List<String> pbs = readyToRunConditionsFailedMap.keySet().stream().map(k -> k + " : KO").collect(Collectors.toList());
+        List<String> pbs = readyToRunConditionsFailedMap.keySet().stream().map(k -> " * " + k + " : KO").collect(Collectors.toList());
         log.warn(pbs);
         return Strings.join("\n", pbs) + "\n";
     }

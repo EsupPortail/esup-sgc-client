@@ -14,7 +14,22 @@ import java.util.Map;
 public class AppSession {
 
     public enum READY_CONDITION {
-        webcam, auth, nfc, nfc_desfire, printer
+
+        webcam ("Caméra"),
+        auth("Authentification esup-nfc-tag"),
+        nfc ("Lecteur USB NFC"),
+        nfc_desfire ("Salle de badgegage de type desfire (encodage)"),
+        printer ("Imprimante evolis primacy2");
+
+        private String name;
+
+        READY_CONDITION(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return name;
+        }
     }
 
     String numeroId = "";

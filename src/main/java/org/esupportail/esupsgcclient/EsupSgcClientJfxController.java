@@ -194,7 +194,7 @@ public class EsupSgcClientJfxController implements Initializable {
 						fileLocalStorage.setItem("esupsgcTask", newServiceName);
 					} else {
 						comboBox.getSelectionModel().select("");
-						logTextarea.appendText(String.format("Impossible de démarrer le service '%s' actuellement.\n", newServiceName));
+						logTextarea.appendText(String.format("Impossible de démarrer le service '%s' :\n", newServiceName));
 						logTextarea.appendText(esupSgcTaskServiceFactory.readyToRunPropertyDisplayProblem(newServiceName));
 						startButton.disableProperty().bind(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).not());
 					}
