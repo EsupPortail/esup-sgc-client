@@ -62,12 +62,12 @@
                               <Insets />
                            </opaqueInsets>
                            <children>
-                              <Button fx:id="startButton" disable="true" mnemonicParsing="false" text="Start">
+                              <Button fx:id="startButton" disable="true" mnemonicParsing="false" styleClass="btn-success" text="Start">
                                  <font>
                                     <Font name="System Bold" size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="stopButton" disable="true" mnemonicParsing="false" text="Stop">
+                              <Button fx:id="stopButton" disable="true" mnemonicParsing="false" styleClass="btn-danger" text="Stop">
                                  <font>
                                     <Font name="System Bold" size="13.0" />
                                  </font>
