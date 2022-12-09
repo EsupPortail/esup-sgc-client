@@ -139,6 +139,7 @@ public class EsupSgcTaskServiceFactory {
         } finally {
             httpRequestFactory.setHttpClient(HttpClients.createSystem());
         }
+        resetUiSteps();
     }
 
     public void runService(String newServiceName) {

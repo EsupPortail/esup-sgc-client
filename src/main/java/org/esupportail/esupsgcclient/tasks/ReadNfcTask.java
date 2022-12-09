@@ -36,7 +36,9 @@ public class ReadNfcTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.encode);
             updateTitle("Badgeage OK");
             while (!encodingService.waitForCardAbsent(1000)) {
-                // Utils.sleep(1000); -  sleep non nécessaire : EncodingService.waitForCardAbsent l'intègre
+                if(isCancelled()) {
+                    return null;
+                }
             }
             updateTitle("Carte retirée");
         } catch (Exception e) {
