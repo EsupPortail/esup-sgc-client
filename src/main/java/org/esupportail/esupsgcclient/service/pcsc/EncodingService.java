@@ -36,6 +36,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class EncodingService {
 	private final static Logger log = Logger.getLogger(EncodingService.class);
+
 	public enum BmpType {color, black}
 	private String pathToExe = "c:\\cnousApi\\";
 	private String csvPath = "c:\\cnousApi\\csv_out.csv";
@@ -70,7 +71,7 @@ public class EncodingService {
 		}
 	}
 
-	public boolean pcscConnection() throws PcscException {
+	public boolean pcscConnection() {
 		try {
 			String cardTerminalName = PcscUsbService.connection();
 			log.debug("cardTerminal : " + cardTerminalName);
@@ -79,6 +80,16 @@ public class EncodingService {
 			log.trace("pcsc connection error : " + e.getMessage());
 		}
 		return false;
+	}
+
+	public void pcscConnection(EsupSgcTask esupSgcTask) {
+		while(!pcscConnection()) {
+			if(esupSgcTask.isCancelled()) {
+				throw new RuntimeException("esupSgcTask is cancelled");
+			}
+			esupSgcTask.updateTitle4thisTask("En attente d'une carte sur le lecteur NFC");
+			Utils.sleep(200);
+		}
 	}
 
 	public String readCsn() throws PcscException {
@@ -214,14 +225,7 @@ public class EncodingService {
 
 	public NfcResultBean encode(EsupSgcTask esupSgcTask, String qrcode) throws Exception {
 		long start = System.currentTimeMillis();
-		long t;
-		while (!pcscConnection()) {
-			if(esupSgcTask.isCancelled()) {
-				throw new RuntimeException("EvolisTask is cancelled");
-			}
-			esupSgcTask.updateTitle4thisTask("En attente d'une carte sur le lecteur NFC");
-			Utils.sleep(1000);
-		}
+		pcscConnection(esupSgcTask);
 		String csn = readCsn();
 		if(qrcode != null) {
 			checkBeforeEncoding(qrcode, csn);
@@ -229,7 +233,6 @@ public class EncodingService {
 		log.info("Encoding : Start");
 		String result = "";
 		while (true) {
-			t = System.currentTimeMillis() - start;
 			log.info("RAPDU : " + result);
 			NfcResultBean nfcResultBean = esupNfcTagRestClientService.getApdu(csn, result);
 			log.info("SAPDU : " + nfcResultBean.getFullApdu());
@@ -237,7 +240,6 @@ public class EncodingService {
 				if (!"END".equals(nfcResultBean.getFullApdu())) {
 					try {
 						result = PcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
-						//updateProgress((long)this.getProgress()+1, (long)this.getTotalWork()+1);
 					} catch (CardException e) {
 						throw new PcscException("pcsc send apdu error", e);
 					}
