@@ -1,6 +1,7 @@
 package org.esupportail.esupsgcclient.tasks;
 
 import com.beust.jcommander.Strings;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableBooleanValue;
@@ -42,8 +43,8 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
                 .stream()
                 .filter(a-> Arrays.asList(readyToRunConditions()).contains(a.getKey()))
                 .collect(Collectors.toMap(e->e.getKey(),e->e.getValue()));
-        ObservableList<ObservableBooleanValue> readyToRunPropertiesList = FXCollections.observableArrayList(readyToRunConditionsMap.values());
-        return Bindings.createBooleanBinding(() -> readyToRunPropertiesList.stream().allMatch(observableBooleanValue -> observableBooleanValue.get()), readyToRunPropertiesList);
+        ObservableBooleanValue[] dependencies = readyToRunConditionsMap.values().stream().toArray(ObservableBooleanValue[]::new);
+        return Bindings.createBooleanBinding(() ->  readyToRunConditionsMap.values().stream().allMatch(ObservableBooleanValue::get), dependencies);
     }
 
     public String readyToRunPropertyDisplayProblem() {
