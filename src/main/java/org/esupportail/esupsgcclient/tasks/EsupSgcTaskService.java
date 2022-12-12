@@ -26,6 +26,8 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
     ImageView webcamImageView;
     ImageView bmpColorImageView;
     ImageView bmpBlackImageView;
+    BooleanBinding readyToRunProperty;
+
 
     public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
         this.uiSteps = uiSteps;
@@ -39,12 +41,15 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
     public abstract AppSession.READY_CONDITION[] readyToRunConditions();
 
     public BooleanBinding readyToRunProperty() {
-        Map<AppSession.READY_CONDITION, ObservableBooleanValue> readyToRunConditionsMap = getAppSession().getReadyConditions().entrySet()
-                .stream()
-                .filter(a-> Arrays.asList(readyToRunConditions()).contains(a.getKey()))
-                .collect(Collectors.toMap(e->e.getKey(),e->e.getValue()));
-        ObservableBooleanValue[] dependencies = readyToRunConditionsMap.values().stream().toArray(ObservableBooleanValue[]::new);
-        return Bindings.createBooleanBinding(() ->  readyToRunConditionsMap.values().stream().allMatch(ObservableBooleanValue::get), dependencies);
+        if(readyToRunProperty == null) {
+            Map<AppSession.READY_CONDITION, ObservableBooleanValue> readyToRunConditionsMap = getAppSession().getReadyConditions().entrySet()
+                    .stream()
+                    .filter(a -> Arrays.asList(readyToRunConditions()).contains(a.getKey()))
+                    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+            ObservableBooleanValue[] dependencies = readyToRunConditionsMap.values().stream().toArray(ObservableBooleanValue[]::new);
+            readyToRunProperty = Bindings.createBooleanBinding(() -> readyToRunConditionsMap.values().stream().allMatch(ObservableBooleanValue::get), dependencies);
+        }
+        return readyToRunProperty;
     }
 
     public String readyToRunPropertyDisplayProblem() {
