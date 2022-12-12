@@ -23,6 +23,13 @@
    <children>
       <MenuBar>
         <menus>
+            <Menu mnemonicParsing="false" text="Options">
+               <items>
+                  <CheckMenuItem fx:id="autostart" mnemonicParsing="false" selected="true" text="Autostart" />
+                  <MenuItem fx:id="reinitAndExit" mnemonicParsing="false" text="Réinitialiser et quitter" />
+                  <MenuItem fx:id="exit" mnemonicParsing="false" text="Quitter" />
+               </items>
+            </Menu>
           <Menu mnemonicParsing="false" text="Affichage">
             <items>
               <CheckMenuItem fx:id="buttonDisplayEsupNfcTag" mnemonicParsing="false" selected="true" text="EsupNfcTag" />

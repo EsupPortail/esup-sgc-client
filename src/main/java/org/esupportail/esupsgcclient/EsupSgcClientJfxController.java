@@ -60,6 +60,15 @@ public class EsupSgcClientJfxController implements Initializable {
 	FileLocalStorage fileLocalStorage;
 
 	@FXML
+	private CheckMenuItem autostart;
+
+	@FXML
+	private MenuItem reinitAndExit;
+
+	@FXML
+	private MenuItem exit;
+
+	@FXML
 	private FlowPane actionsPane;
 
 	@FXML
@@ -168,6 +177,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		buttonDisplayStatut.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayStatut", newValue.toString()));
 		buttonDisplayLogs.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayLogs", newValue.toString()));
 		buttonDisplayControl.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayControl", newValue.toString()));
+		autostart.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("autostart", newValue.toString()));
 
 		webcamImageView.managedProperty().bind(webcamImageView.visibleProperty());
 		bmpBlackImageView.managedProperty().bind(bmpBlackImageView.visibleProperty());
@@ -187,22 +197,28 @@ public class EsupSgcClientJfxController implements Initializable {
 			if(!StringUtils.isEmpty(newServiceName)) {
 				Platform.runLater(() -> {
 					esupSgcTaskServiceFactory.resetUiSteps();
-					if(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
-						startButton.disableProperty().bind(appSession.taskIsRunningProperty().or(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).not()));
-						esupSgcTaskServiceFactory.runService(newServiceName);
-						logTextarea.appendText(String.format("Service '%s' démarré.\n", newServiceName));
-						fileLocalStorage.setItem("esupsgcTask", newServiceName);
-					} else {
-						comboBox.getSelectionModel().select("");
+					startButton.disableProperty().bind(appSession.taskIsRunningProperty().or(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).not()));
+					fileLocalStorage.setItem("esupsgcTask", newServiceName);
+					if (!esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
 						logTextarea.appendText(String.format("Impossible de démarrer le service '%s' :\n", newServiceName));
 						logTextarea.appendText(esupSgcTaskServiceFactory.readyToRunPropertyDisplayProblem(newServiceName));
-						startButton.disableProperty().bind(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).not());
+					} else if(autostart.isSelected()) {
+						esupSgcTaskServiceFactory.runService(newServiceName);
+					} else {
+						logTextarea.appendText(String.format("Le service '%s' est prêt à démarrer.\n", newServiceName));
 					}
 				});
 			} else {
 				startButton.disableProperty().unbind();
 				startButton.setDisable(true);
 			}
+		});
+
+		exit.setOnAction(event -> EsupSgcClientApplication.getPrimaryStage().close());
+
+		reinitAndExit.setOnAction(event -> {
+			fileLocalStorage.clear();
+			EsupSgcClientApplication.getPrimaryStage().close();
 		});
 
 		appSession.nfcReadyProperty().addListener(new ChangeListener<Boolean>() {
@@ -307,6 +323,7 @@ public class EsupSgcClientJfxController implements Initializable {
 			@Override
 			public void handle(ActionEvent e) {
 				esupSgcTaskServiceFactory.runService(comboBox.getSelectionModel().getSelectedItem());
+				logTextarea.appendText(String.format("Service '%s' démarré.\n", comboBox.getSelectionModel().getSelectedItem()));
 			}
 		});
 
@@ -330,6 +347,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		buttonDisplayStatut.setSelected(!"false".equals(fileLocalStorage.getItem("displayStatut")));
 		buttonDisplayLogs.setSelected(!"false".equals(fileLocalStorage.getItem("displayLogs")));
 		buttonDisplayControl.setSelected(!"false".equals(fileLocalStorage.getItem("displayControl")));
+		autostart.setSelected(!"false".equals(fileLocalStorage.getItem("autostart")));
 
 		// initialisation tâche combobox après 2 secondes - temps d'initialisation auth/nfc/imprimante ...
 		log.info("Tâche au démarrage : " + fileLocalStorage.getItem("esupsgcTask"));
