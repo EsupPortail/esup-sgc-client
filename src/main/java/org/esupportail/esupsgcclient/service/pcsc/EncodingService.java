@@ -37,7 +37,7 @@ import org.springframework.web.client.RestTemplate;
 public class EncodingService {
 	private final static Logger log = Logger.getLogger(EncodingService.class);
 
-	public enum BmpType {color, black}
+	public enum BmpType {color, overlay, black}
 	private String pathToExe = "c:\\cnousApi\\";
 	private String csvPath = "c:\\cnousApi\\csv_out.csv";
 	private CnousFournisseurCarteRunExe cnousFournisseurCarteRunExe;
