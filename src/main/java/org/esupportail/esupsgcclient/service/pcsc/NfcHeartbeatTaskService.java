@@ -30,7 +30,6 @@ public class NfcHeartbeatTaskService extends Service<Void> {
                 while(true) {
                     try {
                         String terminalName =  encodingService.getTerminalName();
-                        log.debug("terminalName ...");
                         appSession.setNfcReady(terminalName!=null);
                         if(terminalName!=null && !terminalName.equals(lastTerminalName)) {
                            lastTerminalName = terminalName;
