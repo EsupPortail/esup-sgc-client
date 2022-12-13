@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 
@@ -108,6 +109,7 @@ public class EsupSgcTaskServiceFactory {
         evolisReadNfcTaskService.setExecutor(sgcTaskExecutor);
         readNfcTaskService.setExecutor(sgcTaskExecutor);
 
+        esupSgcHeartbeatService.setExecutor(Executors.newFixedThreadPool(1));
         evolisReadNfcTaskService.readyToRunProperty().addListener(
                 (observable, oldValue, newValue) ->
                     Platform.runLater(() -> {
@@ -115,10 +117,7 @@ public class EsupSgcTaskServiceFactory {
                             if(!esupSgcHeartbeatService.isRunning()) {
                                 esupSgcHeartbeatService.start();
                             }
-                        } else if(esupSgcHeartbeatService.isRunning()) {
-                            esupSgcHeartbeatService.cancel();
-                        }
-                    })
+                    }})
         );
 
         esupSgcTaskUis.put("Encodage via scan de QRCode", new EsupSgcTaskUi(qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));

@@ -24,10 +24,11 @@ public class EsupSgcHeartbeatService extends Service<Void> {
         return new Task<Void>() {
             @Override
             protected Void call() {
-                while (!this.isCancelled()) {
+                String encodePrintHeartbeat = "OK";
+                while (!this.isCancelled() && encodePrintHeartbeat!=null) {
                     try {
                         log.info("encodePrintHeartbeat");
-                        esupSgcRestClientService.getEncodePrintHeartbeat();
+                        encodePrintHeartbeat = esupSgcRestClientService.getEncodePrintHeartbeat();
                     } catch (Exception e) {
                         log.info("EsupSgcHeartbeatService failed", e);
                     }

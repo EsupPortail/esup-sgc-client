@@ -46,6 +46,9 @@ public class EsupSgcRestClientService {
                             throw new RuntimeException("Un esup-sgc-client avec le même utilisateur vient d'être (re)lancé ?!");
                         }
                         return qrcode;
+                    } else {
+                        log.info("Pas de carte à éditer - on relance l'appel à ESUP-SGC dans 3 secondes.");
+                        Utils.sleep(3000);
                     }
                 } catch (ResourceAccessException e) {
                     log.debug("timeout ... we recall esup-sgc in 2 sec");
@@ -67,14 +70,15 @@ public class EsupSgcRestClientService {
         log.info("result of setCardEncodedPrinted of " + qrcodeAndCsn + " : " + result);
     }
 
-    public void getEncodePrintHeartbeat() {
+    public String getEncodePrintHeartbeat() {
         String sgcAuthToken = appSession.getSgcAuthToken();
-        if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken)) {
-            String sgcUrl = appConfig.getEsupSgcUrl() + "/wsrest/nfc/encodePrintHeartbeat?authToken=" + sgcAuthToken;
-            log.debug("Call " + sgcUrl);
-            restTemplate.getForObject(sgcUrl, String.class);
-        } else {
+        while (sgcAuthToken == null || sgcAuthToken.equals("") || "undefined".equals(sgcAuthToken) || "null".equals(sgcAuthToken)) {
             Utils.sleep(1000);
         }
+        String sgcUrl = appConfig.getEsupSgcUrl() + "/wsrest/nfc/encodePrintHeartbeat?authToken=" + sgcAuthToken;
+        log.debug("Call " + sgcUrl);
+        String esupSgcHeartbeatResponse = restTemplate.getForObject(sgcUrl, String.class);
+        log.debug ("Esup Sgc Heartbeat Response : " + esupSgcHeartbeatResponse);
+        return esupSgcHeartbeatResponse;
     }
 }
