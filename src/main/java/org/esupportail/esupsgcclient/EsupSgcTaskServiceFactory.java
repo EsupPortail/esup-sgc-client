@@ -2,6 +2,8 @@ package org.esupportail.esupsgcclient;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -11,6 +13,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.text.TextFlow;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.service.sgc.EsupSgcHeartbeatService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskSupervisionService;
 import org.esupportail.esupsgcclient.tasks.EvolisReadNfcTaskService;
 import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
@@ -70,6 +73,9 @@ public class EsupSgcTaskServiceFactory {
     @Resource
     ThreadPoolExecutor sgcTaskExecutor;
 
+    @Resource
+    EsupSgcHeartbeatService esupSgcHeartbeatService;
+
     Map<UiStep, TextFlow> uiSteps = new HashMap<>();
 
     Map<String, EsupSgcTaskUi> esupSgcTaskUis = new HashMap<>();
@@ -101,6 +107,19 @@ public class EsupSgcTaskServiceFactory {
         evolisTaskService.setExecutor(sgcTaskExecutor);
         evolisReadNfcTaskService.setExecutor(sgcTaskExecutor);
         readNfcTaskService.setExecutor(sgcTaskExecutor);
+
+        evolisReadNfcTaskService.readyToRunProperty().addListener(
+                (observable, oldValue, newValue) ->
+                    Platform.runLater(() -> {
+                        if(newValue) {
+                            if(!esupSgcHeartbeatService.isRunning()) {
+                                esupSgcHeartbeatService.start();
+                            }
+                        } else if(esupSgcHeartbeatService.isRunning()) {
+                            esupSgcHeartbeatService.cancel();
+                        }
+                    })
+        );
 
         esupSgcTaskUis.put("Encodage via scan de QRCode", new EsupSgcTaskUi(qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
         esupSgcTaskUis.put("Encodage et impression via Evolis Primacy", new EsupSgcTaskUi(evolisTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));

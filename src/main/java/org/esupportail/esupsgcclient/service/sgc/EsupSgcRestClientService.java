@@ -57,7 +57,6 @@ public class EsupSgcRestClientService {
         }
     }
 
-
     public void setCardEncodedPrinted(String csn, String qrcode) {
         String sgcAuthToken = appSession.getSgcAuthToken();
         log.debug("Call " + appConfig.getEsupSgcUrl() + "/wsrest/nfc/card-encoded-printed?authToken=" + sgcAuthToken);
@@ -66,5 +65,16 @@ public class EsupSgcRestClientService {
         qrcodeAndCsn.put("qrcode", qrcode);
         String result = restTemplate.postForObject(appConfig.getEsupSgcUrl() + "/wsrest/nfc/card-encoded-printed?authToken=" + sgcAuthToken, qrcodeAndCsn, String.class);
         log.info("result of setCardEncodedPrinted of " + qrcodeAndCsn + " : " + result);
+    }
+
+    public void getEncodePrintHeartbeat() {
+        String sgcAuthToken = appSession.getSgcAuthToken();
+        if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken)) {
+            String sgcUrl = appConfig.getEsupSgcUrl() + "/wsrest/nfc/encodePrintHeartbeat?authToken=" + sgcAuthToken;
+            log.debug("Call " + sgcUrl);
+            restTemplate.getForObject(sgcUrl, String.class);
+        } else {
+            Utils.sleep(1000);
+        }
     }
 }
