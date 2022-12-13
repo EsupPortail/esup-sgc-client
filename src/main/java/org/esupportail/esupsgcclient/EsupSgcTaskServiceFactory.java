@@ -110,7 +110,7 @@ public class EsupSgcTaskServiceFactory {
         readNfcTaskService.setExecutor(sgcTaskExecutor);
 
         esupSgcHeartbeatService.setExecutor(Executors.newFixedThreadPool(1));
-        evolisReadNfcTaskService.readyToRunProperty().addListener(
+        evolisTaskService.readyToRunProperty().addListener(
                 (observable, oldValue, newValue) ->
                     Platform.runLater(() -> {
                         if(newValue) {
