@@ -135,4 +135,12 @@ public class EvolisPrinterCommands {
 		return req;
 	}
 
+	public static EvolisRequest getNextCleaningSteps() {
+		EvolisRequest req = new EvolisRequest();
+		req.getParams().put("command", "Rcsc;other");
+		req.getParams().put("device", "Evolis Primacy 2");
+		req.getParams().put("timeout", "5000");
+		return req;
+	}
+
 }

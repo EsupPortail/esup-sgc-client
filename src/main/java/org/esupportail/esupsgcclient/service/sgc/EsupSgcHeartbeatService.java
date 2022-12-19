@@ -3,10 +3,7 @@ package org.esupportail.esupsgcclient.service.sgc;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisResponse;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -19,6 +16,9 @@ public class EsupSgcHeartbeatService extends Service<Void> {
     @Resource
     EsupSgcRestClientService esupSgcRestClientService;
 
+    @Resource
+    EvolisPrinterService evolisPrinterService;
+
     @Override
     protected Task<Void> createTask() {
         return new Task<Void>() {
@@ -27,8 +27,9 @@ public class EsupSgcHeartbeatService extends Service<Void> {
                 String encodePrintHeartbeat = "OK";
                 while (!this.isCancelled() && encodePrintHeartbeat!=null) {
                     try {
-                        log.info("encodePrintHeartbeat");
-                        encodePrintHeartbeat = esupSgcRestClientService.getEncodePrintHeartbeat();
+                        String maintenanceInfo = evolisPrinterService.getNextCleaningSteps().getResult();
+                        log.info("encodePrintHeartbeat - printer maintenanceInfo : " + maintenanceInfo);
+                        encodePrintHeartbeat = esupSgcRestClientService.postEncodePrintHeartbeat(maintenanceInfo);
                     } catch (Exception e) {
                         log.info("EsupSgcHeartbeatService failed", e);
                     }

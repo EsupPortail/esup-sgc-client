@@ -44,7 +44,7 @@ public class EvolisPrinterService {
 		}
 	}
 
-	EvolisResponse sendRequest(EvolisRequest req) throws EvolisSocketException {
+	synchronized EvolisResponse sendRequest(EvolisRequest req) throws EvolisSocketException {
 		Socket socket = null;
 		try {
 			socket = getSocket();
@@ -167,5 +167,14 @@ public class EvolisPrinterService {
 
 	public void endSequence() {
 		sendRequestAndRetryIfFailed(EvolisPrinterCommands.endSequence());
+	}
+
+	public EvolisResponse getNextCleaningSteps() {
+		try {
+			return sendRequest(EvolisPrinterCommands.getNextCleaningSteps());
+		} catch (Exception e) {
+			log.info("pb avec evolis", e);
+		}
+		return null;
 	}
 }

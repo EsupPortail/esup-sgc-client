@@ -6,7 +6,6 @@ import org.esupportail.esupsgcclient.tasks.EvolisTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -70,14 +69,14 @@ public class EsupSgcRestClientService {
         log.info("result of setCardEncodedPrinted of " + qrcodeAndCsn + " : " + result);
     }
 
-    public String getEncodePrintHeartbeat() {
+    public String postEncodePrintHeartbeat(String maintenanceInfo) {
         String sgcAuthToken = appSession.getSgcAuthToken();
         while (sgcAuthToken == null || sgcAuthToken.equals("") || "undefined".equals(sgcAuthToken) || "null".equals(sgcAuthToken)) {
             Utils.sleep(1000);
         }
         String sgcUrl = appConfig.getEsupSgcUrl() + "/wsrest/nfc/encodePrintHeartbeat?authToken=" + sgcAuthToken;
         log.debug("Call " + sgcUrl);
-        String esupSgcHeartbeatResponse = restTemplate.getForObject(sgcUrl, String.class);
+        String esupSgcHeartbeatResponse = restTemplate.postForObject(sgcUrl, maintenanceInfo, String.class);
         log.debug ("Esup Sgc Heartbeat Response : " + esupSgcHeartbeatResponse);
         return esupSgcHeartbeatResponse;
     }
