@@ -34,6 +34,7 @@ public class EsupSgcHeartbeatService extends Service<Void> {
                         log.info("EsupSgcHeartbeatService failed", e);
                     }
                 }
+                log.warn("EsupSgcHeartbeatService stopped");
                 return null;
             }
         };

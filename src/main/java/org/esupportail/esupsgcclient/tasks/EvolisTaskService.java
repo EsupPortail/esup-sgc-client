@@ -9,6 +9,7 @@ import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.AppSession.READY_CONDITION;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
+import org.esupportail.esupsgcclient.service.sgc.EsupSgcHeartbeatService;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.stereotype.Service;
@@ -31,10 +32,16 @@ public class EvolisTaskService extends EsupSgcTaskService {
 	EvolisPrinterService evolisPrinterService;
 
 	@Resource
+	EsupSgcHeartbeatService esupSgcHeartbeatService;
+
+	@Resource
 	AppSession appSession;
 
 	@Override
 	protected Task<String> createTask() {
+		if(!esupSgcHeartbeatService.isRunning()) {
+			esupSgcHeartbeatService.start();
+		}
 		return new EvolisTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcRestClientService, evolisPrinterService, encodingService);
 	}
 
