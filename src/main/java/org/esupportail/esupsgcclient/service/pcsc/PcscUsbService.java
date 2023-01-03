@@ -53,8 +53,9 @@ public class PcscUsbService {
 				try{
 					card = cardTerminal.connect("*");
 					return cardTerminal.getName();
-				}catch(JnaPCSCException e){
-					log.error("pcsc connection error", e);
+				}catch(JnaPCSCException e) {
+					// if card nfc is ko for example
+					throw new RuntimeException("pcsc connection error - " + e.getMessage(), e);
 				}
 			}
 		}
