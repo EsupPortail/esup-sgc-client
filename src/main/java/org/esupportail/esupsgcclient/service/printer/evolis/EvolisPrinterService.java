@@ -54,6 +54,8 @@ public class EvolisPrinterService {
 			writer.flush();
 			InputStream socketInputStream= socket.getInputStream();
 			String responseStr ="";
+			long time = System.currentTimeMillis();
+			int k = 1;
 			while (true) {
 				int n;
 				try {
@@ -65,7 +67,17 @@ public class EvolisPrinterService {
 						log.trace("SocketTimeoutException - response received - we stop it");
 						log.trace(responseStr.length() > 200 ? responseStr.substring(0, 200) : responseStr);
 						break;
+					} else {
+						if(System.currentTimeMillis()-time>30000) {
+							// close socket - sinon evolis center reste en boucle infinie
+							socketInputStream.close();
+							throw new EvolisSocketException("No response of Evolis after 30 sec -> abort", null);
+						} else if(System.currentTimeMillis()-time>1000*k) {
+							k++;
+							log.debug("SocketTimeoutException after " + k + " sec - but no response - we continue ...");
+						}
 					}
+					Utils.sleep(50);
 				}
 			}
 			EvolisResponse response = objectMapper.readValue(responseStr, EvolisResponse.class);
