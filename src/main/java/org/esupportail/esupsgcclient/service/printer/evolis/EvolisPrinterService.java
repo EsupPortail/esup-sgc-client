@@ -190,4 +190,12 @@ public class EvolisPrinterService {
 		}
 		return null;
 	}
+
+	public void try2printEnd() {
+		try {
+			printEnd();
+		} catch(EvolisException e) {
+			log.trace("printEnd nos succeed : " + e.getMessage(), e);
+		}
+	}
 }
