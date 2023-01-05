@@ -174,11 +174,7 @@ public class EvolisPrinterService {
 			return sendRequest(EvolisPrinterCommands.getNextCleaningSteps());
 		} catch (Exception e) {
 			log.info("pb avec evolis - wait 5 sec", e);
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException ex) {
-				log.trace("exception when waiting 5 sec ...", e);
-			}
+			Utils.sleep(5000);
 		}
 		return null;
 	}

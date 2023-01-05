@@ -22,6 +22,7 @@ public class Utils {
 		try {
 			Thread.sleep(time);
 		} catch (InterruptedException e) {
+			log.trace("exception when waiting " + time + " ms ...", e);
 		}
 	}
 
