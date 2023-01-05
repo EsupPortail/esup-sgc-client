@@ -117,6 +117,9 @@ public class EsupSgcTaskServiceFactory {
                             if(!esupSgcHeartbeatService.isRunning()) {
                                 esupSgcHeartbeatService.start();
                             }
+                            if(!evolisTaskService.isRunning()) {
+                                runService("Encodage et impression via Evolis Primacy");
+                            }
                     }})
         );
 
