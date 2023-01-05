@@ -59,6 +59,10 @@ public class EvolisTask extends EsupSgcTask {
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
+            log.debug("reject and printEnd if needed - no necesseray usually");
+            evolisPrinterService.reject();
+            evolisPrinterService.printEnd();
+            log.debug("try to get qrcode ...");
             String qrcode = esupSgcRestClientService.getQrCode(this);
             setUiStepRunning();
             setUiStepSuccess(UiStep.long_poll);
