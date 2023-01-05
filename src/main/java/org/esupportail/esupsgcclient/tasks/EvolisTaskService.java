@@ -40,7 +40,7 @@ public class EvolisTaskService extends EsupSgcTaskService {
 	@Override
 	protected Task<String> createTask() {
 		if(!esupSgcHeartbeatService.isRunning()) {
-			esupSgcHeartbeatService.start();
+			esupSgcHeartbeatService.restart();
 		}
 		return new EvolisTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcRestClientService, evolisPrinterService, encodingService);
 	}

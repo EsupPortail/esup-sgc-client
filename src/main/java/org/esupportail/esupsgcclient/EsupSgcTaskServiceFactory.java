@@ -17,7 +17,9 @@ import org.esupportail.esupsgcclient.tasks.EvolisReadNfcTaskService;
 import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
 import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
 import org.esupportail.esupsgcclient.tasks.ReadNfcTaskService;
+import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 
@@ -79,6 +81,12 @@ public class EsupSgcTaskServiceFactory {
     @Resource
     EsupSgcHeartbeatService esupSgcHeartbeatService;
 
+    @Resource
+    EsupNfcClientStackPane esupNfcClientStackPane;
+
+    @Resource
+    AppSession appSession;
+
     Map<UiStep, TextFlow> uiSteps = new HashMap<>();
 
     Map<String, EsupSgcTaskUi> esupSgcTaskUis = new HashMap<>();
@@ -117,13 +125,25 @@ public class EsupSgcTaskServiceFactory {
                     Platform.runLater(() -> {
                         if(newValue) {
                             if(!esupSgcHeartbeatService.isRunning()) {
-                                esupSgcHeartbeatService.start();
+                                esupSgcHeartbeatService.restart();
                             }
                             if(!evolisTaskService.isRunning()) {
                                 runService(ENCODAGE_ET_IMPRESSION_VIA_EVOLIS_PRIMACY);
                             }
                     }})
         );
+
+        esupSgcHeartbeatService.setOnSucceeded(event ->  Platform.runLater(() -> {
+            // esupSgcHeartbeatService stopped -> esup-sgc restarted ? -> sgcAutoken should be refreshed ? -> iframe on esup-nfc-tag should be refreshed
+            appSession.setAuthReady(false);
+        }));
+
+        appSession.authReady.addListener((observable, oldValue, newValue) ->
+        {
+            if(!newValue) {
+                esupNfcClientStackPane.init();
+            }
+        });
 
         esupSgcTaskUis.put(ENCODAGE_VIA_SCAN_DE_QR_CODE, new EsupSgcTaskUi(qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
         esupSgcTaskUis.put(ENCODAGE_ET_IMPRESSION_VIA_EVOLIS_PRIMACY, new EsupSgcTaskUi(evolisTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
