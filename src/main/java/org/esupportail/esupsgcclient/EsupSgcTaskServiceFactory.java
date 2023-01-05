@@ -2,6 +2,8 @@ package org.esupportail.esupsgcclient;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -91,6 +93,8 @@ public class EsupSgcTaskServiceFactory {
 
     Map<String, EsupSgcTaskUi> esupSgcTaskUis = new HashMap<>();
 
+    Map<String, ChangeListener<? super Boolean>> startStopListeners = new HashMap<>();
+
     public void init(ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView,
                      TextArea logTextarea, ProgressBar progressBar, Label textPrincipal,
                      FlowPane actionsPane) {
@@ -120,36 +124,26 @@ public class EsupSgcTaskServiceFactory {
         readNfcTaskService.setExecutor(sgcTaskExecutor);
 
         esupSgcHeartbeatService.setExecutor(Executors.newFixedThreadPool(1));
-        evolisTaskService.readyToRunProperty().addListener(
-                (observable, oldValue, newValue) ->
-                    Platform.runLater(() -> {
-                        if(newValue) {
-                            if(!esupSgcHeartbeatService.isRunning()) {
-                                esupSgcHeartbeatService.restart();
-                            }
-                            if(!evolisTaskService.isRunning()) {
-                                runService(ENCODAGE_ET_IMPRESSION_VIA_EVOLIS_PRIMACY);
-                            }
-                    }})
-        );
 
         esupSgcHeartbeatService.setOnSucceeded(event ->  Platform.runLater(() -> {
             // esupSgcHeartbeatService stopped -> esup-sgc restarted ? -> sgcAutoken should be refreshed ? -> iframe on esup-nfc-tag should be refreshed
-            appSession.setAuthReady(false);
+            appSession.authReadyProperty().set(false);
         }));
-
-        appSession.authReady.addListener((observable, oldValue, newValue) ->
-        {
-            if(!newValue) {
-                esupNfcClientStackPane.init();
-            }
-        });
 
         esupSgcTaskUis.put(ENCODAGE_VIA_SCAN_DE_QR_CODE, new EsupSgcTaskUi(qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
         esupSgcTaskUis.put(ENCODAGE_ET_IMPRESSION_VIA_EVOLIS_PRIMACY, new EsupSgcTaskUi(evolisTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
         esupSgcTaskUis.put(BADGEAGE_EN_SERIE_VIA_EVOLIS_PRIMACY, new EsupSgcTaskUi(evolisReadNfcTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
         esupSgcTaskUis.put(BADGEAGE_SIMPLE, new EsupSgcTaskUi(readNfcTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
 
+        for(String serviceName : new String[]{ENCODAGE_VIA_SCAN_DE_QR_CODE, ENCODAGE_ET_IMPRESSION_VIA_EVOLIS_PRIMACY, BADGEAGE_EN_SERIE_VIA_EVOLIS_PRIMACY, BADGEAGE_SIMPLE}) {
+            startStopListeners.put(serviceName, (ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
+                if(newValue) {
+                    runService(serviceName);
+                } else {
+                    cancelService(serviceName);
+                }
+            });
+        }
     }
 
     public TextFlow getTaskUiTemplate() {
@@ -199,5 +193,9 @@ public class EsupSgcTaskServiceFactory {
         for(UiStep step : uiSteps.keySet()) {
             uiSteps.get(step).setVisible(false);
         }
+    }
+
+    public ChangeListener<? super Boolean> getStopStartListener(String serviceName) {
+        return startStopListeners.get(serviceName);
     }
 }

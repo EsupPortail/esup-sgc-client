@@ -196,16 +196,21 @@ public class EsupSgcClientJfxController implements Initializable {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldServiceName + " - " + newServiceName);
 			if(!StringUtils.isEmpty(newServiceName)) {
 				Platform.runLater(() -> {
+					if(autostart.isSelected() && !StringUtils.isEmpty(oldServiceName)) {
+						esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).removeListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
+					}
 					esupSgcTaskServiceFactory.resetUiSteps();
 					startButton.disableProperty().bind(appSession.taskIsRunningProperty().or(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).not()));
 					fileLocalStorage.setItem("esupsgcTask", newServiceName);
-					if (!esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
+					if(!esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
 						logTextarea.appendText(String.format("Impossible de démarrer le service '%s' :\n", newServiceName));
 						logTextarea.appendText(esupSgcTaskServiceFactory.readyToRunPropertyDisplayProblem(newServiceName));
-					} else if(autostart.isSelected()) {
-						esupSgcTaskServiceFactory.runService(newServiceName);
 					} else {
 						logTextarea.appendText(String.format("Le service '%s' est prêt à démarrer.\n", newServiceName));
+					}
+					if(autostart.isSelected()) {
+						esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).addListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
+						esupSgcTaskServiceFactory.runService(newServiceName);
 					}
 				});
 			} else {
@@ -248,6 +253,8 @@ public class EsupSgcClientJfxController implements Initializable {
 					checkAuth.getStyleClass().clear();
 					checkAuth.getStyleClass().add("btn-danger");
 					checkAuth.getTooltip().setText("...");
+					logTextarea.appendText("Authentification K0 for " + appSession.eppnInit + " - we refresh iframe on esup-nfc-tag\n");
+					esupNfcClientStackPane.init();
 				}
 			}
 		});
