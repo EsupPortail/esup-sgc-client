@@ -53,42 +53,35 @@ public class EvolisPrinterCommands {
 	}
 
 	static EvolisRequest printFrontColorBmp(String bmpAsBase64) {
-		EvolisRequest req = new EvolisRequest();
-		req.setMethod("PRINT.SetBitmap");
-		req.getParams().put("session", JOB_ID);
-		req.getParams().put("face", "front");
-		req.getParams().put("panel", "color");
-		req.getParams().put("data", "base64:" + bmpAsBase64);
-		return req;
+		return printColorBmp(bmpAsBase64, "color");
 	}
 
 	static EvolisRequest printFrontBlackBmp(String bmpAsBase64) {
-		EvolisRequest req = new EvolisRequest();
-		req.setMethod("PRINT.SetBitmap");
-		req.getParams().put("session", JOB_ID);
-		req.getParams().put("face", "front");
-		req.getParams().put("panel", "resin");
-		req.getParams().put("data", "base64:" + bmpAsBase64);
-		return req;
+		return printColorBmp(bmpAsBase64, "resin");
 	}
 
 	/*
 		bmpAsBase64 : just black image here for varnish ?
 	 */
 	static EvolisRequest printFrontVarnish(String bmpAsBase64) {
+		return printColorBmp(bmpAsBase64, "varnish");
+	}
+
+	private static EvolisRequest printColorBmp(String bmpAsBase64, String panel) {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.SetBitmap");
 		req.getParams().put("session", JOB_ID);
 		req.getParams().put("face", "front");
-		req.getParams().put("panel", "varnish");
+		req.getParams().put("panel", panel);
 		req.getParams().put("data", "base64:" + bmpAsBase64);
+		req.getParams().put("timeout", "5000");
 		return req;
 	}
-
 	static EvolisRequest print() {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.Print");
 		req.getParams().put("session", JOB_ID);
+		req.getParams().put("timeout", "20000");
 		return req;
 	}
 
