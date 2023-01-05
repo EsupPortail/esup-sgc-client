@@ -2,8 +2,6 @@ package org.esupportail.esupsgcclient;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -38,6 +36,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class EsupSgcTaskServiceFactory {
 
     final static Logger log = Logger.getLogger(EsupSgcTaskServiceFactory.class);
+    protected static final String ENCODAGE_ET_IMPRESSION_VIA_EVOLIS_PRIMACY = "Encodage et impression via Evolis Primacy";
+    protected static final String ENCODAGE_VIA_SCAN_DE_QR_CODE = "Encodage via scan de QRCode";
+    protected static final String BADGEAGE_EN_SERIE_VIA_EVOLIS_PRIMACY = "Badgeage en série via Evolis Primacy";
+    protected static final String BADGEAGE_SIMPLE = "Badgeage simple";
 
     FlowPane actionsPane;
 
@@ -118,15 +120,15 @@ public class EsupSgcTaskServiceFactory {
                                 esupSgcHeartbeatService.start();
                             }
                             if(!evolisTaskService.isRunning()) {
-                                runService("Encodage et impression via Evolis Primacy");
+                                runService(ENCODAGE_ET_IMPRESSION_VIA_EVOLIS_PRIMACY);
                             }
                     }})
         );
 
-        esupSgcTaskUis.put("Encodage via scan de QRCode", new EsupSgcTaskUi(qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
-        esupSgcTaskUis.put("Encodage et impression via Evolis Primacy", new EsupSgcTaskUi(evolisTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
-        esupSgcTaskUis.put("Badgeage en série via Evolis Primacy", new EsupSgcTaskUi(evolisReadNfcTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
-        esupSgcTaskUis.put("Badgeage simple", new EsupSgcTaskUi(readNfcTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
+        esupSgcTaskUis.put(ENCODAGE_VIA_SCAN_DE_QR_CODE, new EsupSgcTaskUi(qrCodeTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
+        esupSgcTaskUis.put(ENCODAGE_ET_IMPRESSION_VIA_EVOLIS_PRIMACY, new EsupSgcTaskUi(evolisTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
+        esupSgcTaskUis.put(BADGEAGE_EN_SERIE_VIA_EVOLIS_PRIMACY, new EsupSgcTaskUi(evolisReadNfcTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
+        esupSgcTaskUis.put(BADGEAGE_SIMPLE, new EsupSgcTaskUi(readNfcTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
 
     }
 
