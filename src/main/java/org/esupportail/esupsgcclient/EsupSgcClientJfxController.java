@@ -210,7 +210,9 @@ public class EsupSgcClientJfxController implements Initializable {
 					}
 					if(autostart.isSelected()) {
 						esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).addListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
-						esupSgcTaskServiceFactory.runService(newServiceName);
+						if(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
+							esupSgcTaskServiceFactory.runService(newServiceName);
+						}
 					}
 				});
 			} else {
