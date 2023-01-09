@@ -33,6 +33,9 @@ public class EvolisPrinterService {
 
 	@Resource
 	AppConfig appConfig;
+	
+	@Resource
+	EvolisPrinterCommands evolisPrinterCommands;
 
 	public Socket getSocket() {
 		try {
@@ -114,44 +117,44 @@ public class EvolisPrinterService {
 	}
 
 	public EvolisResponse insertCard() {
-		return sendRequestAndRetryIfFailed(EvolisPrinterCommands.insertCard());
+		return sendRequestAndRetryIfFailed(evolisPrinterCommands.insertCard());
 	}
 
 	public EvolisResponse getPrinterStatus() throws EvolisSocketException {
-		return sendRequest(EvolisPrinterCommands.getPrinterStatus());
+		return sendRequest(evolisPrinterCommands.getPrinterStatus());
 	}
 
 	public EvolisResponse printBegin() {
-		return sendRequestAndRetryIfFailed(EvolisPrinterCommands.printBegin());
+		return sendRequestAndRetryIfFailed(evolisPrinterCommands.printBegin());
 	}
 
 	public void printSet() {
-		sendRequestAndRetryIfFailed(EvolisPrinterCommands.printSet(appConfig.getPrinterEvolisSet()));
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.printSet(appConfig.getPrinterEvolisSet()));
 	}
 
 	public void printEnd() {
-		sendRequestAndRetryIfFailed(EvolisPrinterCommands.printEnd());
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.printEnd());
 	}
 
 
 	public void printFrontColorBmp(String bmpColorAsBase64) {
-		sendRequestAndRetryIfFailed(EvolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
 	}
 
 	public void printFrontBlackBmp(String bmpBlackAsBase64) {
-		sendRequestAndRetryIfFailed(EvolisPrinterCommands.printFrontBlackBmp(bmpBlackAsBase64));
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.printFrontBlackBmp(bmpBlackAsBase64));
 	}
 
 	public void printFrontVarnish(String bmpVarnishAsBase64) {
-		sendRequestAndRetryIfFailed(EvolisPrinterCommands.printFrontVarnish(bmpVarnishAsBase64));
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.printFrontVarnish(bmpVarnishAsBase64));
 	}
 
 	public void print() {
-		sendRequestAndRetryIfFailed(EvolisPrinterCommands.print());
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.print());
 	}
 
 	public EvolisResponse insertCardToContactLessStation(EsupSgcTask esupSgcTask) {
-		EvolisResponse response = sendRequestAndRetryIfFailed(EvolisPrinterCommands.insertCardToContactLessStation());
+		EvolisResponse response = sendRequestAndRetryIfFailed(evolisPrinterCommands.insertCardToContactLessStation());
 		while(!"OK".equals(response.getResult())) {
 			log.warn("Pb inserting card to contactless station : " + response);
 			esupSgcTask.updateTitle4thisTask("Pb inserting card to contactless station : " + response.getResult());
@@ -159,31 +162,31 @@ public class EvolisPrinterService {
 				throw new RuntimeException("EvolisTask is cancelled");
 			}
 			Utils.sleep(2000);
-			response = sendRequestAndRetryIfFailed(EvolisPrinterCommands.insertCardToContactLessStation());;
+			response = sendRequestAndRetryIfFailed(evolisPrinterCommands.insertCardToContactLessStation());;
 		}
 		return response;
 	}
 
 
 	public void eject() {
-		sendRequestAndRetryIfFailed(EvolisPrinterCommands.eject());
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.eject());
 	}
 
 	public void reject() {
-		sendRequestAndRetryIfFailed(EvolisPrinterCommands.reject());
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.reject());
 	}
 
 	public void startSequence() {
-		sendRequestAndRetryIfFailed(EvolisPrinterCommands.startSequence());
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.startSequence());
 	}
 
 	public void endSequence() {
-		sendRequestAndRetryIfFailed(EvolisPrinterCommands.endSequence());
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.endSequence());
 	}
 
 	public EvolisResponse getNextCleaningSteps() {
 		try {
-			return sendRequest(EvolisPrinterCommands.getNextCleaningSteps());
+			return sendRequest(evolisPrinterCommands.getNextCleaningSteps());
 		} catch (Exception e) {
 			log.info("pb avec evolis - wait 5 sec", e);
 			Utils.sleep(5000);

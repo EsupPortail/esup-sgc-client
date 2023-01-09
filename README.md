@@ -33,6 +33,11 @@ en précissant les "VM Options" de ce type :
 --module-path /usr/local/javafx-sdk-19/lib/ --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.media,javafx.graphics,javafx.swing,javafx.web
 ````
 
+Suivant le certificat utilisé par vos serveurs esup-sgc/esup-nfc-tag, et la version de java utilisée, vous devrez également rajouter dans les options java
+````
+-Djdk.tls.client.protocols=TLSv1.2
+````
+
 ## SceneBuilder
 
 L'interface homme machine (IHM / GUI) est décrite en FXML. 
@@ -53,16 +58,16 @@ boostrapfx étant en fait réellement intégré dans l'application en tant que l
 esup-sgc-client fonctionne avec :
 * requis
   * un serveur esup-nfc-tag 
-  * un lecteur NFC USB permettant de passer des APDUs (notamment Mifare DESFIRE) via PC/SC, celui-ci peut correspondre au lecteur NFC de l'imprimante Evolis Primacy 2
+  * un lecteur NFC USB permettant de passer des APDUs (notamment Mifare DESFIRE) via PC/SC, celui-ci peut correspondre au lecteur NFC de l'imprimante Evolis Primacy (1 ou 2)
 * optionnel
   * une webcam 
-  * une imprimante evolis primacy 2 (ou plus exactement Evolis Premium Suite 2)
+  * une imprimante evolis primacy 1 ou 2 (ou plus exactement Evolis Premium Suite 1 ou 2)
   * un serveur esup-sgc
 
 ### evolis primacy 2
 
 Il vous faut installer le driver de votre encodeur NFC intégré à votre Primacy 2
-(Si vous avez opté pour un encoderu "SpringCard CrazyWriter" par exemple, vous trouverez le driver depuis https://www.springcard.com/en/download/drivers : "PC/SC Driver for USB couplers" / fichier sd16055-2104.exe).
+(Si vous avez opté pour un encodeur "SpringCard CrazyWriter" par exemple, vous trouverez le driver depuis https://www.springcard.com/en/download/drivers : "PC/SC Driver for USB couplers" / fichier sd16055-2104.exe).
 
 Pour la primacy 2 en elle-même, il vous faut installer le "Evolis Premium Suite 2" depuis https://myplace.evolis.com/s/quick-install-step-4?language=fr
 
@@ -82,6 +87,19 @@ RequestServer.tcpenabled = true
 Une fois ces modifications apportées, vous devez redémarrer le servie windows "Evolis Premium Suite 2" (via la gestion classique des "service windows").
 
 Le fichier de configuration d'esup-sgc-client donné dans [src/main/resources/esupsgcclient.properties](src/main/resources/esupsgcclient.properties) doit reprendre ce même numéro de port.
+
+### evolis primacy 1
+
+La mise en place pour Evolis Primacy 1 (par rapport à Primacy 2) est très similaire, il vous faudra cependant installer non pas "Evolis Premium Suite 2" mais "Evolis Premium Suite".
+Le fichier de configuration à modifier est C:\Program Files\Evolis Card Printer\Evolis Premium Suite\ESPFSvc.properties pour activer le support de la communication par TCP (port 18000) :
+```
+ESPFServerManager.enabletcpatstart = true
+```
+
+Au niveau d'esup-sgc-client, il faudra spécifier dans src/main/resources/esupsgcclient.properties :
+```
+printerEvolisVersion=1
+```
 
 ### simulation de evolis primacy 2
 
