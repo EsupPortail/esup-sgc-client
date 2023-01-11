@@ -23,7 +23,7 @@ public class AppConfig {
     @Value("${printerEvolisPort}")
     int printerEvolisPort = 18000;
 
-    @Value("${printerDeviceName")
+    @Value("${printerDeviceName}")
     String printerDeviceName = "Evolis Primacy 2";
 
     @Value("${printerEvolisSet}")
