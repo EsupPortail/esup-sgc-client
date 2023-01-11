@@ -2,6 +2,7 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.esupportail.esupsgcclient.AppConfig;
+import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ import java.net.SocketTimeoutException;
  * It computes JSON-RPC commands to send to Evolis Services Provider 2
  */
 @Component
-public class EvolisPrinterService {
+public class EvolisPrinterService extends EsupSgcPrinterService {
 	
 	final static Logger log = LoggerFactory.getLogger(EvolisPrinterService.class);
 
@@ -35,6 +36,11 @@ public class EvolisPrinterService {
 	
 	@Resource
 	EvolisPrinterCommands evolisPrinterCommands;
+
+	@Override
+	public String getMaintenanceInfo() {
+		return getNextCleaningSteps().getResult();
+	}
 
 	public Socket getSocket() {
 		try {
