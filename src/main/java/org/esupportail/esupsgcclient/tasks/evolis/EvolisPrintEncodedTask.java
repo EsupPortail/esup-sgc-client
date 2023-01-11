@@ -62,13 +62,13 @@ public class EvolisPrintEncodedTask extends EsupSgcTask {
             evolisPrinterService.reject();
             evolisPrinterService.try2printEnd();
             log.debug("get card and read csn ...");
-            setUiStepSuccess(UiStep.printer_nfc);
+            evolisPrinterService.insertCardToContactLessStation(this);
             encodingService.pcscConnection(this);
             encodingService.waitForCardPresent(5000);
             String csn = encodingService.readCsn();
+            setUiStepSuccess(UiStep.printer_nfc);
             updateTitle("try to get encoded card with csn = " + csn);
             String qrcode = esupSgcRestClientService.getQrCode(this, csn);
-            setUiStepRunning();
             setUiStepSuccess(UiStep.long_poll);
             String bmpBlackAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.black);
             updateBmpUi(bmpBlackAsBase64, bmpBlackImageView);
