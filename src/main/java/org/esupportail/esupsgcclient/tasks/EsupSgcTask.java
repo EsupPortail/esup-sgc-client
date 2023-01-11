@@ -3,7 +3,6 @@ package org.esupportail.esupsgcclient.tasks;
 import javafx.concurrent.Task;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.tasks.evolis.EvolisEncodePrintTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.Map;
 
 public abstract class EsupSgcTask extends Task<String> {
 
-    private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
+    private final static Logger log = Logger.getLogger(EsupSgcTask.class);
 
     Map<UiStep, TextFlow> uiSteps;
 

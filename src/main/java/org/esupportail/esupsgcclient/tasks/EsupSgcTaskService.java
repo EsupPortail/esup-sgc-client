@@ -1,12 +1,9 @@
 package org.esupportail.esupsgcclient.tasks;
 
 import com.beust.jcommander.Strings;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableBooleanValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;

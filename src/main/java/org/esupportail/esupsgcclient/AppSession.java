@@ -19,7 +19,7 @@ public class AppSession {
         auth("Authentification esup-nfc-tag"),
         nfc ("Lecteur USB NFC"),
         nfc_desfire ("Salle de badgegage de type desfire (encodage)"),
-        printer ("Imprimante evolis primacy2");
+        printer ("Imprimante à carte");
 
         private String name;
 
