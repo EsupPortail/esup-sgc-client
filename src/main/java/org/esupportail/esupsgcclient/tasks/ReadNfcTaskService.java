@@ -19,6 +19,8 @@ public class ReadNfcTaskService extends EsupSgcTaskService {
 
 	private final static Logger log = Logger.getLogger(ReadNfcTaskService.class);
 
+	static final String BADGEAGE_SIMPLE = "Badgeage simple";
+
 	@Resource
 	EncodingService encodingService;
 
@@ -33,6 +35,11 @@ public class ReadNfcTaskService extends EsupSgcTaskService {
 	@Override
 	public AppSession getAppSession() {
 		return appSession;
+	}
+
+	@Override
+	public String getLabel() {
+		return BADGEAGE_SIMPLE;
 	}
 
 	@Override

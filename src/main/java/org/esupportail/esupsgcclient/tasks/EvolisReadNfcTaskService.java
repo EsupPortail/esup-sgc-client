@@ -21,6 +21,8 @@ public class EvolisReadNfcTaskService extends EsupSgcTaskService {
 
 	private final static Logger log = Logger.getLogger(EvolisReadNfcTaskService.class);
 
+	static final String BADGEAGE_EN_SERIE_VIA_EVOLIS_PRIMACY = "Badgeage en série via Evolis Primacy";
+
 	@Resource
 	EsupSgcRestClientService esupSgcRestClientService;
 
@@ -41,6 +43,11 @@ public class EvolisReadNfcTaskService extends EsupSgcTaskService {
 	@Override
 	public AppSession getAppSession() {
 		return appSession;
+	}
+
+	@Override
+	public String getLabel() {
+		return BADGEAGE_EN_SERIE_VIA_EVOLIS_PRIMACY;
 	}
 
 	@Override

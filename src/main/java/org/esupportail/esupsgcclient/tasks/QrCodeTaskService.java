@@ -20,6 +20,8 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 
 	private final static Logger log = Logger.getLogger(QrCodeTaskService.class);
 
+	static final String ENCODAGE_VIA_SCAN_DE_QR_CODE = "Encodage via scan de QRCode";
+
 	@Resource
 	EncodingService encodingService;
 
@@ -37,6 +39,11 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 	@Override
 	public AppSession getAppSession() {
 		return appSession;
+	}
+
+	@Override
+	public String getLabel() {
+		return ENCODAGE_VIA_SCAN_DE_QR_CODE;
 	}
 
 	@Override
