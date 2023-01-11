@@ -1,4 +1,4 @@
-package org.esupportail.esupsgcclient.tasks;
+package org.esupportail.esupsgcclient.tasks.simple;
 
 import com.github.sarxos.webcam.WebcamException;
 import javafx.beans.property.ObjectProperty;
@@ -8,6 +8,7 @@ import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.webcam.QRCodeReader;
+import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 
@@ -31,7 +32,7 @@ public class QrCodeTask extends EsupSgcTask {
 	}
 
 	@Override
-	List<UiStep> getUiStepsList() {
+	protected List<UiStep> getUiStepsList() {
 		return Arrays.asList(new UiStep[]{
 				UiStep.qrcode_read,
 				UiStep.encode});

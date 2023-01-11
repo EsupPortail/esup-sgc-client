@@ -3,7 +3,6 @@ package org.esupportail.esupsgcclient.service.sgc;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
-import org.esupportail.esupsgcclient.tasks.EvolisEncodePrintTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

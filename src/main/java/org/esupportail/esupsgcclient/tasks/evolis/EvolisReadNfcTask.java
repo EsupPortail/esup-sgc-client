@@ -1,10 +1,11 @@
-package org.esupportail.esupsgcclient.tasks;
+package org.esupportail.esupsgcclient.tasks.evolis;
 
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.pcsc.NfcResultBean;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
+import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
 import java.util.Arrays;
@@ -24,7 +25,7 @@ public class EvolisReadNfcTask extends EsupSgcTask {
     }
 
     @Override
-    List<UiStep> getUiStepsList() {
+    protected List<UiStep> getUiStepsList() {
         return Arrays.asList(new UiStep[]{
                 UiStep.printer_nfc,
                 UiStep.encode});

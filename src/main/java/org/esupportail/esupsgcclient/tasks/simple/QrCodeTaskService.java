@@ -1,6 +1,5 @@
-package org.esupportail.esupsgcclient.tasks;
+package org.esupportail.esupsgcclient.tasks.simple;
 
-import javafx.beans.value.ObservableBooleanValue;
 import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
@@ -9,6 +8,7 @@ import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.AppSession.READY_CONDITION;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.webcam.QRCodeReader;
+import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.stereotype.Component;
 

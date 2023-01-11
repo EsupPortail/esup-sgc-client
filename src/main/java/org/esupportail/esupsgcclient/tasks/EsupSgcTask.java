@@ -3,6 +3,7 @@ package org.esupportail.esupsgcclient.tasks;
 import javafx.concurrent.Task;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.tasks.evolis.EvolisEncodePrintTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
 import java.util.List;
@@ -20,14 +21,14 @@ public abstract class EsupSgcTask extends Task<String> {
         this.uiSteps = uiSteps;
     }
 
-    abstract List<UiStep> getUiStepsList();
+    protected abstract List<UiStep> getUiStepsList();
 
-    void setUiStepFailed(UiStep uiStep, Throwable exception) {
+    protected void setUiStepFailed(UiStep uiStep, Throwable exception) {
         uiSteps.get(uiStep).getStyleClass().clear();
         uiSteps.get(uiStep).getStyleClass().add("alert-danger");
     }
 
-    void setUiStepRunning() {
+    protected void setUiStepRunning() {
         resetUiSteps();
         for(UiStep step : getUiStepsList()) {
             uiSteps.get(step).setVisible(true);
@@ -47,7 +48,7 @@ public abstract class EsupSgcTask extends Task<String> {
         updateTitle(title);
     }
 
-	void setUiStepSuccess(UiStep uiStep) {
+	protected void setUiStepSuccess(UiStep uiStep) {
         if(uiStep == null) {
             updateProgress(0, getUiStepsList().size());
             updateTitle("En attente ...");
@@ -64,7 +65,7 @@ public abstract class EsupSgcTask extends Task<String> {
         lastUiStepSuccess = uiStep;
 	}
 
-    void setCurrentUiStepFailed(Throwable exception) {
+    protected void setCurrentUiStepFailed(Throwable exception) {
         UiStep currentUiStep = null;
         if(lastUiStepSuccess==null) {
             currentUiStep = getUiStepsList().get(0);

@@ -22,11 +22,11 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
 
     private final static Logger log = Logger.getLogger(EsupSgcTaskService.class);
 
-    Map<UiStep, TextFlow> uiSteps;
-    ImageView webcamImageView;
-    ImageView bmpColorImageView;
-    ImageView bmpBlackImageView;
-    BooleanBinding readyToRunProperty;
+    protected Map<UiStep, TextFlow> uiSteps;
+    protected ImageView webcamImageView;
+    protected ImageView bmpColorImageView;
+    protected ImageView bmpBlackImageView;
+    protected BooleanBinding readyToRunProperty;
 
 
     public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {

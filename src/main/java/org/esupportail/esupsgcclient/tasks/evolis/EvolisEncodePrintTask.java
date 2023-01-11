@@ -1,4 +1,4 @@
-package org.esupportail.esupsgcclient.tasks;
+package org.esupportail.esupsgcclient.tasks.evolis;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
+import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
 import javax.imageio.ImageIO;
@@ -39,7 +40,7 @@ public class EvolisEncodePrintTask extends EsupSgcTask {
     }
 
     @Override
-    List<UiStep> getUiStepsList() {
+    protected List<UiStep> getUiStepsList() {
         return Arrays.asList(new UiStep[]{
                 UiStep.long_poll,
                 UiStep.bmp_black,
