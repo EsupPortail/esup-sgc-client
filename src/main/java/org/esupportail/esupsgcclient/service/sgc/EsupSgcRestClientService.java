@@ -49,8 +49,13 @@ public class EsupSgcRestClientService {
                         }
                         return qrcode;
                     } else {
-                        log.info("Pas de carte à éditer - on relance l'appel à ESUP-SGC dans 3 secondes.");
-                        Utils.sleep(3000);
+                        if(csn!=null) {
+                            log.info("Pas de carte à éditer - avec ce csn " + csn);
+                            return null;
+                        } else {
+                            log.info("Pas de carte à éditer - on relance l'appel à ESUP-SGC dans 3 secondes.");
+                            Utils.sleep(3000);
+                        }
                     }
                 } catch (ResourceAccessException e) {
                     log.debug("timeout ... we recall esup-sgc in 2 sec");
