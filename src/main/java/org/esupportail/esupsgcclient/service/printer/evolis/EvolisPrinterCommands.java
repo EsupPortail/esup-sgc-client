@@ -138,10 +138,10 @@ public class EvolisPrinterCommands {
 
 	public EvolisRequest getNextCleaningSteps() {
 		EvolisRequest req = new EvolisRequest();
-		if(isPrimacy1()) {
-			req.getParams().put("command", "Rco;rc");
-		} else {
+		if(isPrimacy2()) {
 			req.getParams().put("command", "Rcsc;other");
+		} else {
+			req.getParams().put("command", "Rco;rc");
 		}
 		req.getParams().put("device", getDeviceName());
 		req.getParams().put("timeout", "5000");
@@ -150,11 +150,11 @@ public class EvolisPrinterCommands {
 	}
 	
 	String getDeviceName() {
-		return isPrimacy1() ? "Evolis Primacy" : "Evolis Primacy 2";
+		return appConfig.getPrinterDeviceName();
 	}
 
-	boolean isPrimacy1() {
-		return appConfig.getPrinterEvolisVersion() == 1;
+	boolean isPrimacy2() {
+		return "Evolis Primacy 2".equals(appConfig.getPrinterDeviceName());
 	}
 
 }

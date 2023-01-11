@@ -23,8 +23,8 @@ public class AppConfig {
     @Value("${printerEvolisPort}")
     int printerEvolisPort = 18000;
 
-    @Value("${printerEvolisVersion}")
-    int printerEvolisVersion = 2;
+    @Value("${printerDeviceName")
+    String printerDeviceName = "Evolis Primacy 2";
 
     @Value("${printerEvolisSet}")
     String printerEvolisSet = "GRibbonType=RC_YMCKO;Duplex=NONE";
@@ -54,8 +54,8 @@ public class AppConfig {
         return printerEvolisPort;
     }
 
-    public int getPrinterEvolisVersion() {
-        return printerEvolisVersion;
+    public String getPrinterDeviceName() {
+        return printerDeviceName;
     }
 
     public String getPrinterEvolisSet() {
