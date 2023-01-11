@@ -1,27 +1,19 @@
 package org.esupportail.esupsgcclient.tasks;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.pcsc.NfcResultBean;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
-import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
 public class EvolisReadNfcTask extends EsupSgcTask {
 
-    private final static Logger log = Logger.getLogger(EvolisTaskService.class);
+    private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
 
     EvolisPrinterService evolisPrinterService;
     EncodingService encodingService;

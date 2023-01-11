@@ -2,7 +2,8 @@ package org.esupportail.esupsgcclient.service.sgc;
 
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
-import org.esupportail.esupsgcclient.tasks.EvolisTask;
+import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
+import org.esupportail.esupsgcclient.tasks.EvolisEncodePrintTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +28,9 @@ public class EsupSgcRestClientService {
     @Resource
     RestTemplate restTemplate;
 
-    public String getQrCode(EvolisTask evolisTask) {
+    public String getQrCode(EsupSgcTask esupSgcTask) {
         while (true) {
-            if(evolisTask.isCancelled()) {
+            if(esupSgcTask.isCancelled()) {
                 throw new RuntimeException("EvolisTask is cancelled");
             }
             String sgcAuthToken = appSession.getSgcAuthToken();
@@ -37,7 +38,7 @@ public class EsupSgcRestClientService {
                 try {
                     String sgcUrl = appConfig.getEsupSgcUrl() + "/wsrest/nfc/qrcode2edit?authToken=" + sgcAuthToken;
                     log.debug("Call " + sgcUrl);
-                    evolisTask.updateTitle4thisTask("Call " + sgcUrl);
+                    esupSgcTask.updateTitle4thisTask("Call " + sgcUrl);
                     String qrcode = restTemplate.getForObject(sgcUrl, String.class);
                     if (qrcode != null) {
                         log.debug("qrcode : " + qrcode);

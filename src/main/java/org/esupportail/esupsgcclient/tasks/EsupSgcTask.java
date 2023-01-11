@@ -1,28 +1,16 @@
 package org.esupportail.esupsgcclient.tasks;
 
 import javafx.concurrent.Task;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisException;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisResponse;
 import org.esupportail.esupsgcclient.ui.UiStep;
-import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class EsupSgcTask extends Task<String> {
 
-    private final static Logger log = Logger.getLogger(EvolisTaskService.class);
+    private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
 
     Map<UiStep, TextFlow> uiSteps;
 

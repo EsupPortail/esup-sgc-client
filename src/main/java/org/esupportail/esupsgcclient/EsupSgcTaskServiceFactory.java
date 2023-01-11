@@ -3,7 +3,6 @@ package org.esupportail.esupsgcclient;
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -16,12 +15,11 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcHeartbeatService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskSupervisionService;
 import org.esupportail.esupsgcclient.tasks.EvolisReadNfcTaskService;
-import org.esupportail.esupsgcclient.tasks.EvolisTaskService;
+import org.esupportail.esupsgcclient.tasks.EvolisEncodePrintTaskService;
 import org.esupportail.esupsgcclient.tasks.QrCodeTaskService;
 import org.esupportail.esupsgcclient.tasks.ReadNfcTaskService;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.UiStep;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 
@@ -63,7 +61,7 @@ public class EsupSgcTaskServiceFactory {
     QrCodeTaskService qrCodeTaskService;
 
     @Resource
-    EvolisTaskService evolisTaskService;
+    EvolisEncodePrintTaskService evolisTaskService;
 
     @Resource
     EvolisReadNfcTaskService evolisReadNfcTaskService;

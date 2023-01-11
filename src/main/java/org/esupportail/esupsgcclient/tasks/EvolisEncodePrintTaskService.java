@@ -1,6 +1,5 @@
 package org.esupportail.esupsgcclient.tasks;
 
-import javafx.beans.value.ObservableBooleanValue;
 import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
@@ -18,9 +17,9 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 @Service
-public class EvolisTaskService extends EsupSgcTaskService {
+public class EvolisEncodePrintTaskService extends EsupSgcTaskService {
 
-	private final static Logger log = Logger.getLogger(EvolisTaskService.class);
+	private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
 
 	@Resource
 	EsupSgcRestClientService esupSgcRestClientService;
@@ -42,7 +41,7 @@ public class EvolisTaskService extends EsupSgcTaskService {
 		if(!esupSgcHeartbeatService.isRunning()) {
 			esupSgcHeartbeatService.restart();
 		}
-		return new EvolisTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcRestClientService, evolisPrinterService, encodingService);
+		return new EvolisEncodePrintTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcRestClientService, evolisPrinterService, encodingService);
 	}
 
 	@Override

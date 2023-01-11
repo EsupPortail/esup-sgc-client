@@ -6,7 +6,6 @@ import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisResponse;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
@@ -19,9 +18,9 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
-public class EvolisTask extends EsupSgcTask {
+public class EvolisEncodePrintTask extends EsupSgcTask {
 
-    private final static Logger log = Logger.getLogger(EvolisTaskService.class);
+    private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
 
     ImageView bmpColorImageView;
 
@@ -29,8 +28,8 @@ public class EvolisTask extends EsupSgcTask {
     EsupSgcRestClientService esupSgcRestClientService;
     EvolisPrinterService evolisPrinterService;
     EncodingService encodingService;
-    public EvolisTask(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView,
-                      EsupSgcRestClientService esupSgcRestClientService, EvolisPrinterService evolisPrinterService, EncodingService encodingService) {
+    public EvolisEncodePrintTask(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView,
+                                 EsupSgcRestClientService esupSgcRestClientService, EvolisPrinterService evolisPrinterService, EncodingService encodingService) {
         super(uiSteps);
         this.bmpColorImageView = bmpColorImageView;
         this.bmpBlackImageView = bmpBlackImageView;

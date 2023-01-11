@@ -3,7 +3,6 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
-import org.esupportail.esupsgcclient.tasks.EvolisTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

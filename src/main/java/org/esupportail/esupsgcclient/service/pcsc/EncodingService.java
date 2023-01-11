@@ -8,7 +8,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.smartcardio.CardException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
@@ -16,8 +15,6 @@ import org.esupportail.esupsgcclient.service.SgcCheckException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteRunExe;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
-import org.esupportail.esupsgcclient.tasks.EvolisReadNfcTask;
-import org.esupportail.esupsgcclient.tasks.EvolisTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;

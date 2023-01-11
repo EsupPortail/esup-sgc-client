@@ -3,7 +3,6 @@ package org.esupportail.esupsgcclient.tasks;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
 import java.util.Arrays;
@@ -12,7 +11,7 @@ import java.util.Map;
 
 public class ReadNfcTask extends EsupSgcTask {
 
-    private final static Logger log = Logger.getLogger(EvolisTaskService.class);
+    private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
 
     EncodingService encodingService;
 
