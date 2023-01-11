@@ -22,7 +22,7 @@ public class EvolisEncodePrintTaskService extends EsupSgcTaskService {
 
 	private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
 
-	static final String ENCODAGE_ET_IMPRESSION_VIA_EVOLIS_PRIMACY = "Encodage et impression via Evolis Primacy";
+	static final String ENCODAGE_ET_IMPRESSION_VIA_EVOLIS = "Encodage et impression via imprimante Evolis";
 
 	@Resource
 	EsupSgcRestClientService esupSgcRestClientService;
@@ -53,7 +53,7 @@ public class EvolisEncodePrintTaskService extends EsupSgcTaskService {
 
 	@Override
 	public String getLabel() {
-		return ENCODAGE_ET_IMPRESSION_VIA_EVOLIS_PRIMACY;
+		return ENCODAGE_ET_IMPRESSION_VIA_EVOLIS;
 	}
 
 	@Override

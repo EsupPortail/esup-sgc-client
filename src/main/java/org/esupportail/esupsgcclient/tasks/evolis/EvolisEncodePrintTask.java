@@ -63,7 +63,7 @@ public class EvolisEncodePrintTask extends EsupSgcTask {
             evolisPrinterService.reject();
             evolisPrinterService.try2printEnd();
             log.debug("try to get qrcode ...");
-            String qrcode = esupSgcRestClientService.getQrCode(this);
+            String qrcode = esupSgcRestClientService.getQrCode(this, null);
             setUiStepRunning();
             setUiStepSuccess(UiStep.long_poll);
             String bmpBlackAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.black);
