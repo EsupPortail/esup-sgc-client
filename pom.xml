@@ -21,6 +21,7 @@
 		<module>esupsgcclient-core</module>
 		<module>esupsgcclient-evolis</module>
 		<module>esupsgcclient-assembly</module>
+		<module>esupsgcclient-javafx-run</module>
 	</modules>
 	<dependencies>
 		<dependency>
@@ -158,6 +159,15 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.openjfx</groupId>
+				<artifactId>javafx-maven-plugin</artifactId>
+				<version>0.0.8</version>
+				<configuration>
+					<mainClass>org.esupportail.esupsgcclient.EsupSgcClientApplication</mainClass>
+					<skip>true</skip>
 				</configuration>
 			</plugin>
 		</plugins>
