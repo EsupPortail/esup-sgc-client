@@ -11,11 +11,11 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.FlowPane;
+import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisHeartbeatTaskService;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
+import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
 
@@ -31,7 +31,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
-import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
@@ -48,10 +47,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	AppSession appSession;
 
 	@Resource
-	EvolisPrinterService evolisPrinterService;
-
-	@Resource
-	EvolisHeartbeatTaskService evolisHeartbeatTaskService;
+	EsupSgcPrinterService esupSgcPrinterService;
 
 	@Resource
 	NfcHeartbeatTaskService nfcHeartbeatTaskService;
@@ -149,6 +145,8 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Resource
 	EsupNfcClientStackPane esupNfcClientStackPane;
 
+	Stage stage;
+
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -167,10 +165,10 @@ public class EsupSgcClientJfxController implements Initializable {
 		controlPane.visibleProperty().bind(buttonDisplayControl.selectedProperty());
 
 		// changement de la visibilité -> redimensionnement effectif de l'application
-		nfcTagPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
-		statutPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
-		logTextarea.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
-		controlPane.visibleProperty().addListener(observable -> EsupSgcClientApplication.getPrimaryStage().sizeToScene());
+		nfcTagPane.visibleProperty().addListener(observable -> stage.sizeToScene());
+		statutPane.visibleProperty().addListener(observable -> stage.sizeToScene());
+		logTextarea.visibleProperty().addListener(observable -> stage.sizeToScene());
+		controlPane.visibleProperty().addListener(observable -> stage.sizeToScene());
 
 		// (dé)sélection menu affichage -> sauvegarde dans le filelocalstorage
 		buttonDisplayEsupNfcTag.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayEsupNfcTag", newValue.toString()));
@@ -221,11 +219,11 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
-		exit.setOnAction(event -> EsupSgcClientApplication.getPrimaryStage().close());
+		exit.setOnAction(event -> stage.close());
 
 		reinitAndExit.setOnAction(event -> {
 			fileLocalStorage.clear();
-			EsupSgcClientApplication.getPrimaryStage().close();
+			stage.close();
 		});
 
 		appSession.nfcReadyProperty().addListener(new ChangeListener<Boolean>() {
@@ -261,13 +259,14 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
+		// TODO ...
 		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
 				Thread th = new Thread(new Task<>() {
 					@Override
 					protected Object call() throws Exception {
-						evolisPrinterService.reject();
+						esupSgcPrinterService.reject();
 						return null;
 					}
 				});
@@ -282,7 +281,7 @@ public class EsupSgcClientJfxController implements Initializable {
 				Thread th = new Thread(new Task<>() {
 					@Override
 					protected Object call() throws Exception {
-						evolisPrinterService.printEnd();
+						esupSgcPrinterService.printEnd();
 						return null;
 					}
 				});
@@ -336,9 +335,7 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
-		checkPrinter.getTooltip().textProperty().bind(evolisHeartbeatTaskService.titleProperty());
-		evolisHeartbeatTaskService.start();
-		evolisHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
+		esupSgcPrinterService.setupCheckPrinterToolTip(checkPrinter.getTooltip(), logTextarea);
 
 		checkNfc.getTooltip().textProperty().bind(nfcHeartbeatTaskService.titleProperty());
 		nfcHeartbeatTaskService.start();
@@ -349,7 +346,9 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	}
 
-	public void initializeFromFileLocalStorage() {
+	public void initializeFromFileLocalStorage(Stage stage) {
+
+		this.stage = stage;
 
 		// initialisation (dé)sélection menu affichage fonction du filelocalstorage
 		buttonDisplayEsupNfcTag.setSelected(!"false".equals(fileLocalStorage.getItem("displayEsupNfcTag")));

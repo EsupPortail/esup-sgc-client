@@ -1,6 +1,8 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.Tooltip;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
@@ -37,9 +39,19 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	@Resource
 	EvolisPrinterCommands evolisPrinterCommands;
 
+	@Resource
+	EvolisHeartbeatTaskService evolisHeartbeatTaskService;
+
 	@Override
 	public String getMaintenanceInfo() {
 		return getNextCleaningSteps().getResult();
+	}
+
+	@Override
+	public void setupCheckPrinterToolTip(Tooltip tooltip, TextArea logTextarea) {
+		tooltip.textProperty().bind(evolisHeartbeatTaskService.titleProperty());
+		evolisHeartbeatTaskService.start();
+		evolisHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
 	}
 
 	public Socket getSocket() {

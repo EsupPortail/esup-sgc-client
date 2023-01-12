@@ -40,7 +40,7 @@ public class EsupSgcClientApplication extends Application {
 		pStage = primaryStage;
 
 		EsupSgcClientJfxController esupSgcClientJfxController = fxmlLoader.getController();
-		esupSgcClientJfxController.initializeFromFileLocalStorage();
+		esupSgcClientJfxController.initializeFromFileLocalStorage(pStage);
 
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
@@ -51,12 +51,5 @@ public class EsupSgcClientApplication extends Application {
 		});
 		
 	}
-
-	public static Stage getPrimaryStage() {
-		return pStage;
-	}
-
-
-
 
 }

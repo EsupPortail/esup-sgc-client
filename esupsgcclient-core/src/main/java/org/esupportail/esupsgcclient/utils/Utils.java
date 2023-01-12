@@ -1,17 +1,10 @@
 package org.esupportail.esupsgcclient.utils;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.EsupSgcClientApplication;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 
 @SuppressWarnings("restriction")
 public class Utils {
