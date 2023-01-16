@@ -8,7 +8,6 @@ import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.AppSession.READY_CONDITION;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
-import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.stereotype.Service;
@@ -22,9 +21,6 @@ public class EvolisReadNfcTaskService extends EsupSgcTaskService {
 	private final static Logger log = Logger.getLogger(EvolisReadNfcTaskService.class);
 
 	static final String BADGEAGE_EN_SERIE_VIA_EVOLIS_PRIMACY = "Badgeage en série via Imprimante Evolis";
-
-	@Resource
-	EsupSgcRestClientService esupSgcRestClientService;
 
 	@Resource
 	EncodingService encodingService;

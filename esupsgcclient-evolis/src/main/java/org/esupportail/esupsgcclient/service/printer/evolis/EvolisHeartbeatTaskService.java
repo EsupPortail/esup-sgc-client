@@ -1,6 +1,5 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
@@ -31,8 +30,10 @@ public class EvolisHeartbeatTaskService extends Service<Void> {
                 while(true) {
                     try {
                         EvolisResponse status = evolisPrinterService.getPrinterStatus();
-                        appSession.setPrinterReady(true);
                         String printerStatus = status.getResult();
+                        if(printerStatus.contains("PRINTER_READY")) {
+                            appSession.setPrinterReady(true);
+                        }
                         if(printerStatus!=null && !printerStatus.equals(lastPrinterStatus)) {
                             lastPrinterStatus = printerStatus;
                             updateTitle("Statut Evolis : " + lastPrinterStatus);
