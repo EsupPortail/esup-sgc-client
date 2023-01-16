@@ -1,6 +1,13 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import org.esupportail.esupsgcclient.AppConfig;
@@ -48,10 +55,50 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	}
 
 	@Override
-	public void setupCheckPrinterToolTip(Tooltip tooltip, TextArea logTextarea) {
+	public void setupJfxUi(Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
 		tooltip.textProperty().bind(evolisHeartbeatTaskService.titleProperty());
 		evolisHeartbeatTaskService.start();
 		evolisHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
+
+		MenuItem evolisReject = new MenuItem();
+		evolisReject.setText("Rejeter la carte");
+		MenuItem evolisPrintEnd = new MenuItem();
+		evolisPrintEnd.setText("Clore la session d'impression");
+		Menu evolisMenu = new Menu();
+		evolisMenu.setText("Evolis");
+		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd);
+		menuBar.getMenus().add(evolisMenu);
+
+		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				Thread th = new Thread(new Task<>() {
+					@Override
+					protected Object call() throws Exception {
+						reject();
+						return null;
+					}
+				});
+				th.setDaemon(true);
+				th.start();
+			}
+		});
+
+		evolisPrintEnd.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				Thread th = new Thread(new Task<>() {
+					@Override
+					protected Object call() throws Exception {
+						printEnd();
+						return null;
+					}
+				});
+				th.setDaemon(true);
+				th.start();
+			}
+		});
+
 	}
 
 	public Socket getSocket() {

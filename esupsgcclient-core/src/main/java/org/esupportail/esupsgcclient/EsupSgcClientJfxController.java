@@ -3,11 +3,11 @@ package org.esupportail.esupsgcclient;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.FlowPane;
@@ -32,6 +32,7 @@ import javafx.scene.layout.Pane;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -46,7 +47,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Resource
 	AppSession appSession;
 
-	@Resource
+	@Autowired(required = false)
 	EsupSgcPrinterService esupSgcPrinterService;
 
 	@Resource
@@ -65,6 +66,9 @@ public class EsupSgcClientJfxController implements Initializable {
 	private MenuItem exit;
 
 	@FXML
+	private MenuBar menuBar;
+
+	@FXML
 	private FlowPane actionsPane;
 
 	@FXML
@@ -78,12 +82,6 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	@FXML
 	private CheckMenuItem buttonDisplayControl;
-
-	@FXML
-	private MenuItem evolisReject;
-
-	@FXML
-	private MenuItem evolisPrintEnd;
 
 	@FXML
 	private Menu camerasMenu;
@@ -259,37 +257,6 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
-		// TODO ...
-		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Thread th = new Thread(new Task<>() {
-					@Override
-					protected Object call() throws Exception {
-						esupSgcPrinterService.reject();
-						return null;
-					}
-				});
-				th.setDaemon(true);
-				th.start();
-			}
-		});
-
-		evolisPrintEnd.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Thread th = new Thread(new Task<>() {
-					@Override
-					protected Object call() throws Exception {
-						esupSgcPrinterService.printEnd();
-						return null;
-					}
-				});
-				th.setDaemon(true);
-				th.start();
-			}
-		});
-
 		appSession.printerReadyProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
@@ -335,7 +302,11 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
-		esupSgcPrinterService.setupCheckPrinterToolTip(checkPrinter.getTooltip(), logTextarea);
+		if(esupSgcPrinterService != null) {
+			esupSgcPrinterService.setupJfxUi(checkPrinter.getTooltip(), logTextarea, menuBar);
+		} else {
+			checkPrinter.setDisable(true);
+		}
 
 		checkNfc.getTooltip().textProperty().bind(nfcHeartbeatTaskService.titleProperty());
 		nfcHeartbeatTaskService.start();
