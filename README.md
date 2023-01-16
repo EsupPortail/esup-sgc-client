@@ -64,6 +64,26 @@ esup-sgc-client fonctionne avec :
   * une imprimante evolis primacy 1 ou 2 (ou plus exactement Evolis Premium Suite 1 ou 2)
   * un serveur esup-sgc
 
+
+### modules maven
+
+Des sous-modules maven peuvent être utilisés pour ajouter le support aux imprimantes evolis (et bientôt zebra).
+Pour ajouter le module evolis, vous pouvez ajouter `-P evolis` à vos commandes maven.
+
+Ainsi
+````
+mvn -P evolis clean package
+````
+permet de récupérer le client esup-sg-client avec le module esupsgcclient-evolis ici : `esupsgcclient-assembly/target/esup-sgc-client-final.jar`
+
+De même, pour lancer directement cette application avec esupsgcclient-evolis de chargé via meven, vous pouvez lancer :
+````
+mvn -P evolis clean javafx:run
+````
+
+Depuis votre IDE (intellij idea par exemple), vous pouvez travailler/lancer l'application en spécifiant le module via `-cp esupsgcclient-evolis` ;
+la classe principale à lancer restant `org.esupportail.esupsgcclient.EsupSgcClientApplication`.
+
 ### evolis primacy 2
 
 Il vous faut installer le driver de votre encodeur NFC intégré à votre Primacy 2

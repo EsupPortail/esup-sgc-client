@@ -12,12 +12,7 @@
   <dependencies>
     <dependency>
       <groupId>org.esupportail.esupsgcclient</groupId>
-      <artifactId>esupsgcclient-core</artifactId>
-      <version>${revision}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.esupportail.esupsgcclient</groupId>
-      <artifactId>esupsgcclient-evolis</artifactId>
+      <artifactId>esupsgcclient-assembly</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>

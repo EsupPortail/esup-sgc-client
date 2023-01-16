@@ -15,12 +15,19 @@
       <artifactId>esupsgcclient-core</artifactId>
       <version>${revision}</version>
     </dependency>
-    <dependency>
-      <groupId>org.esupportail.esupsgcclient</groupId>
-      <artifactId>esupsgcclient-evolis</artifactId>
-      <version>${revision}</version>
-    </dependency>
   </dependencies>
+  <profiles>
+    <profile>
+      <id>evolis</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.esupportail.esupsgcclient</groupId>
+          <artifactId>esupsgcclient-evolis</artifactId>
+          <version>${revision}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
   <build>
     <plugins>
       <plugin>
