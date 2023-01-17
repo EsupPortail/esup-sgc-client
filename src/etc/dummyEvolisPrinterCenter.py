@@ -16,7 +16,10 @@ try:
         while 1:
             receivedData = newSocket.recv(1024)
             if not receivedData: break
-            newSocket.send(b'{"id":"1","jsonrpc":"2.0","result":"OK - PRINTER_READY"}')
+            if 'SUPERVISION.List' in receivedData:
+                newSocket.send(b'{"id":"1","jsonrpc":"2.0","result":"OK - PRINTER_READY"}')
+            else :
+                newSocket.send(b'{"id":"1","jsonrpc":"2.0","result":"OK"}')
         newSocket.close(  )
         print("Disconnected from", address)
 finally:
