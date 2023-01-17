@@ -66,7 +66,15 @@ public class EsupSgcTaskUi {
                 textPrincipal.setText("...");
             }
         });
-        service.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
+        service.titleProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue.length()>1) {
+                logTextarea.appendText(newValue + "\n");
+                log.info(newValue);
+            } else {
+                // case of simple '.' from encoding task
+                logTextarea.appendText(newValue);
+            }
+        });
     }
 
 

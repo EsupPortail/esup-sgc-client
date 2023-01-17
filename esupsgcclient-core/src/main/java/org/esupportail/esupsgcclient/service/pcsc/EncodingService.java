@@ -228,25 +228,31 @@ public class EncodingService {
 		if(qrcode != null) {
 			checkBeforeEncoding(qrcode, csn);
 		}
-		log.info("Encoding : Start");
+		esupSgcTask.updateTitle4thisTask("Encoding : Start");
+		int k = 0;
 		String result = "";
 		while (true) {
 			log.info("RAPDU : " + result);
 			NfcResultBean nfcResultBean = esupNfcTagRestClientService.getApdu(csn, result);
 			log.info("SAPDU : " + nfcResultBean.getFullApdu());
+			k++;
+			// hack to log progress on textaera
+			esupSgcTask.updateTitle4thisTask(k%2==0 ? "." : "_");
 			if (nfcResultBean.getFullApdu() != null) {
 				if (!"END".equals(nfcResultBean.getFullApdu())) {
 					try {
 						result = PcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
 					} catch (CardException e) {
+						esupSgcTask.updateTitle4thisTask("\n");
 						throw new PcscException("pcsc send apdu error", e);
 					}
 				} else {
-					log.info("Encoding  : OK");
+					esupSgcTask.updateTitle4thisTask("\nEncoding  : OK");
 					encodeCnousIfNeeded(csn);
 					return nfcResultBean;
 				}
 			} else {
+				esupSgcTask.updateTitle4thisTask("\n");
 				throw new EncodingException("NFC APDU gived by nfctag is null ?!");
 			}
 		}
