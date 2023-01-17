@@ -84,15 +84,17 @@ public class EsupSgcTaskServiceFactory {
         this.progressBar = progressBar;
         this.textPrincipal = textPrincipal;
 
+        List<TextFlow> textFlows2Add = new ArrayList<>();
         for(UiStep step : UiStep.values()) {
             TextFlow textFlow = getTaskUiTemplate();
             textFlow.managedProperty().bind(textFlow.visibleProperty());
             Label label = (Label)textFlow.getChildren().get(0);
             label.setText(step.toString());
-            actionsPane.getChildren().add(actionsPane.getChildren().size(), textFlow);
+            textFlows2Add.add(textFlow);
             uiSteps.put(step, textFlow);
             textFlow.setVisible(false);
         }
+        actionsPane.getChildren().addAll(textFlows2Add);
 
         esupSgcTaskSupervisionService.start();
 
