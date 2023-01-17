@@ -16,7 +16,7 @@ try:
         while 1:
             receivedData = newSocket.recv(1024)
             if not receivedData: break
-            newSocket.send(b'{"id":"1","jsonrpc":"2.0","result":"OK"}')
+            newSocket.send(b'{"id":"1","jsonrpc":"2.0","result":"OK - PRINTER_READY"}')
         newSocket.close(  )
         print("Disconnected from", address)
 finally:
