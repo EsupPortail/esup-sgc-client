@@ -43,7 +43,7 @@ public class EsupSgcRestClientService {
                     esupSgcTask.updateTitle4thisTask("Call " + sgcUrl);
                     String qrcode = restTemplate.getForObject(sgcUrl, String.class);
                     if (qrcode != null) {
-                        log.debug("qrcode : " + qrcode);
+                        esupSgcTask.updateTitle4thisTask("qrcode : " + qrcode);
                         if("stop".equals(qrcode)) {
                             throw new RuntimeException("Un esup-sgc-client avec le même utilisateur vient d'être (re)lancé ?!");
                         }
