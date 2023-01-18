@@ -228,7 +228,7 @@ public class EncodingService {
 		if(qrcode != null) {
 			checkBeforeEncoding(qrcode, csn);
 		}
-		esupSgcTask.updateTitle4thisTask("Encoding : Start");
+		esupSgcTask.updateTitle4thisTask("NFC : Start");
 		int k = 0;
 		String result = "";
 		while (true) {
@@ -247,7 +247,7 @@ public class EncodingService {
 						throw new PcscException("pcsc send apdu error", e);
 					}
 				} else {
-					esupSgcTask.updateTitle4thisTask("\nEncoding  : OK");
+					esupSgcTask.updateTitle4thisTask("\n");
 					encodeCnousIfNeeded(csn);
 					return nfcResultBean;
 				}

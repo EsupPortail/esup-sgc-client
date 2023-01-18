@@ -2,8 +2,10 @@ package org.esupportail.esupsgcclient.tasks;
 
 import javafx.concurrent.Task;
 import javafx.scene.text.TextFlow;
+import jdk.jshell.execution.Util;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.esupportail.esupsgcclient.utils.Utils;
 
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,8 @@ public abstract class EsupSgcTask extends Task<String> {
 
    public void  updateTitle4thisTask(String title) {
         updateTitle(title);
+        // just to let time to update title / logtextarea in UI
+        Utils.sleep(5);
     }
 
 	protected void setUiStepSuccess(UiStep uiStep) {
