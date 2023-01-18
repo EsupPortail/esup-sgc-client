@@ -26,6 +26,8 @@ public class EsupSgcClientApplication extends Application {
 
 	public void start(final Stage primaryStage) throws IOException {
 
+		long start = System.currentTimeMillis();
+
 		ApplicationContext context = new AnnotationConfigApplicationContext(EsupSgcClientApplication.class);
 		
 		primaryStage.setTitle("Esup-SGC-Client");
@@ -49,7 +51,8 @@ public class EsupSgcClientApplication extends Application {
 				System.exit(0);
 			}
 		});
-		
+
+		esupSgcClientJfxController.logTextarea.appendText(String.format("Application intialized in %.2f seconds\n", (System.currentTimeMillis()-start)/1000.0));
 	}
 
 }
