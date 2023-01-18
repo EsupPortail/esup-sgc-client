@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.tasks;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.text.TextFlow;
 import jdk.jshell.execution.Util;
@@ -13,6 +14,8 @@ import java.util.Map;
 public abstract class EsupSgcTask extends Task<String> {
 
     private final static Logger log = Logger.getLogger(EsupSgcTask.class);
+
+    private final static int PROGRESS_STEP_LENGTH = 100;
 
     Map<UiStep, TextFlow> uiSteps;
 
@@ -53,13 +56,13 @@ public abstract class EsupSgcTask extends Task<String> {
 
 	protected void setUiStepSuccess(UiStep uiStep) {
         if(uiStep == null) {
-            updateProgress(0, getUiStepsList().size());
+            updateProgress(0, getUiStepsList().size()*PROGRESS_STEP_LENGTH);
             updateTitle("En attente ...");
         } else {
             TextFlow uiStepTextFlow = (TextFlow) uiSteps.get(uiStep);
             uiStepTextFlow.getStyleClass().clear();
             uiStepTextFlow.getStyleClass().add("alert-success");
-            updateProgress(getUiStepsList().indexOf(uiStep), getUiStepsList().size());
+            updateProgress((getUiStepsList().indexOf(uiStep)+1)*PROGRESS_STEP_LENGTH, getUiStepsList().size()*PROGRESS_STEP_LENGTH);
             if(getUiStepsList().indexOf(uiStep)+1<getUiStepsList().size()) {
                 UiStep newtUiStep = (UiStep) getUiStepsList().get(getUiStepsList().indexOf(uiStep) + 1);
                 updateTitle(newtUiStep.toString());
@@ -67,6 +70,12 @@ public abstract class EsupSgcTask extends Task<String> {
         }
         lastUiStepSuccess = uiStep;
 	}
+
+    public void updateProgressStep() {
+       Platform.runLater(() -> {
+           updateProgress(getProgress() * getUiStepsList().size() * PROGRESS_STEP_LENGTH + 1, getUiStepsList().size() * PROGRESS_STEP_LENGTH);
+       });
+    }
 
     protected void setCurrentUiStepFailed(Throwable exception) {
         UiStep currentUiStep = null;

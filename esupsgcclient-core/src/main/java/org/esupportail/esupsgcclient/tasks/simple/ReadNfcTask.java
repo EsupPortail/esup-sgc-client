@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.esupportail.esupsgcclient.utils.Utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,13 +35,14 @@ public class ReadNfcTask extends EsupSgcTask {
             setUiStepSuccess(null);
             encodingService.encode(this);
             setUiStepSuccess(UiStep.encode);
-            updateTitle("Badgeage OK");
+            updateTitle4thisTask("Badgeage OK");
+            updateTitle4thisTask("Merci de retirer cette carte");
             while (!encodingService.waitForCardAbsent(1000)) {
                 if(isCancelled()) {
                     return null;
                 }
             }
-            updateTitle("Carte retirée");
+            updateTitle4thisTask("Carte retirée");
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
             throw new RuntimeException("Exception on  EvolisReadNfcTask : " + e.getMessage(), e);

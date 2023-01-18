@@ -238,6 +238,7 @@ public class EncodingService {
 			k++;
 			// hack to log progress on textaera
 			esupSgcTask.updateTitle4thisTask(k%2==0 ? "." : "_");
+			esupSgcTask.updateProgressStep();
 			if (nfcResultBean.getFullApdu() != null) {
 				if (!"END".equals(nfcResultBean.getFullApdu())) {
 					try {
