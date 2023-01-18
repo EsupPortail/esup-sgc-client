@@ -19,10 +19,17 @@
 	</properties>
 	<modules>
 		<module>esupsgcclient-core</module>
-		<module>esupsgcclient-evolis</module>
 		<module>esupsgcclient-assembly</module>
 		<module>esupsgcclient-javafx-run</module>
 	</modules>
+	<profiles>
+		<profile>
+			<id>evolis</id>
+			<modules>
+				<module>esupsgcclient-evolis</module>
+			</modules>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
