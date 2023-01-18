@@ -15,7 +15,7 @@ public abstract class EsupSgcTask extends Task<String> {
 
     private final static Logger log = Logger.getLogger(EsupSgcTask.class);
 
-    private final static int PROGRESS_STEP_LENGTH = 100;
+    private final static int PROGRESS_STEP_LENGTH = 200;
 
     Map<UiStep, TextFlow> uiSteps;
 
