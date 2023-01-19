@@ -1,6 +1,7 @@
 package org.esupportail.esupsgcclient;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -87,7 +88,7 @@ public class EsupSgcTaskUi {
         service.restart();
         progressBar.setStyle("");
         progressBar.progressProperty().bind(service.progressProperty());
-        textPrincipal.textProperty().bind(service.titleProperty());
+        textPrincipal.textProperty().bind(Bindings.format("%.60s", service.titleProperty()));
     }
 
     public BooleanBinding readyToRunProperty() {

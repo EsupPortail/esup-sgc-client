@@ -181,9 +181,6 @@ public class EsupSgcClientJfxController implements Initializable {
 		bmpBlackImageView.setFitWidth(250.0);
 		bmpColorImageView.setFitWidth(250.0);
 
-		textPrincipal.setWrapText(true);
-		textPrincipal.setMaxSize(500, 1);
-
 		nfcTagPane.getChildren().add(esupNfcClientStackPane);
 
 		stopButton.disableProperty().bind(appSession.taskIsRunningProperty().not());
