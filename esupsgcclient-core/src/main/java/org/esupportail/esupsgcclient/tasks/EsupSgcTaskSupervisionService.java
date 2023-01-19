@@ -1,12 +1,12 @@
 package org.esupportail.esupsgcclient.tasks;
 
+import jakarta.annotation.Resource;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Service

@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.service.sgc;
 
+import jakarta.annotation.Resource;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
@@ -7,7 +8,6 @@ import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 
 @Component
 public class EsupSgcHeartbeatService extends Service<Void> {

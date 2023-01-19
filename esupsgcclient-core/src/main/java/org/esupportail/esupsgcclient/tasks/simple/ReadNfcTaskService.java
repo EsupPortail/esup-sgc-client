@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.tasks.simple;
 
+import jakarta.annotation.Resource;
 import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
@@ -11,7 +12,6 @@ import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Map;
 
 @Service

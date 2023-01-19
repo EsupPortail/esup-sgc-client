@@ -1,21 +1,20 @@
 package org.esupportail.esupsgcclient;
 
-import java.io.IOException;
-import java.net.URL;
-
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import org.springframework.context.annotation.ComponentScan;
+
+import java.io.IOException;
+import java.net.URL;
 
 @ComponentScan
 public class EsupSgcClientApplication extends Application {

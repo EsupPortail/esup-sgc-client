@@ -3,7 +3,6 @@ package org.esupportail.esupsgcclient.tasks;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.text.TextFlow;
-import jdk.jshell.execution.Util;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;

@@ -1,13 +1,7 @@
 package org.esupportail.esupsgcclient.service.pcsc;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.smartcardio.CardException;
-
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
@@ -29,6 +23,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import javax.smartcardio.CardException;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class EncodingService {

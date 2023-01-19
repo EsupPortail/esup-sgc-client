@@ -1,14 +1,5 @@
 package org.esupportail.esupsgcclient.service.webcam;
 
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
-
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
@@ -18,6 +9,14 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 @Service 
 public class QRCodeReader {

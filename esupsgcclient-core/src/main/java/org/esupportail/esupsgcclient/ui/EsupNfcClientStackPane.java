@@ -1,15 +1,7 @@
 package org.esupportail.esupsgcclient.ui;
 
-import java.awt.HeadlessException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -17,13 +9,19 @@ import javafx.concurrent.Worker.State;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 
 @Component
 public class EsupNfcClientStackPane extends StackPane {

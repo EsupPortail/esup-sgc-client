@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class EvolisResponse {
     final static Logger log = LoggerFactory.getLogger(EvolisResponse.class);
     static ObjectMapper objectMapper = new ObjectMapper();

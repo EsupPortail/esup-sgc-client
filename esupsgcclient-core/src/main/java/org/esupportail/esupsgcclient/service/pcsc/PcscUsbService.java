@@ -1,9 +1,8 @@
 package org.esupportail.esupsgcclient.service.pcsc;
 
-import java.security.Security;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import jnasmartcardio.Smartcardio;
+import jnasmartcardio.Smartcardio.JnaPCSCException;
+import org.apache.log4j.Logger;
 
 import javax.smartcardio.Card;
 import javax.smartcardio.CardException;
@@ -12,12 +11,10 @@ import javax.smartcardio.CardTerminals;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
-
-import org.apache.log4j.Logger;
-
-import jnasmartcardio.Smartcardio;
-import jnasmartcardio.Smartcardio.JnaPCSCException;
-import org.esupportail.esupsgcclient.utils.Utils;
+import java.security.Security;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PcscUsbService {
 

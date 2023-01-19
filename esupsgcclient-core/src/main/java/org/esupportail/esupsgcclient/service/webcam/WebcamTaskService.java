@@ -1,6 +1,7 @@
 package org.esupportail.esupsgcclient.service.webcam;
 
 import com.github.sarxos.webcam.Webcam;
+import jakarta.annotation.Resource;
 import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -10,11 +11,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
-import org.esupportail.esupsgcclient.EsupSgcClientJfxController;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.atomic.AtomicReference;
 

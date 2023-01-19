@@ -1,10 +1,10 @@
 package org.esupportail.esupsgcclient.service.pcsc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
 
 @Component
 public class EsupNfcTagRestClientService {

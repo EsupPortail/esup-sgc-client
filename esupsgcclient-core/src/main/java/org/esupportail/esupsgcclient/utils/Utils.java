@@ -1,10 +1,10 @@
 package org.esupportail.esupsgcclient.utils;
 
+import org.apache.log4j.Logger;
+
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-
-import org.apache.log4j.Logger;
 
 @SuppressWarnings("restriction")
 public class Utils {

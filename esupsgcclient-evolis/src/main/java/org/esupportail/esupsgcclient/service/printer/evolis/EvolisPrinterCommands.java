@@ -1,19 +1,9 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
+import jakarta.annotation.Resource;
 import org.esupportail.esupsgcclient.AppConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
 
 
 /**

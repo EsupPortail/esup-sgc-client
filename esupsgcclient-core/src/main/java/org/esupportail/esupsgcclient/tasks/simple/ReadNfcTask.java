@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
-import org.esupportail.esupsgcclient.utils.Utils;
 
 import java.util.Arrays;
 import java.util.List;

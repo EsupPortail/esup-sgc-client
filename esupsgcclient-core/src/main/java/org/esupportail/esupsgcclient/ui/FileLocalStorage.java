@@ -1,5 +1,12 @@
 package org.esupportail.esupsgcclient.ui;
 
+import jakarta.annotation.PostConstruct;
+import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.AppSession;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
+
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,15 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javafx.beans.property.SimpleBooleanProperty;
-import org.apache.log4j.Logger;
-import org.esupportail.esupsgcclient.AppSession;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-
 @Component
 public class FileLocalStorage {
 
@@ -27,7 +25,7 @@ public class FileLocalStorage {
 
 	private File file;
 
-	@javax.annotation.Resource
+	@jakarta.annotation.Resource
 	AppSession appSession;
 
 	@PostConstruct

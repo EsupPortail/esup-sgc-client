@@ -1,16 +1,26 @@
 package org.esupportail.esupsgcclient;
 
+import com.github.sarxos.webcam.Webcam;
+import jakarta.annotation.Resource;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextArea;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -18,24 +28,12 @@ import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
-
-import com.github.sarxos.webcam.Webcam;
-
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ResourceBundle;
 

@@ -1,11 +1,11 @@
 package org.esupportail.esupsgcclient.service.cnous;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import org.apache.log4j.Logger;
 
 public class CnousFournisseurCarteRunExe {
 

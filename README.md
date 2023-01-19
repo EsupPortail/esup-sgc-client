@@ -15,7 +15,7 @@ qui peut lui-même être généré depuis un simple formulaire web en ligne via 
 esup-sgc-client est une application java/spring/javafx utilisant maven pour gérer la compilation 
 et les dépendances des librairies utilisées.
 
-Pour fonctionner, il requiert un openjdk 11 (ou supérieur) et openjfx
+Pour fonctionner, il requiert un openjdk 17 (ou supérieur) et openjfx
 
 ## Environnement de développement
 

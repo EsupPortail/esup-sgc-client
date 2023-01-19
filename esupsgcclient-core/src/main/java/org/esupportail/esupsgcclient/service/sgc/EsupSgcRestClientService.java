@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.service.sgc;
 
+import jakarta.annotation.Resource;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 

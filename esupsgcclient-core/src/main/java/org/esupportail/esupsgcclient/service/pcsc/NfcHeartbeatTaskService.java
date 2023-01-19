@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.service.pcsc;
 
+import jakarta.annotation.Resource;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
@@ -7,7 +8,6 @@ import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 
 @Component
 public class NfcHeartbeatTaskService extends Service<Void> {
