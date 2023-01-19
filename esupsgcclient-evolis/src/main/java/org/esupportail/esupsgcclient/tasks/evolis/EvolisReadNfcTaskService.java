@@ -13,6 +13,7 @@ import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -30,6 +31,11 @@ public class EvolisReadNfcTaskService extends EsupSgcTaskService {
 
 	@Resource
 	AppSession appSession;
+
+	@Override
+	public List<UiStep> getUiStepsList() {
+		return EvolisReadNfcTask.UI_STEPS_LIST;
+	}
 
 	@Override
 	protected Task<String> createTask() {

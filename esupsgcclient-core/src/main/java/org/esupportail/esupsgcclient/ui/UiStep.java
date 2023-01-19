@@ -1,5 +1,8 @@
 package org.esupportail.esupsgcclient.ui;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 public enum UiStep {
 
         long_poll("Récupération carte depuis ESUP-SGC"),
@@ -27,4 +30,5 @@ public enum UiStep {
         public String toString() {
             return name;
         }
+
     }

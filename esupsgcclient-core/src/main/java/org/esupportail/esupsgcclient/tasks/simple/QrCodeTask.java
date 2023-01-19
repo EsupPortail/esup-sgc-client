@@ -20,6 +20,9 @@ import java.util.Map;
 public class QrCodeTask extends EsupSgcTask {
 
 	private final static Logger log = Logger.getLogger(QrCodeTask.class);
+
+	final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{UiStep.qrcode_read, UiStep.encode});
+
 	ObjectProperty<Image> webcamImageProperty;
 	EncodingService encodingService;
 	QRCodeReader qRCodeReader;
@@ -33,9 +36,7 @@ public class QrCodeTask extends EsupSgcTask {
 
 	@Override
 	protected List<UiStep> getUiStepsList() {
-		return Arrays.asList(new UiStep[]{
-				UiStep.qrcode_read,
-				UiStep.encode});
+		return UI_STEPS_LIST;
 	}
 
 	@Override

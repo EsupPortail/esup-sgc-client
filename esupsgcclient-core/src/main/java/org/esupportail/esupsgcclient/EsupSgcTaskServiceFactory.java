@@ -106,7 +106,7 @@ public class EsupSgcTaskServiceFactory {
             // 1 thread for all EsupSgcTasks to be sure to avoid multiple runs in parallels
             esupSgcTaskService.setExecutor(sgcTaskExecutor);
             // create esupSgcTaskUis
-            esupSgcTaskUis.put(esupSgcTaskService.getLabel(), new EsupSgcTaskUi(esupSgcTaskService, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
+            esupSgcTaskUis.put(esupSgcTaskService.getLabel(), new EsupSgcTaskUi(esupSgcTaskService, actionsPane, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
             // add startStopListeners setup by @EsupSfcClientJfxController
             startStopListeners.put(esupSgcTaskService.getLabel(), (ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
                 if(newValue) {

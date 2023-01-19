@@ -13,6 +13,7 @@ import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -30,6 +31,11 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 
 	@Resource
 	AppSession appSession;
+
+	@Override
+	public List<UiStep> getUiStepsList() {
+		return QrCodeTask.UI_STEPS_LIST;
+	}
 
 	@Override
 	protected Task<String> createTask() {

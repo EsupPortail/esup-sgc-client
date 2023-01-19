@@ -39,6 +39,8 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
 
     public abstract String getLabel();
 
+    public abstract List<UiStep> getUiStepsList();
+
     public BooleanBinding readyToRunProperty() {
         if(readyToRunProperty == null) {
             Map<AppSession.READY_CONDITION, ObservableBooleanValue> readyToRunConditionsMap = getAppSession().getReadyConditions().entrySet()

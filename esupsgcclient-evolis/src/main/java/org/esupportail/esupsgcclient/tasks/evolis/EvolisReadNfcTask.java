@@ -16,6 +16,10 @@ public class EvolisReadNfcTask extends EsupSgcTask {
 
     private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
 
+    final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{
+            UiStep.printer_nfc,
+            UiStep.encode});
+
     EvolisPrinterService evolisPrinterService;
     EncodingService encodingService;
     public EvolisReadNfcTask(Map<UiStep, TextFlow> uiSteps, EvolisPrinterService evolisPrinterService, EncodingService encodingService) {
@@ -26,9 +30,7 @@ public class EvolisReadNfcTask extends EsupSgcTask {
 
     @Override
     protected List<UiStep> getUiStepsList() {
-        return Arrays.asList(new UiStep[]{
-                UiStep.printer_nfc,
-                UiStep.encode});
+        return UI_STEPS_LIST;
     }
 
     @Override

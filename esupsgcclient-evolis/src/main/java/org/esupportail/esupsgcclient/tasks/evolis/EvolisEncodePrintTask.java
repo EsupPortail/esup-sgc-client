@@ -23,6 +23,18 @@ public class EvolisEncodePrintTask extends EsupSgcTask {
 
     private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
 
+    final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{
+            UiStep.long_poll,
+            UiStep.bmp_black,
+            UiStep.bmp_color,
+            UiStep.printer_nfc,
+            UiStep.encode,
+            UiStep.printer_color,
+            UiStep.printer_black,
+            UiStep.printer_overlay,
+            UiStep.printer_print,
+            UiStep.sgc_ok});
+
     ImageView bmpColorImageView;
 
     ImageView bmpBlackImageView;
@@ -41,17 +53,7 @@ public class EvolisEncodePrintTask extends EsupSgcTask {
 
     @Override
     protected List<UiStep> getUiStepsList() {
-        return Arrays.asList(new UiStep[]{
-                UiStep.long_poll,
-                UiStep.bmp_black,
-                UiStep.bmp_color,
-                UiStep.printer_nfc,
-                UiStep.encode,
-                UiStep.printer_color,
-                UiStep.printer_black,
-                UiStep.printer_overlay,
-                UiStep.printer_print,
-                UiStep.sgc_ok});
+        return UI_STEPS_LIST;
     }
 
     @Override

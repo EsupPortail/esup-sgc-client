@@ -14,6 +14,8 @@ public class ReadNfcTask extends EsupSgcTask {
 
     private final static Logger log = Logger.getLogger(ReadNfcTask.class);
 
+    final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{UiStep.encode});
+
     EncodingService encodingService;
 
     public ReadNfcTask(Map<UiStep, TextFlow> uiSteps, EncodingService encodingService) {
@@ -23,8 +25,7 @@ public class ReadNfcTask extends EsupSgcTask {
 
     @Override
     protected List<UiStep> getUiStepsList() {
-        return Arrays.asList(new UiStep[]{
-                UiStep.encode});
+        return UI_STEPS_LIST;
     }
 
     @Override
