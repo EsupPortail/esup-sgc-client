@@ -39,7 +39,8 @@ public class EsupSgcClientApplication extends Application {
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		
+
+		// positionnement application au 'centre' du bureau
 		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
 		double x = bounds.getMinX() + (bounds.getWidth() - scene.getWidth()) * 0.2;
 		double y = bounds.getMinY() + (bounds.getHeight() - scene.getHeight()) * 0.5;
