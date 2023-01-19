@@ -53,6 +53,12 @@ public class EvolisEncodePrintTaskService extends EsupSgcTaskService {
 	}
 
 	@Override
+	protected void cancelled() {
+		super.cancelled();
+		esupSgcHeartbeatService.cancel();
+	}
+
+	@Override
 	public AppSession getAppSession() {
 		return appSession;
 	}
