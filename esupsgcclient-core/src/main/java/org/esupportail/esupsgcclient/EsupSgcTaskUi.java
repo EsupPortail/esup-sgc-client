@@ -62,7 +62,7 @@ public class EsupSgcTaskUi {
         service.setOnCancelled(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                log.error("Cancel called");
+                log.info("Cancel called");
                 progressBar.setStyle("-fx-accent:red");
                 textPrincipal.textProperty().unbind();
                 textPrincipal.setText("...");

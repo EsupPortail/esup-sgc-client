@@ -44,20 +44,25 @@ public class QrCodeTask extends EsupSgcTask {
 		setUiStepSuccess(null);
 		String qrcode = getQrcode();
 		if(qrcode == null) return null;
-		updateTitle("qrcode détecté : " + qrcode);
+		long start = System.currentTimeMillis();
+		updateTitle4thisTask("qrcode détecté : " + qrcode);
 		setUiStepRunning();
 		setUiStepSuccess(UiStep.qrcode_read);
 		try {
 			encodingService.encode(this, qrcode);
 			setUiStepSuccess(UiStep.encode);
+			String msgTimer = String.format("Carte encodée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
+			updateTitle4thisTask(msgTimer);
 		} catch (Exception e) {
 			log.debug("Exception on QrCodeTask", e);
 			setUiStepFailed(UiStep.encode, e);
-			updateTitle("PB :" +  e.getMessage() + "\nMerci de retirer cette carte");
+			updateTitle4thisTask("PB :" +  e.getMessage());
+		} finally {
+			updateTitle4thisTask("Merci de retirer cette carte");
 			while (!encodingService.waitForCardAbsent(1000)) {
 				// Utils.sleep(1000); -  sleep non nécessaire : EncodingService.waitForCardAbsent l'intègre
 			}
-			updateTitle("Carte retirée");
+			updateTitle4thisTask("Carte retirée");
 		}
 		return null;
 	}
