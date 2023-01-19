@@ -9,4 +9,19 @@
     <version>${revision}</version>
   </parent>
   <artifactId>esupsgcclient-core</artifactId>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <compilerArgs>
+            <arg>--add-modules</arg>
+            <arg>java.smartcardio</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
