@@ -71,6 +71,7 @@ public class EsupSgcTaskUi {
             @Override
             public void handle(WorkerStateEvent t) {
                 log.info("Cancel called");
+                logTextarea.appendText("Service stoppé\n");
                 progressBar.setStyle("-fx-accent:red");
                 textPrincipal.textProperty().unbind();
                 textPrincipal.setText("...");
