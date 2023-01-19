@@ -55,55 +55,55 @@ public class EsupSgcClientJfxController implements Initializable {
 	FileLocalStorage fileLocalStorage;
 
 	@FXML
-	private CheckMenuItem autostart;
+	CheckMenuItem autostart;
 
 	@FXML
-	private MenuItem reinitAndExit;
+	MenuItem reinitAndExit;
 
 	@FXML
-	private MenuItem exit;
+	MenuItem exit;
 
 	@FXML
-	private MenuBar menuBar;
+	MenuBar menuBar;
 
 	@FXML
-	private FlowPane actionsPane;
+	FlowPane actionsPane;
 
 	@FXML
-	private CheckMenuItem buttonDisplayStatut;
+	CheckMenuItem buttonDisplayStatut;
 
 	@FXML
-	private CheckMenuItem buttonDisplayEsupNfcTag;
+	CheckMenuItem buttonDisplayEsupNfcTag;
 
 	@FXML
-	private CheckMenuItem buttonDisplayLogs;
+	CheckMenuItem buttonDisplayLogs;
 
 	@FXML
-	private CheckMenuItem buttonDisplayControl;
+	CheckMenuItem buttonDisplayControl;
 
 	@FXML
-	private Menu camerasMenu;
+	Menu camerasMenu;
 
 	@FXML
-	private Button checkAuth;
+	Button checkAuth;
 
 	@FXML
-	private Button checkCamera;
+	Button checkCamera;
 
 	@FXML
-	private Button checkNfc;
+	Button checkNfc;
 
 	@FXML
-	private Button checkPrinter;
+	Button checkPrinter;
 
 	@FXML
-	private Button startButton;
+	Button startButton;
 
 	@FXML
-	private Button stopButton;
+	Button stopButton;
 
 	@FXML
-	private ComboBox<String> comboBox;
+	ComboBox<String> comboBox;
 
 	@FXML
 	public TextArea logTextarea;
@@ -112,13 +112,13 @@ public class EsupSgcClientJfxController implements Initializable {
 	public Pane nfcTagPane;
 
 	@FXML
-	private FlowPane statutPane;
+	FlowPane statutPane;
 
 	@FXML
 	public Pane controlPane;
 
 	@FXML
-	private Label textPrincipal;
+	Label textPrincipal;
 
 	@FXML
 	public ImageView webcamImageView;
@@ -130,7 +130,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	public ImageView bmpColorImageView;
 
 	@FXML
-	private ProgressBar progressBar;
+	ProgressBar progressBar;
 
 	@Resource
 	WebcamTaskService webcamTaskService;
@@ -176,6 +176,13 @@ public class EsupSgcClientJfxController implements Initializable {
 		webcamImageView.managedProperty().bind(webcamImageView.visibleProperty());
 		bmpBlackImageView.managedProperty().bind(bmpBlackImageView.visibleProperty());
 		bmpColorImageView.managedProperty().bind(bmpColorImageView.visibleProperty());
+
+		webcamImageView.setFitWidth(380.0);
+		bmpBlackImageView.setFitWidth(250.0);
+		bmpColorImageView.setFitWidth(250.0);
+
+		textPrincipal.setWrapText(true);
+		textPrincipal.setMaxSize(500, 1);
 
 		nfcTagPane.getChildren().add(esupNfcClientStackPane);
 
