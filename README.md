@@ -38,6 +38,10 @@ Suivant le certificat utilisé par vos serveurs esup-sgc/esup-nfc-tag, et la ver
 -Djdk.tls.client.protocols=TLSv1.2
 ````
 
+Pour activer le profile/module evolis dans l'IDE, vous pouvez ajouter le "classpath of module" `-cp esupsgclient-evolis`  
+
+En optant pour `-cp esupsgclient-core` vous aurez le client sans module/profile supplémentaire.
+
 ## SceneBuilder
 
 L'interface homme machine (IHM / GUI) est décrite en FXML. 
