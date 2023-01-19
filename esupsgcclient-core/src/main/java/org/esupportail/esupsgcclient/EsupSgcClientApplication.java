@@ -4,11 +4,14 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,8 +23,6 @@ import java.net.URL;
 public class EsupSgcClientApplication extends Application {
 
 	private final static Logger log = Logger.getLogger(EsupSgcClientApplication.class);
-
-	static Stage pStage;
 
 	public void start(final Stage primaryStage) throws IOException {
 
@@ -38,10 +39,15 @@ public class EsupSgcClientApplication extends Application {
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		pStage = primaryStage;
+		
+		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+		double x = bounds.getMinX() + (bounds.getWidth() - scene.getWidth()) * 0.2;
+		double y = bounds.getMinY() + (bounds.getHeight() - scene.getHeight()) * 0.5;
+		primaryStage.setX(x);
+		primaryStage.setY(y);
 
 		EsupSgcClientJfxController esupSgcClientJfxController = fxmlLoader.getController();
-		esupSgcClientJfxController.initializeFromFileLocalStorage(pStage);
+		esupSgcClientJfxController.initializeFromFileLocalStorage(primaryStage);
 
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
