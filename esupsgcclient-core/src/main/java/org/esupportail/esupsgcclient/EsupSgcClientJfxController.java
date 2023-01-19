@@ -154,6 +154,8 @@ public class EsupSgcClientJfxController implements Initializable {
 		statutPane.managedProperty().bind(statutPane.visibleProperty());
 		controlPane.managedProperty().bind(controlPane.visibleProperty());
 
+		statutPane.getParent().managedProperty().bind(statutPane.managedProperty().or(controlPane.managedProperty()));
+
 		// affichage panes fonction de la (dé)sélection menus affichage
 		nfcTagPane.visibleProperty().bind(buttonDisplayEsupNfcTag.selectedProperty());
 		statutPane.visibleProperty().bind(buttonDisplayStatut.selectedProperty());
