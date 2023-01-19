@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
@@ -49,6 +50,8 @@ public class EsupSgcTaskServiceFactory {
 
     Label textPrincipal;
 
+    CheckMenuItem autostart;
+
     @Resource
     List<EsupSgcTaskService> esupSgcTaskServices;
 
@@ -75,7 +78,7 @@ public class EsupSgcTaskServiceFactory {
 
     public void init(ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView,
                      TextArea logTextarea, ProgressBar progressBar, Label textPrincipal,
-                     FlowPane actionsPane) {
+                     FlowPane actionsPane, CheckMenuItem autostart) {
         this.actionsPane = actionsPane;
         this.webcamImageView = webcamImageView;
         this.bmpColorImageView = bmpColorImageView;
@@ -83,6 +86,7 @@ public class EsupSgcTaskServiceFactory {
         this.logTextarea = logTextarea;
         this.progressBar = progressBar;
         this.textPrincipal = textPrincipal;
+        this.autostart = autostart;
 
         List<TextFlow> textFlows2Add = new ArrayList<>();
         for(UiStep step : UiStep.values()) {
@@ -106,8 +110,14 @@ public class EsupSgcTaskServiceFactory {
             // add startStopListeners setup by @EsupSfcClientJfxController
             startStopListeners.put(esupSgcTaskService.getLabel(), (ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
                 if(newValue) {
-                    runService(esupSgcTaskService.getLabel());
+                    if(autostart.isSelected()) {
+                        logTextarea.appendText(String.format("Autostart est activé, le service '%s' va démarrer.\n", esupSgcTaskService.getLabel()));
+                        runService(esupSgcTaskService.getLabel());
+                    } else {
+                        logTextarea.appendText(String.format("Le service '%s' est prêt à démarrer.\n", esupSgcTaskService.getLabel()));
+                    }
                 } else {
+                    logTextarea.appendText(String.format("Le service '%s' va s'arrêter.\n", esupSgcTaskService.getLabel()));
                     cancelService(esupSgcTaskService.getLabel());
                 }
             });

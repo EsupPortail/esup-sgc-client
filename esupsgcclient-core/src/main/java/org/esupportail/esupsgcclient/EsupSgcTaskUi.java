@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient;
 
+import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -98,6 +99,8 @@ public class EsupSgcTaskUi {
     }
 
     public void cancelTaskService() {
-        this.service.cancel();
+        Platform.runLater(() -> {
+                this.service.cancel();
+        });
     }
 }

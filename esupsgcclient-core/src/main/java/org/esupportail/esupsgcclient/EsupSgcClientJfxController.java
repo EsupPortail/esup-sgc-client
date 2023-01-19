@@ -146,7 +146,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
-		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane);
+		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane, autostart);
 
 		// redimensionnement possible en fonction de la visible
 		nfcTagPane.managedProperty().bind(nfcTagPane.visibleProperty());
@@ -202,11 +202,10 @@ public class EsupSgcClientJfxController implements Initializable {
 					} else {
 						logTextarea.appendText(String.format("Le service '%s' est prêt à démarrer.\n", newServiceName));
 					}
-					if(autostart.isSelected()) {
-						esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).addListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
-						if(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
-							esupSgcTaskServiceFactory.runService(newServiceName);
-						}
+					esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).addListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
+					if(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get() && autostart.isSelected()) {
+						logTextarea.appendText(String.format("Autostart est activé, le service '%s' va démarrer.\n", newServiceName));
+						esupSgcTaskServiceFactory.runService(newServiceName);
 					}
 				});
 			} else {
