@@ -16,10 +16,13 @@ public class AppConfig {
 
     @Value("${encodeCnous}")
     boolean encodeCnous = false;
+
     @Value("${localStorageDir}")
     String localStorageDir;
+
     @Value("${printerEvolisIp}")
     String printerEvolisIp = "127.0.0.1";
+
     @Value("${printerEvolisPort}")
     int printerEvolisPort = 18000;
 
@@ -40,11 +43,6 @@ public class AppConfig {
     public boolean isEncodeCnous() {
         return encodeCnous;
     }
-
-    public String getLocalStorageDir() {
-        return localStorageDir;
-    }
-
 
     public String getPrinterEvolisIp() {
         return printerEvolisIp;

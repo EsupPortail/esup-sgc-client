@@ -323,7 +323,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		buttonDisplayStatut.setSelected(!"false".equals(fileLocalStorage.getItem("displayStatut")));
 		buttonDisplayLogs.setSelected(!"false".equals(fileLocalStorage.getItem("displayLogs")));
 		buttonDisplayControl.setSelected(!"false".equals(fileLocalStorage.getItem("displayControl")));
-		autostart.setSelected(!"false".equals(fileLocalStorage.getItem("autostart")));
+		autostart.setSelected("true".equals(fileLocalStorage.getItem("autostart")));
 
 		// initialisation tâche combobox après 2 secondes - temps d'initialisation auth/nfc/imprimante ...
 		log.info("Tâche au démarrage : " + fileLocalStorage.getItem("esupsgcTask"));
