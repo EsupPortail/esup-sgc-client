@@ -38,7 +38,9 @@ Suivant le certificat utilisé par vos serveurs esup-sgc/esup-nfc-tag, et la ver
 -Djdk.tls.client.protocols=TLSv1.2
 ````
 
-Pour activer le profile/module evolis dans l'IDE, vous pouvez ajouter le "classpath of module" `-cp esupsgclient-evolis`  
+Pour activer le profile/module evolis dans l'IDE, vous pouvez ajouter le "classpath of module" `-cp esupsgclient-evolis` .
+
+_Sous intelliJ, pour pouvoir sélectionner `-cp esupsgclient-evolis` vous devez au préalable activer le profile evolis dans la fenêtre maven (et recharger les projets maven)._
 
 En optant pour `-cp esupsgclient-core` vous aurez le client sans module/profile supplémentaire.
 
