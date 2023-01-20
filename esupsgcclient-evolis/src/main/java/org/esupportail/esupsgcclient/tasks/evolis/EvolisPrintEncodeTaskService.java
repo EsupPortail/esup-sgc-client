@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class EvolisEncodePrintTaskService extends EsupSgcTaskService {
+public class EvolisPrintEncodeTaskService extends EsupSgcTaskService {
 
-	private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
+	private final static Logger log = Logger.getLogger(EvolisPrintEncodeTaskService.class);
 
-	static final String ENCODAGE_ET_IMPRESSION_VIA_EVOLIS = "Encodage et impression via imprimante Evolis";
+	static final String IMPRESSION_ET_ENCODAGE_VIA_EVOLIS = "Impression et encodage via imprimante Evolis";
 
 	@Resource
 	EsupSgcRestClientService esupSgcRestClientService;
@@ -42,14 +42,14 @@ public class EvolisEncodePrintTaskService extends EsupSgcTaskService {
 
 	@Override
 	public List<UiStep> getUiStepsList() {
-		return EvolisEncodePrintTask.UI_STEPS_LIST;
+		return EvolisPrintEncodeTask.UI_STEPS_LIST;
 	}
 
 	@Override
 	protected Task<String> createTask() {
 		esupSgcHeartbeatService.setEsupSgcPrinterService(evolisPrinterService);
 		esupSgcHeartbeatService.restart();
-		return new EvolisEncodePrintTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcRestClientService, evolisPrinterService, encodingService);
+		return new EvolisPrintEncodeTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcRestClientService, evolisPrinterService, encodingService);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class EvolisEncodePrintTaskService extends EsupSgcTaskService {
 
 	@Override
 	public String getLabel() {
-		return ENCODAGE_ET_IMPRESSION_VIA_EVOLIS;
+		return IMPRESSION_ET_ENCODAGE_VIA_EVOLIS;
 	}
 
 	@Override

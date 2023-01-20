@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class EvolisReadNfcTask extends EsupSgcTask {
 
-    private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
+    private final static Logger log = Logger.getLogger(EvolisPrintEncodeTaskService.class);
 
     final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{
             UiStep.printer_nfc,

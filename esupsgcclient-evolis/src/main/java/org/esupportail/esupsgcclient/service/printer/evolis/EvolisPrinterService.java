@@ -134,10 +134,10 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 						log.trace(responseStr.length() > 200 ? responseStr.substring(0, 200) : responseStr);
 						break;
 					} else {
-						if(System.currentTimeMillis()-time>30000) {
+						if(System.currentTimeMillis()-time>60000) {
 							// close socket - sinon evolis center reste en boucle infinie
 							socketInputStream.close();
-							throw new EvolisSocketException("No response of Evolis after 30 sec -> abort", null);
+							throw new EvolisSocketException("No response of Evolis after 60 sec -> abort", null);
 						} else if(System.currentTimeMillis()-time>1000*k) {
 							k++;
 							log.debug("SocketTimeoutException after " + k + " sec - but no response - we continue ...");
@@ -213,6 +213,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	}
 
 	public void print() {
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.noEject());
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.print());
 	}
 

@@ -117,12 +117,24 @@ public class EvolisPrinterCommands {
 	public EvolisRequest startSequence() {
 		EvolisRequest req = new EvolisRequest();
 		req.getParams().put("command", "Ss");
+		req.getParams().put("device", getDeviceName());
+		req.getParams().put("timeout", "5000");
 		return req;
 	}
 
 	public EvolisRequest endSequence() {
 		EvolisRequest req = new EvolisRequest();
 		req.getParams().put("command", "Se");
+		req.getParams().put("device", getDeviceName());
+		req.getParams().put("timeout", "5000");
+		return req;
+	}
+
+	public EvolisRequest noEject() {
+		EvolisRequest req = new EvolisRequest();
+		req.getParams().put("command", "Psoe;d");
+		req.getParams().put("device", getDeviceName());
+		req.getParams().put("timeout", "5000");
 		return req;
 	}
 
@@ -146,5 +158,6 @@ public class EvolisPrinterCommands {
 	boolean isPrimacy2() {
 		return "Evolis Primacy 2".equals(appConfig.getPrinterDeviceName());
 	}
+
 
 }

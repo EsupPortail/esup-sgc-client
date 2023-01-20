@@ -9,6 +9,7 @@ import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.esupportail.esupsgcclient.utils.Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -19,21 +20,20 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
-public class EvolisEncodePrintTask extends EsupSgcTask {
+public class EvolisPrintEncodeTask extends EsupSgcTask {
 
-    private final static Logger log = Logger.getLogger(EvolisEncodePrintTaskService.class);
+    private final static Logger log = Logger.getLogger(EvolisPrintEncodeTaskService.class);
 
     final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{
             UiStep.long_poll,
             UiStep.bmp_black,
             UiStep.bmp_color,
-            UiStep.printer_nfc,
-            UiStep.encode,
             UiStep.printer_color,
             UiStep.printer_black,
             UiStep.printer_overlay,
             UiStep.printer_print,
-            UiStep.sgc_ok});
+            UiStep.printer_nfc,
+            UiStep.encode});
 
     ImageView bmpColorImageView;
 
@@ -41,7 +41,7 @@ public class EvolisEncodePrintTask extends EsupSgcTask {
     EsupSgcRestClientService esupSgcRestClientService;
     EvolisPrinterService evolisPrinterService;
     EncodingService encodingService;
-    public EvolisEncodePrintTask(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView,
+    public EvolisPrintEncodeTask(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView,
                                  EsupSgcRestClientService esupSgcRestClientService, EvolisPrinterService evolisPrinterService, EncodingService encodingService) {
         super(uiSteps);
         this.bmpColorImageView = bmpColorImageView;
@@ -75,13 +75,7 @@ public class EvolisEncodePrintTask extends EsupSgcTask {
             updateBmpUi(bmpColorAsBase64, bmpColorImageView);
             setUiStepSuccess(UiStep.bmp_color);
             String bmpOverlayAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.overlay);
-            evolisPrinterService.insertCardToContactLessStation(this);
-            setUiStepSuccess(UiStep.printer_nfc);
-            encodingService.pcscConnection(this);
-            encodingService.waitForCardPresent(5000);
-            String csn = encodingService.readCsn();
-            encodingService.encode(this, qrcode);
-            setUiStepSuccess(UiStep.encode);
+            evolisPrinterService.startSequence();
             evolisPrinterService.printBegin();
             evolisPrinterService.printSet();
             evolisPrinterService.printFrontColorBmp(bmpColorAsBase64);
@@ -92,8 +86,14 @@ public class EvolisEncodePrintTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.printer_overlay);
             evolisPrinterService.print();
             setUiStepSuccess(UiStep.printer_print);
-            esupSgcRestClientService.setCardEncodedPrinted(csn, qrcode);
-            setUiStepSuccess(UiStep.sgc_ok);
+            evolisPrinterService.insertCardToContactLessStation(this);
+            Utils.sleep(500);
+            setUiStepSuccess(UiStep.printer_nfc);
+            encodingService.pcscConnection(this);
+            encodingService.waitForCardPresent(5000);
+            String csn = encodingService.readCsn();
+            encodingService.encode(this, qrcode);
+            setUiStepSuccess(UiStep.encode);
             String msgTimer = String.format("Carte éditée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
             updateTitle(msgTimer);
         } catch (Exception e) {
@@ -102,10 +102,11 @@ public class EvolisEncodePrintTask extends EsupSgcTask {
         } finally {
             try {
                 evolisPrinterService.printEnd();
-                resetBmpUi();
             } catch (Exception e) {
                 log.info("Can't reset printing session after exception", e);
             }
+            evolisPrinterService.endSequence();
+            resetBmpUi();
         }
 		return null;
 	}
