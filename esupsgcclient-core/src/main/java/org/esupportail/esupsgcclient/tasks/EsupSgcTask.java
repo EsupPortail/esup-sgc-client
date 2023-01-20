@@ -57,6 +57,9 @@ public abstract class EsupSgcTask extends Task<String> {
         if(uiStep == null) {
             updateProgress(0, getUiStepsList().size()*PROGRESS_STEP_LENGTH);
             updateTitle("En attente ...");
+            TextFlow uiStepTextFlow = (TextFlow) uiSteps.get(getUiStepsList().get(0));
+            uiStepTextFlow.getStyleClass().clear();
+            uiStepTextFlow.getStyleClass().add("alert-warning");
         } else {
             TextFlow uiStepTextFlow = (TextFlow) uiSteps.get(uiStep);
             uiStepTextFlow.getStyleClass().clear();
@@ -65,6 +68,9 @@ public abstract class EsupSgcTask extends Task<String> {
             if(getUiStepsList().indexOf(uiStep)+1<getUiStepsList().size()) {
                 UiStep newtUiStep = (UiStep) getUiStepsList().get(getUiStepsList().indexOf(uiStep) + 1);
                 updateTitle(newtUiStep.toString());
+                uiStepTextFlow = (TextFlow) uiSteps.get(newtUiStep);
+                uiStepTextFlow.getStyleClass().clear();
+                uiStepTextFlow.getStyleClass().add("alert-warning");
             }
         }
         lastUiStepSuccess = uiStep;
