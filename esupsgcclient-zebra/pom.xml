@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.esupportail.esupsgcclient</groupId>
+    <artifactId>esupsgcclient</artifactId>
+    <version>${revision}</version>
+  </parent>
+  <artifactId>esupsgcclient-zebra</artifactId>
+  <properties>
+    <zebra.link_os_sdk.lib>/opt/link_os_sdk/PC-Card/v2.14.5198/lib</zebra.link_os_sdk.lib>
+  </properties>
+  <dependencies>
+      <dependency>
+        <groupId>org.esupportail.esupsgcclient</groupId>
+        <artifactId>esupsgcclient-core</artifactId>
+        <version>${revision}</version>
+      </dependency>
+    <dependency>
+      <groupId>ccom.zebra.sdk.common</groupId>
+      <artifactId>ZSDK_API</artifactId>
+      <version>v2.14.5198</version>
+      <scope>system</scope>
+      <systemPath>${zebra.link_os_sdk.lib}/ZSDK_API.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>ccom.zebra.sdk.common.card</groupId>
+      <artifactId>com.zebra.sdk.common.card</artifactId>
+      <version>v2.14.5198</version>
+      <scope>system</scope>
+      <systemPath>${zebra.link_os_sdk.lib}/ZSDK_CARD_API.jar</systemPath>
+    </dependency>
+  </dependencies>
+</project>

@@ -27,6 +27,16 @@
         </dependency>
       </dependencies>
     </profile>
+    <profile>
+      <id>zebra</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.esupportail.esupsgcclient</groupId>
+          <artifactId>esupsgcclient-zebra</artifactId>
+          <version>${revision}</version>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
   <build>
     <plugins>
