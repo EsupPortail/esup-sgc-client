@@ -2,6 +2,10 @@ package org.esupportail.esupsgcclient.service.printer.zebra;
 
 import java.util.List;
 
+import com.zebra.sdk.common.card.enumerations.CardDestination;
+import com.zebra.sdk.common.card.enumerations.CardSource;
+import com.zebra.sdk.common.card.enumerations.SmartCardEncoderType;
+import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
 import jakarta.annotation.Resource;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -72,12 +76,21 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		if(zebraCardPrinter != null ) {
 				setSmartcardJob();
 		}
+
+
+
+		try {
+			zebraCardPrinter.setSetting(ZebraCardSettingNames.SMARTCARD_X_OFFSET, "450");
+			log.info(String.format("AllSetting : %s", zebraCardPrinter.getAllSettingValues()));
+		} catch (Exception e) {
+			log.warn(e);
+		}
 	}
 	public void setSmartcardJob(){
 		try {
-			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_SOURCE, "Feeder");
-			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_DESTINATION, "Hold");
-			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS, "MIFARE");
+			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_SOURCE, CardSource.Feeder.name());
+			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_DESTINATION, CardDestination.Hold.name());
+			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS, SmartCardEncoderType.MIFARE.name());
 		} catch (SettingsException e) {
 			log.error("Zebra settings error", e);
 		}
@@ -86,7 +99,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	public void launchEncoding() {
 		try {
 			setSmartcardJob();
-			jobId = zebraCardPrinter.positionCard();
+			jobId = zebraCardPrinter.smartCardEncode(1);
 		} catch (SettingsException | ZebraCardException | ConnectionException e) {
 			log.error("Zebra card encoder activation error", e);
 		}

@@ -37,11 +37,13 @@ public class ZebraReadNfcTask extends EsupSgcTask {
     @Override
     protected String call() throws Exception {
         try {
+            Utils.sleep(500);
             setUiStepRunning();
             setUiStepSuccess(null);
             zebraPrinterService.launchEncoding();
+            zebraPrinterService.pollJobStatus();
             setUiStepSuccess(UiStep.printer_nfc);
-            NfcResultBean nfcResultBean = encodingService.encode(this);
+            encodingService.encode(this);
             setUiStepSuccess(UiStep.encode);
             zebraPrinterService.eject();
         } catch (Exception e) {
@@ -51,6 +53,7 @@ public class ZebraReadNfcTask extends EsupSgcTask {
             updateTitle("Carte rejetée");
             throw new RuntimeException("Exception on  ZebraReadNfcTask : " + e.getMessage(), e);
         }
+        updateTitle4thisTask("ZebraReadNfcTask OK");
 		return null;
 	}
 

@@ -3,6 +3,7 @@ package org.esupportail.esupsgcclient.service.pcsc;
 import jnasmartcardio.Smartcardio;
 import jnasmartcardio.Smartcardio.JnaPCSCException;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.utils.Utils;
 
 import javax.smartcardio.Card;
 import javax.smartcardio.CardException;
@@ -45,13 +46,20 @@ public class PcscUsbService {
 	
 	public static String connection() throws CardException{
 		for (CardTerminal terminal : terminals.list()) {
-			if(!terminal.getName().contains("6121") && terminal.isCardPresent()){
-				cardTerminal = terminal;
+			if(terminal.isCardPresent()){
+				log.info("Try with terminal " + terminal.getName());
 				try{
-					card = cardTerminal.connect("*");
+					card = terminal.connect("*");
+					cardTerminal = terminal;
 					return cardTerminal.getName();
-				}catch(JnaPCSCException e) {
+				} catch(JnaPCSCException e) {
 					// if card nfc is ko for example
+					if(e.getMessage().contains("SCARD_E_NO_SMARTCARD") || e.getMessage().contains("SCARD_W_UNPOWERED_CARD")) {
+						log.info("wait ... " + e.getMessage());
+						log.info("wait ... " + terminal.getName());
+						Utils.sleep(200);
+						return connection();
+					}
 					throw new RuntimeException("pcsc connection error - " + e.getMessage(), e);
 				}
 			}
