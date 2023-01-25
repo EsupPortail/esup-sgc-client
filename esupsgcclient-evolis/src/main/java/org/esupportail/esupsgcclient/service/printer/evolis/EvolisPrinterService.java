@@ -240,10 +240,16 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.reject());
 	}
 
+/*
+ 	Do not use :redundant with printBegin ?
+ */
 	public void startSequence() {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.startSequence());
 	}
 
+	/*
+		Do not use : redundant with printEnd ?
+	 */
 	public void endSequence() {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.endSequence());
 	}
@@ -263,6 +269,18 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 			printEnd();
 		} catch(EvolisException e) {
 			log.trace("printEnd nos succeed : " + e.getMessage(), e);
+		}
+	}
+
+	public void setup() {
+		disableDriverPrinterStatus();
+	}
+
+	private void disableDriverPrinterStatus() {
+		try {
+			sendRequest(evolisPrinterCommands.disableDriverPrinterStatus());
+		} catch (EvolisSocketException e) {
+			log.warn("Cant disable driver printer status : " + e.getMessage(), e);
 		}
 	}
 }

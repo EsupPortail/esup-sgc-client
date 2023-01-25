@@ -32,7 +32,10 @@ public class EvolisHeartbeatTaskService extends Service<Void> {
                         EvolisResponse status = evolisPrinterService.getPrinterStatus();
                         String printerStatus = status.getResult();
                         if(printerStatus.contains("PRINTER_READY")) {
-                            appSession.setPrinterReady(true);
+                            if(!appSession.isPrinterReady()) {
+                                evolisPrinterService.setup();
+                                appSession.setPrinterReady(true);
+                            }
                         }
                         if(printerStatus!=null && !printerStatus.equals(lastPrinterStatus)) {
                             lastPrinterStatus = printerStatus;
