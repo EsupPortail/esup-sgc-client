@@ -9,7 +9,9 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.TilePane;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
@@ -26,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.Optional;
 
 
 /**
@@ -63,9 +66,11 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		evolisReject.setText("Rejeter la carte");
 		MenuItem evolisPrintEnd = new MenuItem();
 		evolisPrintEnd.setText("Clore la session d'impression");
+		MenuItem evolisCommand = new MenuItem();
+		evolisCommand.setText("Envoyer une commande avancée à l'imprimante");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis");
-		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd);
+		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd, evolisCommand);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
@@ -95,6 +100,27 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 				});
 				th.setDaemon(true);
 				th.start();
+			}
+		});
+
+		TilePane r = new TilePane();
+		TextInputDialog td = new TextInputDialog("Rvtods");
+		td.setHeaderText("Lancer une commande à l'imprimante evolis");
+		td.setContentText("Commande");
+		evolisCommand.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				Optional<String> result = td.showAndWait();
+				result.ifPresent(command -> {
+					try {
+						logTextarea.appendText("Send command to evolis : " + command + "\n");
+						EvolisResponse response = sendRequest(evolisPrinterCommands.getEvolisCommandFromPlainText(command));
+						logTextarea.appendText("Response from evolis : " + response.getResult() + "\n");
+					} catch (EvolisSocketException ex) {
+						logTextarea.appendText("Evolis exception : " + ex.getMessage() + "\n");
+						log.warn(String.format("Evolis exception sending command %s : %s", command, ex.getMessage()), ex);
+					}
+				});
 			}
 		});
 
@@ -273,12 +299,12 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	}
 
 	public void setup() {
-		disableDriverPrinterStatus();
+		disableSomePrinterStatus();
 	}
 
-	private void disableDriverPrinterStatus() {
+	private void disableSomePrinterStatus() {
 		try {
-			sendRequest(evolisPrinterCommands.disableDriverPrinterStatus());
+			sendRequest(evolisPrinterCommands.disableFeederNearEmptyPrinterStatus());
 		} catch (EvolisSocketException e) {
 			log.warn("Cant disable driver printer status : " + e.getMessage(), e);
 		}

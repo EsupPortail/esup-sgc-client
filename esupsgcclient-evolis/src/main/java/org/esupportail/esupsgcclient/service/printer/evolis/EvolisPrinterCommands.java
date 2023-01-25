@@ -152,12 +152,11 @@ public class EvolisPrinterCommands {
 	}
 
 	/*
-		Disable printer popup from evolis driver
-		Permet d'éviter d'avoir des popups qui interrompent l'édition d'une carte (pour avertir que le ruban est bientôt fini par exemple, ...)
+		Permet d'éviter d'avoir des popups qui interrompent l'édition d'une carte (pour avertir que le ruban est bientôt fini)
 	 */
-	public EvolisRequest disableDriverPrinterStatus() {
+	public EvolisRequest disableFeederNearEmptyPrinterStatus() {
 		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Pps;0");
+		req.getParams().put("command", "Ppsc;n;S;D");
 		req.getParams().put("device", getDeviceName());
 		req.getParams().put("timeout", "5000");
 		return req;
@@ -171,4 +170,11 @@ public class EvolisPrinterCommands {
 		return "Evolis Primacy 2".equals(appConfig.getPrinterDeviceName());
 	}
 
+	public EvolisRequest getEvolisCommandFromPlainText(String plainTextCommand) {
+		EvolisRequest req = new EvolisRequest();
+		req.getParams().put("command", plainTextCommand);
+		req.getParams().put("device", getDeviceName());
+		req.getParams().put("timeout", "5000");
+		return req;
+	}
 }
