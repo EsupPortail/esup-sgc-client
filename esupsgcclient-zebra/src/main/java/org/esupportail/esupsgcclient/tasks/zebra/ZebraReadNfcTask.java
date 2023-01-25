@@ -52,6 +52,8 @@ public class ZebraReadNfcTask extends EsupSgcTask {
             //zebraPrinterService.reset();
             updateTitle("Carte rejetée");
             throw new RuntimeException("Exception on  ZebraReadNfcTask : " + e.getMessage(), e);
+        } finally {
+            zebraPrinterService.cancelJob();
         }
         updateTitle4thisTask("ZebraReadNfcTask OK");
 		return null;

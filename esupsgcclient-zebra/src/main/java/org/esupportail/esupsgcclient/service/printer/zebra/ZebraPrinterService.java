@@ -80,7 +80,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 
 
 		try {
-			zebraCardPrinter.setSetting(ZebraCardSettingNames.SMARTCARD_X_OFFSET, "450");
+			zebraCardPrinter.setSetting(ZebraCardSettingNames.SMARTCARD_X_OFFSET, "0");
 			log.info(String.format("AllSetting : %s", zebraCardPrinter.getAllSettingValues()));
 		} catch (Exception e) {
 			log.warn(e);
@@ -207,7 +207,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			while(status == null){
 				Utils.sleep(250);
 				try {
-					log.debug(zebraCardPrinter.getPrinterStatus().status +" : " +  zebraCardPrinter.getPrinterStatus().alarmInfo.description);
+					log.trace(zebraCardPrinter.getPrinterStatus().status +" : " +  zebraCardPrinter.getPrinterStatus().alarmInfo.description);
 					status = zebraCardPrinter.getPrinterStatus().status + " " + zebraCardPrinter.getPrinterStatus().alarmInfo.description;
 				} catch (ConnectionException | SettingsException | ZebraCardException e) {
 					log.error(e);
