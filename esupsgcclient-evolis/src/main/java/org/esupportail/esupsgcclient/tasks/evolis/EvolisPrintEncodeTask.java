@@ -28,12 +28,12 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
             UiStep.long_poll,
             UiStep.bmp_black,
             UiStep.bmp_color,
+            UiStep.printer_nfc,
+            UiStep.encode,
             UiStep.printer_color,
             UiStep.printer_black,
             UiStep.printer_overlay,
-            UiStep.printer_print,
-            UiStep.printer_nfc,
-            UiStep.encode});
+            UiStep.printer_print});
 
     ImageView bmpColorImageView;
 
@@ -81,6 +81,14 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
                 Utils.sleep(5000);
                 evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
             }
+            evolisPrinterService.insertCardToContactLessStation(this);
+            Utils.sleep(500);
+            setUiStepSuccess(UiStep.printer_nfc);
+            encodingService.pcscConnection(this);
+            encodingService.waitForCardPresent(5000);
+            String csn = encodingService.readCsn();
+            encodingService.encode(this, qrcode);
+            setUiStepSuccess(UiStep.encode);
             evolisPrinterService.printBegin();
             evolisPrinterService.printSet();
             evolisPrinterService.printFrontColorBmp(bmpColorAsBase64);
@@ -91,26 +99,13 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.printer_overlay);
             evolisPrinterService.print();
             setUiStepSuccess(UiStep.printer_print);
-            evolisPrinterService.insertCardToContactLessStation(this);
-            Utils.sleep(500);
-            setUiStepSuccess(UiStep.printer_nfc);
-            encodingService.pcscConnection(this);
-            encodingService.waitForCardPresent(5000);
-            String csn = encodingService.readCsn();
-            encodingService.encode(this, qrcode);
-            setUiStepSuccess(UiStep.encode);
             String msgTimer = String.format("Carte éditée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
             updateTitle(msgTimer);
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
             throw new RuntimeException("Exception on  EvolisTask : " + e.getMessage(), e);
         } finally {
-            try {
-                evolisPrinterService.printEnd();
-            } catch (Exception e) {
-                log.info("Can't reset printing session after exception", e);
-            }
-            evolisPrinterService.endSequence();
+            evolisPrinterService.try2printEnd();
             resetBmpUi();
         }
 		return null;

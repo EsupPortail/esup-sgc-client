@@ -156,6 +156,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 					responseStr = responseStr + new String(buffer);
 				} catch(SocketTimeoutException | SocketException ex){
 					if(StringUtils.hasText(responseStr)) {
+						log.trace("cmdString : " + cmdString);
 						log.trace("SocketTimeoutException - response received - we stop it");
 						log.trace(responseStr.length() > 200 ? responseStr.substring(0, 200) : responseStr);
 						break;
@@ -197,6 +198,9 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		try {
 			response = sendRequest(evolisRequest);
 		} catch (EvolisSocketException e) {
+			if(e.getMessage().contains("Communication session already reserved")) {
+				throw new RuntimeException("Exception when sending evolis request - Communication session already reserved : " + evolisRequest, e);
+			}
 			log.warn("Exception when sending evolis request (we retry it in 2 sec) : " + evolisRequest, e);
 			Utils.sleep(2000);
 			sendRequestAndRetryIfFailed(evolisRequest);
@@ -221,8 +225,8 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.printSet(appConfig.getPrinterEvolisSet()));
 	}
 
-	public void printEnd() {
-		sendRequestAndRetryIfFailed(evolisPrinterCommands.printEnd());
+	public void printEnd() throws EvolisSocketException {
+		sendRequest(evolisPrinterCommands.printEnd());
 	}
 
 
@@ -239,8 +243,16 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	}
 
 	public void print() {
-		sendRequestAndRetryIfFailed(evolisPrinterCommands.noEject());
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.print());
+	}
+
+	/*
+	 Ne fonctionne pas avec Primacy2
+	 -> après impression sur Primacy2 la carte est forcément éjectée
+	 -> on encode puis imprime au lieu d'imprimer puis encoder ...
+	 */
+	public void noEject() {
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.noEject());
 	}
 
 	public EvolisResponse insertCardToContactLessStation(EsupSgcTask esupSgcTask) {
@@ -293,8 +305,8 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	public void try2printEnd() {
 		try {
 			printEnd();
-		} catch(EvolisException e) {
-			log.trace("printEnd nos succeed : " + e.getMessage(), e);
+		} catch(Exception e) {
+			log.warn("printEnd nos succeed : " + e.getMessage(), e);
 		}
 	}
 
@@ -309,4 +321,5 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 			log.warn("Cant disable driver printer status : " + e.getMessage(), e);
 		}
 	}
+
 }

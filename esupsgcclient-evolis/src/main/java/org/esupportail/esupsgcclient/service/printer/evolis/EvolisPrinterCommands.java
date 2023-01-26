@@ -87,6 +87,7 @@ public class EvolisPrinterCommands {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.End");
 		req.getParams().put("session", JOB_ID);
+		req.getParams().put("timeout", "5000");
 		return req;
 	}
 
