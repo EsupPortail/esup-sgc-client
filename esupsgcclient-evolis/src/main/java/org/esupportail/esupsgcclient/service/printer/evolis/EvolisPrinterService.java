@@ -245,12 +245,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	public void print() {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.print());
 	}
-
-	/*
-	 Ne fonctionne pas avec Primacy2
-	 -> après impression sur Primacy2 la carte est forcément éjectée
-	 -> on encode puis imprime au lieu d'imprimer puis encoder ...
-	 */
+	
 	public void noEject() {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.noEject());
 	}
