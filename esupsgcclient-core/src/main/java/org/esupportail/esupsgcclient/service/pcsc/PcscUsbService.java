@@ -76,7 +76,12 @@ public class PcscUsbService {
 	}
 
 	public static String getTerminalName() throws CardException, PcscException {
-		if(terminals==null || terminals.list().isEmpty()) {
+		try {
+			if (terminals == null || terminals.list().isEmpty()) {
+				init();
+			}
+		} catch(Exception e) {
+			log.warn("Exception on PC/SC - retry to init", e);
 			init();
 		}
 		for (CardTerminal terminal : terminals.list()) {

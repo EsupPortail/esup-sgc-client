@@ -95,6 +95,12 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.printer_print);
             evolisPrinterService.printEnd();
             evolisPrinterService.insertCardToContactLessStation(this);
+            evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
+            while(!evolisPrinterStatus.contains("ENCODING_RUNNING")) {
+                updateTitle(String.format("en attente d'une carte ...", evolisPrinterStatus));
+                Utils.sleep(100);
+                evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
+            }
             setUiStepSuccess(UiStep.printer_nfc);
             encodingService.pcscConnection(this);
             encodingService.waitForCardPresent(5000);

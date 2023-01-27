@@ -163,6 +163,22 @@ public class EvolisPrinterCommands {
 		return req;
 	}
 
+	public EvolisRequest resetSequence() {
+		EvolisRequest req = new EvolisRequest();
+		req.getParams().put("command", "Srs");
+		req.getParams().put("device", getDeviceName());
+		req.getParams().put("timeout", "5000");
+		return req;
+	}
+
+	public EvolisRequest restoreManufactureParameters() {
+		EvolisRequest req = new EvolisRequest();
+		req.getParams().put("command", "Rmp;all");
+		req.getParams().put("device", getDeviceName());
+		req.getParams().put("timeout", "5000");
+		return req;
+	}
+
 	String getDeviceName() {
 		return appConfig.getPrinterDeviceName();
 	}
@@ -178,4 +194,5 @@ public class EvolisPrinterCommands {
 		req.getParams().put("timeout", "5000");
 		return req;
 	}
+
 }

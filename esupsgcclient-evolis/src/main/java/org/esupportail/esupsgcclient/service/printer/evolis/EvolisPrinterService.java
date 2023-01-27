@@ -66,11 +66,13 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		evolisReject.setText("Rejeter la carte");
 		MenuItem evolisPrintEnd = new MenuItem();
 		evolisPrintEnd.setText("Clore la session d'impression");
+		MenuItem evolisRestoreManufactureParameters = new MenuItem();
+		evolisRestoreManufactureParameters.setText("Restaurer les paramètres d'usine de l'imprimante");
 		MenuItem evolisCommand = new MenuItem();
 		evolisCommand.setText("Envoyer une commande avancée à l'imprimante");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis");
-		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd, evolisCommand);
+		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd,evolisRestoreManufactureParameters,  evolisCommand);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
@@ -103,8 +105,23 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 			}
 		});
 
+		evolisRestoreManufactureParameters.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				Thread th = new Thread(new Task<>() {
+					@Override
+					protected Object call() throws Exception {
+						restoreManufactureParameters();
+						return null;
+					}
+				});
+				th.setDaemon(true);
+				th.start();
+			}
+		});
+
 		TilePane r = new TilePane();
-		TextInputDialog td = new TextInputDialog("Rvtods");
+		TextInputDialog td = new TextInputDialog("Echo;ESUP-SGC d'ESUP-Portail");
 		td.setHeaderText("Lancer une commande à l'imprimante evolis");
 		td.setContentText("Commande");
 		evolisCommand.setOnAction(new EventHandler<ActionEvent>() {
@@ -245,7 +262,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	public void print() {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.print());
 	}
-	
+
 	public void noEject() {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.noEject());
 	}
@@ -285,6 +302,14 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	 */
 	public void endSequence() {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.endSequence());
+	}
+
+	public void reset() {
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.resetSequence());
+	}
+
+	void restoreManufactureParameters() {
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.restoreManufactureParameters());
 	}
 
 	public EvolisResponse getNextCleaningSteps() {
