@@ -133,7 +133,7 @@ public class EvolisPrinterCommands {
 
 	public EvolisRequest noEject() {
 		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Psoe;d");
+		req.getParams().put("command", "Psoe;D");
 		req.getParams().put("device", getDeviceName());
 		req.getParams().put("timeout", "5000");
 		return req;

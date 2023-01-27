@@ -18,6 +18,7 @@ import org.esupportail.esupsgcclient.service.sgc.EsupSgcHeartbeatService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskSupervisionService;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 
@@ -111,7 +112,8 @@ public class EsupSgcTaskServiceFactory {
             startStopListeners.put(esupSgcTaskService.getLabel(), (ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
                 if(newValue) {
                     if(autostart.isSelected()) {
-                        logTextarea.appendText(String.format("Autostart est activé, le service '%s' va démarrer.\n", esupSgcTaskService.getLabel()));
+                        logTextarea.appendText(String.format("Autostart est activé, le service '%s' va démarrer dans 5 secondes.\n", esupSgcTaskService.getLabel()));
+                        Utils.sleep(5000);
                         runService(esupSgcTaskService.getLabel());
                     } else {
                         logTextarea.appendText(String.format("Le service '%s' est prêt à démarrer.\n", esupSgcTaskService.getLabel()));
