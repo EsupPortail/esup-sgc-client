@@ -2,9 +2,11 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -51,6 +53,9 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	@Resource
 	EvolisHeartbeatTaskService evolisHeartbeatTaskService;
 
+	@Resource
+	EvolisTestPcsc evolisTestPcsc;
+
 	@Override
 	public String getMaintenanceInfo() {
 		return getNextCleaningSteps().getResult();
@@ -68,9 +73,11 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		evolisPrintEnd.setText("Clore la session d'impression");
 		MenuItem evolisCommand = new MenuItem();
 		evolisCommand.setText("Envoyer une commande avancée à l'imprimante");
+		MenuItem testPcsc = new MenuItem();
+		testPcsc.setText("Stress test pc/sc");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis");
-		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd, evolisCommand);
+		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd, evolisCommand, testPcsc);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
@@ -100,6 +107,13 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 				});
 				th.setDaemon(true);
 				th.start();
+			}
+		});
+
+		testPcsc.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				evolisTestPcsc.getTestPcscDialog().show();
 			}
 		});
 
