@@ -63,13 +63,11 @@ public class EvolisTestPcsc {
                 }
             }
             log.info("terminal ok : " + cardTerminalName);
-            long time = System.currentTimeMillis();
-            int k = 0;
             log.info("test run for 10 sec");
             boolean cardWasPresent = false;
             int nbFailed = 0;
-            while(System.currentTimeMillis()-time<10000) {
-                final String fk = Double.toString(k/10.0);
+            long time = System.currentTimeMillis();
+            while(System.currentTimeMillis()-time<10200) {
                 boolean isCardPresent = false;
                 try {
                     isCardPresent = PcscUsbService.isCardPresent();
@@ -77,6 +75,7 @@ public class EvolisTestPcsc {
                 } catch (CardException e) {
                     e.printStackTrace();
                 }
+                final String fk = String.format("%.1f", (System.currentTimeMillis()-time)/1000.0);
                 final int fv = isCardPresent ? 1 : 0;
                 Platform.runLater(() ->
                         {
@@ -84,7 +83,7 @@ public class EvolisTestPcsc {
                         }
                 );
                 if(cardWasPresent && !isCardPresent) {
-                    log.warn("card no more present after " + k/10.0 + " sec");
+                    log.warn("card no more present after " + fk + " sec");
                     nbFailed++;
                     final String newTtitle = String.format("PC/SC Stress Test - %d erreur(s)", nbFailed);
                     Platform.runLater(() ->
@@ -93,7 +92,6 @@ public class EvolisTestPcsc {
                     });
                 }
                 Utils.sleep(100);
-                k++;
             }
             log.info("test finished - nb failed : " + nbFailed);
 
