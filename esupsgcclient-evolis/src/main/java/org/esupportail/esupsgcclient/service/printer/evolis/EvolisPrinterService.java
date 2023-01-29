@@ -2,12 +2,6 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
-import javafx.animation.PauseTransition;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -16,8 +10,10 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.TilePane;
 import org.esupportail.esupsgcclient.AppConfig;
+import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
+import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +51,10 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	EvolisHeartbeatTaskService evolisHeartbeatTaskService;
 
 	@Resource
-	EvolisTestPcsc evolisTestPcsc;
+	EsupSgcTestPcscDialog esupSgcTestPcscDialog;
+
+	@Resource
+	AppSession appSession;
 
 	@Override
 	public String getMaintenanceInfo() {
@@ -90,8 +89,12 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		});
 
 		testPcsc.setOnAction(actionEvent -> {
-			evolisTestPcsc.getTestPcscDialog().show();
+			esupSgcTestPcscDialog.getTestPcscDialog(
+					()->try2sendRequest(evolisPrinterCommands.insertCardToContactLessStation()),
+					()->try2sendRequest(evolisPrinterCommands.eject())
+			).show();
 		});
+		testPcsc.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()).or(appSession.printerReadyProperty().not()));
 
 		TilePane r = new TilePane();
 		TextInputDialog td = new TextInputDialog("Rvtods");
@@ -216,6 +219,9 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		sendRequest(evolisPrinterCommands.printEnd());
 	}
 
+	public void try2printEnd() {
+		try2sendRequest(evolisPrinterCommands.printEnd());
+	}
 
 	public void printFrontColorBmp(String bmpColorAsBase64) {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
@@ -284,11 +290,11 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		return null;
 	}
 
-	public void try2printEnd() {
+	void try2sendRequest(EvolisRequest evolisRequest) {
 		try {
-			printEnd();
+			sendRequest(evolisRequest);
 		} catch(Exception e) {
-			log.warn("printEnd nos succeed : " + e.getMessage(), e);
+			log.warn(evolisRequest + " nos succeed : " + e.getMessage(), e);
 		}
 	}
 

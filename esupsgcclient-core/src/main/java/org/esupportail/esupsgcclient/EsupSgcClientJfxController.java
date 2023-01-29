@@ -29,6 +29,7 @@ import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
+import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,9 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	@FXML
 	MenuItem reinitAndExit;
+
+	@FXML
+	MenuItem pcscTest;
 
 	@FXML
 	MenuItem exit;
@@ -141,6 +145,9 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Resource
 	EsupNfcClientStackPane esupNfcClientStackPane;
 
+	@Resource
+	EsupSgcTestPcscDialog esupSgcTestPcscDialog;
+
 	Stage stage;
 
 	@Override
@@ -219,6 +226,9 @@ public class EsupSgcClientJfxController implements Initializable {
 				startButton.setDisable(true);
 			}
 		});
+
+		pcscTest.setOnAction(event -> esupSgcTestPcscDialog.getTestPcscDialog(null, null).show());
+		pcscTest.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()));
 
 		exit.setOnAction(event -> stage.close());
 

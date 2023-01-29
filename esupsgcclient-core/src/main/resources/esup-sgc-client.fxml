@@ -23,10 +23,11 @@
    <children>
       <MenuBar fx:id="menuBar">
         <menus>
-            <Menu mnemonicParsing="false" text="Options">
+            <Menu mnemonicParsing="false" text="Général">
                <items>
                   <CheckMenuItem fx:id="autostart" mnemonicParsing="false" selected="false" text="Autostart" />
                   <MenuItem fx:id="reinitAndExit" mnemonicParsing="false" text="Réinitialiser et quitter" />
+                  <MenuItem fx:id="pcscTest" mnemonicParsing="false" text="Test PC/SC" />
                   <MenuItem fx:id="exit" mnemonicParsing="false" text="Quitter" />
                </items>
             </Menu>

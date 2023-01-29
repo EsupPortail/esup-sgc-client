@@ -1,10 +1,8 @@
-package org.esupportail.esupsgcclient.service.printer.evolis;
+package org.esupportail.esupsgcclient.ui;
 
 
-import jakarta.annotation.Resource;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -18,17 +16,13 @@ import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
 import javax.smartcardio.CardException;
-import java.util.Random;
 
 @Component
-public class EvolisTestPcsc {
+public class EsupSgcTestPcscDialog {
 
-    private final static Logger log = Logger.getLogger(EvolisTestPcsc.class);
+    private final static Logger log = Logger.getLogger(EsupSgcTestPcscDialog.class);
 
-    @Resource
-    EvolisPrinterCommands evolisPrinterCommands;
-
-    public Dialog getTestPcscDialog() {
+    public Dialog getTestPcscDialog(Runnable runAtStart, Runnable runAtEnd) {
 
         log.info("PC/SC Dialog test init");
 
@@ -49,8 +43,9 @@ public class EvolisTestPcsc {
         lineChart.getData().add(series);
 
         Thread testPcSc = new Thread(() -> {
-            log.info("insertCardToContactLessStation");
-            evolisPrinterCommands.insertCardToContactLessStation();
+            if(runAtStart != null) {
+                runAtStart.run();
+            }
             log.info("wait for terminal ...");
             String cardTerminalName = null;
             while(cardTerminalName==null) {
@@ -94,8 +89,9 @@ public class EvolisTestPcsc {
                 Utils.sleep(100);
             }
             log.info("test finished - nb failed : " + nbFailed);
-
-            evolisPrinterCommands.eject();
+            if(runAtEnd != null) {
+                runAtEnd.run();
+            }
         });
 
         DialogPane dialogPane = new DialogPane();
