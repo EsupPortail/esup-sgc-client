@@ -2,6 +2,7 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -80,62 +81,34 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd, evolisCommand, testPcsc);
 		menuBar.getMenus().add(evolisMenu);
 
-		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Thread th = new Thread(new Task<>() {
-					@Override
-					protected Object call() throws Exception {
-						reject();
-						return null;
-					}
-				});
-				th.setDaemon(true);
-				th.start();
-			}
+		evolisReject.setOnAction(actionEvent -> {
+			new Thread(() -> reject()).start();
 		});
 
-		evolisPrintEnd.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Thread th = new Thread(new Task<>() {
-					@Override
-					protected Object call() throws Exception {
-						printEnd();
-						return null;
-					}
-				});
-				th.setDaemon(true);
-				th.start();
-			}
+		evolisPrintEnd.setOnAction(actionEvent -> {
+			new Thread(() -> try2printEnd()).start();
 		});
 
-		testPcsc.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				evolisTestPcsc.getTestPcscDialog().show();
-			}
+		testPcsc.setOnAction(actionEvent -> {
+			evolisTestPcsc.getTestPcscDialog().show();
 		});
 
 		TilePane r = new TilePane();
 		TextInputDialog td = new TextInputDialog("Rvtods");
 		td.setHeaderText("Lancer une commande à l'imprimante evolis");
 		td.setContentText("Commande");
-		evolisCommand.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Optional<String> result = td.showAndWait();
-				result.ifPresent(command -> {
-					try {
-						logTextarea.appendText("Send command to evolis : " + command + "\n");
-						EvolisResponse response = sendRequest(evolisPrinterCommands.getEvolisCommandFromPlainText(command));
-						logTextarea.appendText("Response from evolis : " + response.getResult() + "\n");
-					} catch (EvolisSocketException ex) {
-						logTextarea.appendText("Evolis exception : " + ex.getMessage() + "\n");
-						log.warn(String.format("Evolis exception sending command %s : %s", command, ex.getMessage()), ex);
-					}
-				});
-			}
+		evolisCommand.setOnAction(actionEvent -> {
+			Optional<String> result = td.showAndWait();
+			result.ifPresent(command -> {
+				try {
+					logTextarea.appendText("Send command to evolis : " + command + "\n");
+					EvolisResponse response = sendRequest(evolisPrinterCommands.getEvolisCommandFromPlainText(command));
+					logTextarea.appendText("Response from evolis : " + response.getResult() + "\n");
+				} catch (EvolisSocketException ex) {
+					logTextarea.appendText("Evolis exception : " + ex.getMessage() + "\n");
+					log.warn(String.format("Evolis exception sending command %s : %s", command, ex.getMessage()), ex);
+				}
+			});
 		});
 
 	}
