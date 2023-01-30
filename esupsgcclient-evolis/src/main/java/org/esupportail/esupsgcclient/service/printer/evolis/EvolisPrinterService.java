@@ -79,9 +79,11 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		evolisCommand.setText("Envoyer une commande avancée à l'imprimante");
 		MenuItem testPcsc = new MenuItem();
 		testPcsc.setText("Stress test pc/sc");
+		MenuItem stopEvolis = new MenuItem();
+		stopEvolis.setText("Éteindre l'imprimante");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis");
-		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd,evolisRestoreManufactureParameters,  evolisRestart, evolisCommand, testPcsc);
+		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd,evolisRestoreManufactureParameters,  evolisRestart, evolisCommand, testPcsc, stopEvolis);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisReject.setOnAction(actionEvent -> {
@@ -124,6 +126,10 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 					log.warn(String.format("Evolis exception sending command %s : %s", command, ex.getMessage()), ex);
 				}
 			});
+		});
+
+		stopEvolis.setOnAction(actionEvent -> {
+			evolisShutdown();
 		});
 
 	}
@@ -253,6 +259,10 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 
 	public void noEject() {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.noEject());
+	}
+
+	private void evolisShutdown() {
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.shutdown());
 	}
 
 	public EvolisResponse insertCardToContactLessStation(EsupSgcTask esupSgcTask) {

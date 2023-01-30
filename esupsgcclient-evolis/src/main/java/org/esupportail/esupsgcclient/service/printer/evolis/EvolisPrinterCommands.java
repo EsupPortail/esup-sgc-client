@@ -115,6 +115,10 @@ public class EvolisPrinterCommands {
 		return getEvolisCommandFromPlainText("Psoe;D");
 	}
 
+	public EvolisRequest shutdown() {
+		return getEvolisCommandFromPlainText("Psdc;Force");
+	}
+
 	public EvolisRequest getNextCleaningSteps() {
 		EvolisRequest req = new EvolisRequest();
 		if(isPrimacy2()) {
