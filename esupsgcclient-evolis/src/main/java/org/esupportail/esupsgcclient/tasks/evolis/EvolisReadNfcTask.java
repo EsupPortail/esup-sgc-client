@@ -7,6 +7,7 @@ import org.esupportail.esupsgcclient.service.pcsc.NfcResultBean;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.esupportail.esupsgcclient.utils.Utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +39,18 @@ public class EvolisReadNfcTask extends EsupSgcTask {
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
+            // evolisPrinterService.setupCardToContactLessStation();
             evolisPrinterService.insertCardToContactLessStation(this);
+            Utils.sleep(5000);
+            String evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
+            while(!evolisPrinterStatus.contains("ENCODING_RUNNING")) {
+                updateTitle(String.format("en attente d'une carte ...", evolisPrinterStatus));
+                Utils.sleep(100);
+                evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
+            }
+            setUiStepSuccess(UiStep.printer_nfc);
+            encodingService.pcscConnection(this);
+            encodingService.waitForCardPresent(5000);
             setUiStepSuccess(UiStep.printer_nfc);
             NfcResultBean nfcResultBean = encodingService.encode(this);
             if(!nfcResultBean.inError()) {

@@ -62,9 +62,6 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
-            log.debug("reject and printEnd if needed - usually not necessary");
-            evolisPrinterService.reject();
-            evolisPrinterService.try2printEnd();
             log.debug("try to get qrcode ...");
             String qrcode = esupSgcRestClientService.getQrCode(this, null);
             long start = System.currentTimeMillis();
@@ -94,17 +91,20 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
             evolisPrinterService.print();
             setUiStepSuccess(UiStep.printer_print);
             evolisPrinterService.printEnd();
+            evolisPrinterService.setupCardToContactLessStation();
             evolisPrinterService.insertCardToContactLessStation(this);
+            Utils.sleep(5000);
             evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
             while(!evolisPrinterStatus.contains("ENCODING_RUNNING")) {
                 updateTitle(String.format("en attente d'une carte ...", evolisPrinterStatus));
-                Utils.sleep(100);
+                Utils.sleep(500);
                 evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
             }
             setUiStepSuccess(UiStep.printer_nfc);
             encodingService.pcscConnection(this);
             encodingService.waitForCardPresent(5000);
-            encodingService.readCsn();
+            String csn = encodingService.readCsn();
+            updateTitle4thisTask(csn);
             encodingService.encode(this, qrcode);
             setUiStepSuccess(UiStep.encode);
             evolisPrinterService.eject();

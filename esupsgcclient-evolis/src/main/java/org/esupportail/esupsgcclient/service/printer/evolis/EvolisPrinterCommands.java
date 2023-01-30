@@ -92,51 +92,27 @@ public class EvolisPrinterCommands {
 	}
 
 	EvolisRequest insertCardToContactLessStation() {
-		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Sic");
-		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
-		return req;
+		return getEvolisCommandFromPlainText("Sic");
 	}
 
 	EvolisRequest eject() {
-		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Se");
-		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
-		return req;
+		return getEvolisCommandFromPlainText("Se");
 	}
 
 	EvolisRequest reject() {
-		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Ser");
-		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
-		return req;
+		return getEvolisCommandFromPlainText("Ser");
 	}
 
 	public EvolisRequest startSequence() {
-		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Ss");
-		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
-		return req;
+		return getEvolisCommandFromPlainText("Ss");
 	}
 
 	public EvolisRequest endSequence() {
-		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Se");
-		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
-		return req;
+		return getEvolisCommandFromPlainText("Se");
 	}
 
 	public EvolisRequest noEject() {
-		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Psoe;D");
-		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
-		return req;
+		return getEvolisCommandFromPlainText("Psoe;D");
 	}
 
 	public EvolisRequest getNextCleaningSteps() {
@@ -156,27 +132,15 @@ public class EvolisPrinterCommands {
 		Permet d'éviter d'avoir des popups qui interrompent l'édition d'une carte (pour avertir que le ruban est bientôt fini)
 	 */
 	public EvolisRequest disableFeederNearEmptyPrinterStatus() {
-		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Ppsc;n;S;D");
-		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
-		return req;
-	}
-
-	public EvolisRequest resetSequence() {
-		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Srs");
-		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
-		return req;
+		return getEvolisCommandFromPlainText("Ppsc;n;S;D");
 	}
 
 	public EvolisRequest restoreManufactureParameters() {
-		EvolisRequest req = new EvolisRequest();
-		req.getParams().put("command", "Rmp;all");
-		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
-		return req;
+		return getEvolisCommandFromPlainText("Rmp;all");
+	}
+
+	public EvolisRequest evolisRestart() {
+		return getEvolisCommandFromPlainText("Srs");
 	}
 
 	String getDeviceName() {
@@ -195,4 +159,7 @@ public class EvolisPrinterCommands {
 		return req;
 	}
 
+	public EvolisRequest setupCardToContactLessStation() {
+		return getEvolisCommandFromPlainText("Poc;=;800");
+	}
 }

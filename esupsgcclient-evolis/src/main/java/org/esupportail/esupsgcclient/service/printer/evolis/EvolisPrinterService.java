@@ -68,11 +68,13 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		evolisPrintEnd.setText("Clore la session d'impression");
 		MenuItem evolisRestoreManufactureParameters = new MenuItem();
 		evolisRestoreManufactureParameters.setText("Restaurer les paramètres d'usine de l'imprimante");
+		MenuItem evolisRestart = new MenuItem();
+		evolisRestart.setText("Redémarrer l'imprimante");
 		MenuItem evolisCommand = new MenuItem();
 		evolisCommand.setText("Envoyer une commande avancée à l'imprimante");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis");
-		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd,evolisRestoreManufactureParameters,  evolisCommand);
+		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd,evolisRestoreManufactureParameters,  evolisRestart, evolisCommand);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
@@ -112,6 +114,21 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 					@Override
 					protected Object call() throws Exception {
 						restoreManufactureParameters();
+						return null;
+					}
+				});
+				th.setDaemon(true);
+				th.start();
+			}
+		});
+
+		evolisRestart.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				Thread th = new Thread(new Task<>() {
+					@Override
+					protected Object call() throws Exception {
+						evolisRestart();
 						return null;
 					}
 				});
@@ -304,13 +321,14 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.endSequence());
 	}
 
-	public void reset() {
-		sendRequestAndRetryIfFailed(evolisPrinterCommands.resetSequence());
-	}
-
 	void restoreManufactureParameters() {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.restoreManufactureParameters());
 	}
+
+	void evolisRestart() {
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.evolisRestart());
+	}
+
 
 	public EvolisResponse getNextCleaningSteps() {
 		try {
@@ -342,4 +360,11 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		}
 	}
 
+	public void setupCardToContactLessStation() {
+		try {
+			sendRequest(evolisPrinterCommands.setupCardToContactLessStation());
+		} catch (EvolisSocketException e) {
+			log.warn("Cant poc contacless printer offset : " + e.getMessage(), e);
+		}
+	}
 }
