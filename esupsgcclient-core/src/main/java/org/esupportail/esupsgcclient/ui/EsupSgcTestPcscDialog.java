@@ -10,6 +10,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.stage.Window;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -52,38 +53,46 @@ public class EsupSgcTestPcscDialog {
                 try {
                     cardTerminalName = PcscUsbService.connection();
                     log.debug("cardTerminal : " + cardTerminalName);
-                } catch (CardException e) {
-                    log.trace("pcsc connection error : " + e.getMessage());
+                } catch (Exception e) {
+                    log.trace("PCSC error : " + e.getMessage());
                     Utils.sleep(1000);
                 }
             }
             log.info("terminal ok : " + cardTerminalName);
-            log.info("test run for 10 sec");
-            boolean cardWasPresent = false;
+            log.info("test run for 20 sec");
+            boolean cardWasOk = false;
             int nbFailed = 0;
             long time = System.currentTimeMillis();
-            while(System.currentTimeMillis()-time<10200) {
-                boolean isCardPresent = false;
+            String lastTimeFailed = "";
+            while(System.currentTimeMillis()-time<20200) {
+                boolean isCardOk = false;
                 try {
-                    isCardPresent = PcscUsbService.isCardPresent();
-                    cardWasPresent = cardWasPresent || isCardPresent;
+                    isCardOk = PcscUsbService.isCardPresent() && !StringUtils.isEmpty(PcscUsbService.getCardId());
+                    cardWasOk = cardWasOk || isCardOk;
                 } catch (CardException e) {
-                    e.printStackTrace();
+                    log.error(String.format("Card exception after %.2f sec. - reconnect terminal", (System.currentTimeMillis()-time)/1000.0), e);
+                    try {
+                        cardTerminalName = PcscUsbService.connection();
+                    } catch (CardException ex) {
+                        log.warn(String.format("Can't reconnect terminal at %2.f sec", (System.currentTimeMillis()-time)/1000.0), e);
+                    }
+                    log.debug("cardTerminal : " + cardTerminalName);
                 }
-                final String fk = String.format("%.1f", (System.currentTimeMillis()-time)/1000.0);
-                final int fv = isCardPresent ? 1 : 0;
+                final String fk = String.format("%.1f sec", (System.currentTimeMillis()-time)/1000.0);
+                final int fv = isCardOk ? 1 : 0;
+                lastTimeFailed = isCardOk ? lastTimeFailed : fk;
                 Platform.runLater(() ->
                         {
                             series.getData().add(new XYChart.Data(fk, fv));
                         }
                 );
-                if(cardWasPresent && !isCardPresent) {
-                    log.warn("card no more present after " + fk + " sec");
+                if(cardWasOk && !isCardOk) {
+                    log.warn("card no more present after " + fk);
                     nbFailed++;
-                    final String newTtitle = String.format("PC/SC Stress Test - %d erreur(s)", nbFailed);
+                    final String newTitle = String.format("PC/SC Stress Test - %d error(s) - last error : %s", nbFailed, lastTimeFailed);
                     Platform.runLater(() ->
                     {
-                        title.setValue(newTtitle);
+                        title.setValue(newTitle);
                     });
                 }
                 Utils.sleep(100);
