@@ -93,7 +93,6 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
             evolisPrinterService.printEnd();
             evolisPrinterService.setupCardToContactLessStation();
             evolisPrinterService.insertCardToContactLessStation(this);
-            Utils.sleep(5000);
             evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
             while(!evolisPrinterStatus.contains("ENCODING_RUNNING")) {
                 updateTitle(String.format("en attente d'une carte ...", evolisPrinterStatus));

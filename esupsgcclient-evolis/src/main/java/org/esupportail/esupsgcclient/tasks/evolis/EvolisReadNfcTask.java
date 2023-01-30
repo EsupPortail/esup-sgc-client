@@ -41,7 +41,6 @@ public class EvolisReadNfcTask extends EsupSgcTask {
             setUiStepSuccess(null);
             // evolisPrinterService.setupCardToContactLessStation();
             evolisPrinterService.insertCardToContactLessStation(this);
-            Utils.sleep(5000);
             String evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
             while(!evolisPrinterStatus.contains("ENCODING_RUNNING")) {
                 updateTitle(String.format("en attente d'une carte ...", evolisPrinterStatus));
