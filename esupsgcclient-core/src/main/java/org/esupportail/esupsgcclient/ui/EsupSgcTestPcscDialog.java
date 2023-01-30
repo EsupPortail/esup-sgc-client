@@ -67,14 +67,15 @@ public class EsupSgcTestPcscDialog {
             while(System.currentTimeMillis()-time<20200) {
                 boolean isCardOk = false;
                 try {
-                    isCardOk = PcscUsbService.isCardPresent() && !StringUtils.isEmpty(PcscUsbService.getCardId());
+                    // Test : card is prsent AND get UID ok AND get challenge (for auth) ok
+                    isCardOk = PcscUsbService.isCardPresent() && !StringUtils.isEmpty(PcscUsbService.getCardId()) && !StringUtils.isEmpty(PcscUsbService.sendAPDU("901a0000010000"));
                     cardWasOk = cardWasOk || isCardOk;
                 } catch (CardException e) {
                     log.error(String.format("Card exception after %.2f sec. - reconnect terminal", (System.currentTimeMillis()-time)/1000.0), e);
                     try {
                         cardTerminalName = PcscUsbService.connection();
-                    } catch (CardException ex) {
-                        log.warn(String.format("Can't reconnect terminal at %2.f sec", (System.currentTimeMillis()-time)/1000.0), e);
+                    } catch (Exception ex) {
+                        log.warn(String.format("Can't reconnect terminal at %.2f sec", (System.currentTimeMillis()-time)/1000.0), e);
                     }
                     log.debug("cardTerminal : " + cardTerminalName);
                 }
