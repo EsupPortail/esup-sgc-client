@@ -2,9 +2,6 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -13,8 +10,10 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.TilePane;
 import org.esupportail.esupsgcclient.AppConfig;
+import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
+import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +50,12 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	@Resource
 	EvolisHeartbeatTaskService evolisHeartbeatTaskService;
 
+	@Resource
+	EsupSgcTestPcscDialog esupSgcTestPcscDialog;
+
+	@Resource
+	AppSession appSession;
+
 	@Override
 	public String getMaintenanceInfo() {
 		return getNextCleaningSteps().getResult();
@@ -72,90 +77,53 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		evolisRestart.setText("Redémarrer l'imprimante");
 		MenuItem evolisCommand = new MenuItem();
 		evolisCommand.setText("Envoyer une commande avancée à l'imprimante");
+		MenuItem testPcsc = new MenuItem();
+		testPcsc.setText("Stress test pc/sc");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis");
-		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd,evolisRestoreManufactureParameters,  evolisRestart, evolisCommand);
+		evolisMenu.getItems().addAll(evolisReject, evolisPrintEnd,evolisRestoreManufactureParameters,  evolisRestart, evolisCommand, testPcsc);
 		menuBar.getMenus().add(evolisMenu);
 
-		evolisReject.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Thread th = new Thread(new Task<>() {
-					@Override
-					protected Object call() throws Exception {
-						reject();
-						return null;
-					}
-				});
-				th.setDaemon(true);
-				th.start();
-			}
+		evolisReject.setOnAction(actionEvent -> {
+			new Thread(() -> reject()).start();
 		});
 
-		evolisPrintEnd.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Thread th = new Thread(new Task<>() {
-					@Override
-					protected Object call() throws Exception {
-						printEnd();
-						return null;
-					}
-				});
-				th.setDaemon(true);
-				th.start();
-			}
+		evolisPrintEnd.setOnAction(actionEvent -> {
+			new Thread(() -> try2printEnd()).start();
 		});
 
-		evolisRestoreManufactureParameters.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Thread th = new Thread(new Task<>() {
-					@Override
-					protected Object call() throws Exception {
-						restoreManufactureParameters();
-						return null;
-					}
-				});
-				th.setDaemon(true);
-				th.start();
-			}
+		evolisRestoreManufactureParameters.setOnAction(actionEvent -> {
+			restoreManufactureParameters();
 		});
 
-		evolisRestart.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Thread th = new Thread(new Task<>() {
-					@Override
-					protected Object call() throws Exception {
-						evolisRestart();
-						return null;
-					}
-				});
-				th.setDaemon(true);
-				th.start();
-			}
+		evolisRestart.setOnAction(actionEvent -> {
+			evolisRestart();
 		});
+
+		testPcsc.setOnAction(actionEvent -> {
+			esupSgcTestPcscDialog.getTestPcscDialog(
+					()->try2sendRequest(evolisPrinterCommands.insertCardToContactLessStation()),
+					()->try2sendRequest(evolisPrinterCommands.eject())
+			).show();
+		});
+		testPcsc.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()).or(appSession.printerReadyProperty().not()));
 
 		TilePane r = new TilePane();
 		TextInputDialog td = new TextInputDialog("Echo;ESUP-SGC d'ESUP-Portail");
 		td.setHeaderText("Lancer une commande à l'imprimante evolis");
 		td.setContentText("Commande");
-		evolisCommand.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				Optional<String> result = td.showAndWait();
-				result.ifPresent(command -> {
-					try {
-						logTextarea.appendText("Send command to evolis : " + command + "\n");
-						EvolisResponse response = sendRequest(evolisPrinterCommands.getEvolisCommandFromPlainText(command));
-						logTextarea.appendText("Response from evolis : " + response.getResult() + "\n");
-					} catch (EvolisSocketException ex) {
-						logTextarea.appendText("Evolis exception : " + ex.getMessage() + "\n");
-						log.warn(String.format("Evolis exception sending command %s : %s", command, ex.getMessage()), ex);
-					}
-				});
-			}
+		evolisCommand.setOnAction(actionEvent -> {
+			Optional<String> result = td.showAndWait();
+			result.ifPresent(command -> {
+				try {
+					logTextarea.appendText("Send command to evolis : " + command + "\n");
+					EvolisResponse response = sendRequest(evolisPrinterCommands.getEvolisCommandFromPlainText(command));
+					logTextarea.appendText("Response from evolis : " + response.getResult() + "\n");
+				} catch (EvolisSocketException ex) {
+					logTextarea.appendText("Evolis exception : " + ex.getMessage() + "\n");
+					log.warn(String.format("Evolis exception sending command %s : %s", command, ex.getMessage()), ex);
+				}
+			});
 		});
 
 	}
@@ -263,6 +231,9 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		sendRequest(evolisPrinterCommands.printEnd());
 	}
 
+	public void try2printEnd() {
+		try2sendRequest(evolisPrinterCommands.printEnd());
+	}
 
 	public void printFrontColorBmp(String bmpColorAsBase64) {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
@@ -340,11 +311,11 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		return null;
 	}
 
-	public void try2printEnd() {
+	void try2sendRequest(EvolisRequest evolisRequest) {
 		try {
-			printEnd();
+			sendRequest(evolisRequest);
 		} catch(Exception e) {
-			log.warn("printEnd nos succeed : " + e.getMessage(), e);
+			log.warn(evolisRequest + " nos succeed : " + e.getMessage(), e);
 		}
 	}
 

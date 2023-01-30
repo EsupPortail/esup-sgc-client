@@ -43,7 +43,11 @@ public class PcscUsbService {
 	public static boolean waitForCardPresent(long timeout) throws CardException{
 		return cardTerminal.waitForCardPresent(timeout);
 	}
-	
+
+	public static boolean isCardPresent() throws CardException{
+		return cardTerminal.isCardPresent();
+	}
+
 	public static String connection() throws CardException{
 		for (CardTerminal terminal : terminals.list()) {
 			if(terminal.isCardPresent()){
