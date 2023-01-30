@@ -119,6 +119,10 @@ public class EvolisPrinterCommands {
 		return getEvolisCommandFromPlainText("Psdc;Force");
 	}
 
+	public EvolisRequest evolisClearStatus() {
+		return getEvolisCommandFromPlainText("Scs");
+	}
+
 	public EvolisRequest getNextCleaningSteps() {
 		EvolisRequest req = new EvolisRequest();
 		if(isPrimacy2()) {
@@ -163,7 +167,4 @@ public class EvolisPrinterCommands {
 		return req;
 	}
 
-	public EvolisRequest setupCardToContactLessStation() {
-		return getEvolisCommandFromPlainText("Poc;=;800");
-	}
 }

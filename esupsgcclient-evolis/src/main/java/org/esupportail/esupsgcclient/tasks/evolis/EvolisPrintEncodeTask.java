@@ -91,7 +91,6 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
             evolisPrinterService.print();
             setUiStepSuccess(UiStep.printer_print);
             evolisPrinterService.printEnd();
-            evolisPrinterService.setupCardToContactLessStation();
             evolisPrinterService.insertCardToContactLessStation(this);
             evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
             while(!evolisPrinterStatus.contains("ENCODING_RUNNING")) {
