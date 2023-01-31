@@ -62,9 +62,9 @@ public class PcscUsbService {
 						log.info("wait ... " + e.getMessage());
 						log.info("wait ... " + terminal.getName());
 						Utils.sleep(200);
-						return connection();
+					} else {
+						throw new RuntimeException("pcsc connection error - " + e.getMessage(), e);
 					}
-					throw new RuntimeException("pcsc connection error - " + e.getMessage(), e);
 				}
 			}
 		}
