@@ -89,22 +89,23 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisReject.setOnAction(actionEvent -> {
-			new Thread(() -> reject()).start();
+			callCommand(evolisPrinterCommands.reject(), logTextarea);
 		});
 
 		evolisPrintEnd.setOnAction(actionEvent -> {
-			new Thread(() -> try2printEnd()).start();
+			callCommand(evolisPrinterCommands.printEnd(), logTextarea);
 		});
 
 		evolisClearStatus.setOnAction(actionEvent -> {
-			new Thread(() -> evolisClearStatus()).start();
+			callCommand(evolisPrinterCommands.evolisClearStatus(), logTextarea);
 		});
 
 		evolisRestoreManufactureParameters.setOnAction(actionEvent -> {
-			new Thread(() -> restoreManufactureParameters()).start();
+			callCommand(evolisPrinterCommands.restoreManufactureParameters(), logTextarea);
 		});
 
 		evolisRestart.setOnAction(actionEvent -> {
+			callCommand(evolisPrinterCommands.evolisRestart(), logTextarea);
 			new Thread(() -> evolisRestart()).start();
 		});
 
@@ -123,21 +124,27 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		evolisCommand.setOnAction(actionEvent -> {
 			Optional<String> result = td.showAndWait();
 			result.ifPresent(command -> {
-				try {
-					logTextarea.appendText("Send command to evolis : " + command + "\n");
-					EvolisResponse response = sendRequest(evolisPrinterCommands.getEvolisCommandFromPlainText(command));
-					logTextarea.appendText("Response from evolis : " + response.getResult() + "\n");
-				} catch (EvolisSocketException ex) {
-					logTextarea.appendText("Evolis exception : " + ex.getMessage() + "\n");
-					log.warn(String.format("Evolis exception sending command %s : %s", command, ex.getMessage()), ex);
-				}
+				callCommand(evolisPrinterCommands.getEvolisCommandFromPlainText(command), logTextarea);
 			});
 		});
 
 		stopEvolis.setOnAction(actionEvent -> {
-			new Thread(() -> evolisShutdown()).start();
+			callCommand(evolisPrinterCommands.shutdown(), logTextarea);
 		});
 
+	}
+
+	void callCommand(EvolisRequest evolisRequest, TextArea logTextarea) {
+		new Thread(() -> {
+			logTextarea.appendText("Send command to evolis : " + evolisRequest + "\n");
+			try {
+				EvolisResponse evolisResponse = sendRequest(evolisRequest);
+				logTextarea.appendText("Response from evolis : " + evolisResponse.getResult() + "\n");
+			} catch (EvolisSocketException ex) {
+				log.warn(String.format("Evolis exception sending command %s : %s", evolisRequest, ex.getMessage()), ex);
+				logTextarea.appendText("Evolis exception : " + ex.getMessage() + "\n");
+			}
+		}).start();
 	}
 
 	public Socket getSocket() {
