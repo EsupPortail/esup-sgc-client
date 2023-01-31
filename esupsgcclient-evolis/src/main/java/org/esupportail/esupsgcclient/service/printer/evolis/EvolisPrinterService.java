@@ -247,11 +247,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	}
 
 	public void printEnd() throws EvolisSocketException {
-		sendRequest(evolisPrinterCommands.printEnd());
-	}
-
-	public void try2printEnd() {
-		try2sendRequest(evolisPrinterCommands.printEnd());
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.printEnd());
 	}
 
 	public void printFrontColorBmp(String bmpColorAsBase64) {

@@ -79,6 +79,7 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
                 Utils.sleep(5000);
                 evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
             }
+            evolisPrinterService.startSequence();
             evolisPrinterService.noEject();
             evolisPrinterService.printBegin();
             evolisPrinterService.printSet();
