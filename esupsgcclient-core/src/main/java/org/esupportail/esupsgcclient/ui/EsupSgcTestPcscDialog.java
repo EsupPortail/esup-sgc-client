@@ -3,6 +3,7 @@ package org.esupportail.esupsgcclient.ui;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Task;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -43,66 +44,72 @@ public class EsupSgcTestPcscDialog {
 
         lineChart.getData().add(series);
 
-        Thread testPcSc = new Thread(() -> {
-            if(runAtStart != null) {
-                runAtStart.run();
-            }
-            log.info("wait for terminal ...");
-            String cardTerminalName = null;
-            while(cardTerminalName==null) {
-                try {
-                    cardTerminalName = PcscUsbService.connection();
-                    log.debug("cardTerminal : " + cardTerminalName);
-                } catch (Exception e) {
-                    log.trace("PCSC error : " + e.getMessage());
-                    Utils.sleep(1000);
+        Task testPcSc = new Task<Void>() {
+
+            @Override
+            protected Void call() {
+                if (runAtStart != null) {
+                    runAtStart.run();
                 }
-            }
-            log.info("terminal ok : " + cardTerminalName);
-            log.info("test run for 20 sec");
-            boolean cardWasOk = false;
-            int nbFailed = 0;
-            long time = System.currentTimeMillis();
-            String lastTimeFailed = "";
-            while(System.currentTimeMillis()-time<20200) {
-                boolean isCardOk = false;
-                try {
-                    // Test : card is prsent AND get UID ok AND get challenge (for auth) ok
-                    isCardOk = PcscUsbService.isCardPresent() && !StringUtils.isEmpty(PcscUsbService.getCardId()) && !StringUtils.isEmpty(PcscUsbService.sendAPDU("901a0000010000"));
-                    cardWasOk = cardWasOk || isCardOk;
-                } catch (CardException e) {
-                    log.error(String.format("Card exception after %.2f sec. - reconnect terminal", (System.currentTimeMillis()-time)/1000.0), e);
+                log.info("wait for terminal ...");
+                String cardTerminalName = null;
+                while (cardTerminalName == null && !isCancelled()) {
                     try {
                         cardTerminalName = PcscUsbService.connection();
-                    } catch (Exception ex) {
-                        log.warn(String.format("Can't reconnect terminal at %.2f sec", (System.currentTimeMillis()-time)/1000.0), e);
+                        log.debug("cardTerminal : " + cardTerminalName);
+                    } catch (Exception e) {
+                        log.trace("PCSC error : " + e.getMessage());
+                        Utils.sleep(1000);
                     }
-                    log.debug("cardTerminal : " + cardTerminalName);
                 }
-                final String fk = String.format("%.1f sec", (System.currentTimeMillis()-time)/1000.0);
-                final int fv = isCardOk ? 1 : 0;
-                lastTimeFailed = isCardOk ? lastTimeFailed : fk;
-                Platform.runLater(() ->
-                        {
-                            series.getData().add(new XYChart.Data(fk, fv));
+                log.info("terminal ok : " + cardTerminalName);
+                log.info("test run for 20 sec");
+                boolean cardWasOk = false;
+                int nbFailed = 0;
+                long time = System.currentTimeMillis();
+                String lastTimeFailed = "";
+                while (System.currentTimeMillis() - time < 20200 && !isCancelled()) {
+                    boolean isCardOk = false;
+                    try {
+                        // Test : card is prsent AND get UID ok AND get challenge (for auth) ok
+                        isCardOk = PcscUsbService.isCardPresent() && !StringUtils.isEmpty(PcscUsbService.getCardId()) && !StringUtils.isEmpty(PcscUsbService.sendAPDU("901a0000010000"));
+                        cardWasOk = cardWasOk || isCardOk;
+                    } catch (Exception e) {
+                        log.error(String.format("Exception after %.2f sec. - reconnect terminal", (System.currentTimeMillis() - time) / 1000.0), e);
+                        try {
+                            cardTerminalName = PcscUsbService.connection();
+                        } catch (Exception ex) {
+                            log.warn(String.format("Can't reconnect terminal at %.2f sec", (System.currentTimeMillis() - time) / 1000.0), e);
                         }
-                );
-                if(cardWasOk && !isCardOk) {
-                    log.warn("card no more present after " + fk);
-                    nbFailed++;
-                    final String newTitle = String.format("PC/SC Stress Test - %d error(s) - last error : %s", nbFailed, lastTimeFailed);
+                        log.debug("cardTerminal : " + cardTerminalName);
+                    }
+                    final String fk = String.format("%.1f sec", (System.currentTimeMillis() - time) / 1000.0);
+                    final int fv = isCardOk ? 1 : 0;
+                    lastTimeFailed = isCardOk ? lastTimeFailed : fk;
                     Platform.runLater(() ->
-                    {
-                        title.setValue(newTitle);
-                    });
+                            {
+                                series.getData().add(new XYChart.Data(fk, fv));
+                            }
+                    );
+                    if (cardWasOk && !isCardOk) {
+                        log.warn("card no more present after " + fk);
+                        nbFailed++;
+                        final String newTitle = String.format("PC/SC Stress Test - %d error(s) - last error : %s", nbFailed, lastTimeFailed);
+                        Platform.runLater(() ->
+                        {
+                            title.setValue(newTitle);
+                        });
+                    }
+                    Utils.sleep(100);
                 }
-                Utils.sleep(100);
+                log.info("test finished - nb failed : " + nbFailed);
+                if (runAtEnd != null) {
+                    runAtEnd.run();
+                }
+                return null;
             }
-            log.info("test finished - nb failed : " + nbFailed);
-            if(runAtEnd != null) {
-                runAtEnd.run();
-            }
-        });
+        };
+
 
         DialogPane dialogPane = new DialogPane();
         dialogPane.setContent(lineChart);
@@ -110,10 +117,13 @@ public class EsupSgcTestPcscDialog {
         Dialog pcscTestDialog = new Dialog<>();
         pcscTestDialog.setDialogPane(dialogPane);
 
-        pcscTestDialog.setOnShown(dialogEvent -> testPcSc.start());
+        pcscTestDialog.setOnShown(dialogEvent -> new Thread(testPcSc).start());
 
         Window window = pcscTestDialog.getDialogPane().getScene().getWindow();
-        window.setOnCloseRequest(event -> window.hide());
+        window.setOnCloseRequest(event -> {
+            testPcSc.cancel();
+            window.hide();
+        });
 
         log.info("PC/SC Dialog test init OK");
 
