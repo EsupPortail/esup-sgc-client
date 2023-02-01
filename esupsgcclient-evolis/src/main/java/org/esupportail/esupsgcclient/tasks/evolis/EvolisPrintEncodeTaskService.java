@@ -12,7 +12,9 @@ import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcHeartbeatService;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
+import org.esupportail.esupsgcclient.tasks.simple.ReadNfcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,12 +28,6 @@ public class EvolisPrintEncodeTaskService extends EsupSgcTaskService {
 	static final String IMPRESSION_ET_ENCODAGE_VIA_EVOLIS = "Impression et encodage via imprimante Evolis";
 
 	@Resource
-	EsupSgcRestClientService esupSgcRestClientService;
-
-	@Resource
-	EncodingService encodingService;
-
-	@Resource
 	EvolisPrinterService evolisPrinterService;
 
 	@Resource
@@ -39,6 +35,9 @@ public class EvolisPrintEncodeTaskService extends EsupSgcTaskService {
 
 	@Resource
 	AppSession appSession;
+
+	@Resource
+	private ApplicationContext ctx;
 
 	@Override
 	public List<UiStep> getUiStepsList() {
@@ -49,7 +48,7 @@ public class EvolisPrintEncodeTaskService extends EsupSgcTaskService {
 	protected Task<String> createTask() {
 		esupSgcHeartbeatService.setEsupSgcPrinterService(evolisPrinterService);
 		esupSgcHeartbeatService.restart();
-		return new EvolisPrintEncodeTask(uiSteps, bmpColorImageView, bmpBlackImageView, esupSgcRestClientService, evolisPrinterService, encodingService);
+		return ctx.getBean(EvolisPrintEncodeTask.class, uiSteps, bmpColorImageView, bmpBlackImageView);
 	}
 
 	@Override

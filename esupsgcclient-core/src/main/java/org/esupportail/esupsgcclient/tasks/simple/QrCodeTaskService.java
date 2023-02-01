@@ -11,6 +11,7 @@ import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.webcam.QRCodeReader;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,13 +25,10 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 	static final String ENCODAGE_VIA_SCAN_DE_QR_CODE = "Encodage via scan de QRCode";
 
 	@Resource
-	EncodingService encodingService;
-
-	@Resource
-	QRCodeReader qRCodeReader;
-
-	@Resource
 	AppSession appSession;
+
+	@Resource
+	private ApplicationContext ctx;
 
 	@Override
 	public List<UiStep> getUiStepsList() {
@@ -39,7 +37,7 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return new QrCodeTask(uiSteps, webcamImageView.imageProperty(), encodingService, qRCodeReader);
+		return ctx.getBean(QrCodeTask.class, uiSteps, webcamImageView.imageProperty());
 	}
 
 	@Override

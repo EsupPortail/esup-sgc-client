@@ -11,6 +11,7 @@ import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +33,9 @@ public class EvolisReadNfcTaskService extends EsupSgcTaskService {
 	@Resource
 	AppSession appSession;
 
+	@Resource
+	private ApplicationContext ctx;
+
 	@Override
 	public List<UiStep> getUiStepsList() {
 		return EvolisReadNfcTask.UI_STEPS_LIST;
@@ -39,7 +43,7 @@ public class EvolisReadNfcTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return new EvolisReadNfcTask(uiSteps, evolisPrinterService, encodingService);
+		return ctx.getBean(EvolisReadNfcTask.class, uiSteps);
 	}
 
 	@Override

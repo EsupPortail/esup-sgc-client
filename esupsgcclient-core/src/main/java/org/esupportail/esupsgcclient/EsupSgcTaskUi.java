@@ -22,7 +22,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-
 public class EsupSgcTaskUi {
     final static Logger log = Logger.getLogger(EsupSgcTaskUi.class);
     EsupSgcTaskService service;

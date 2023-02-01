@@ -10,6 +10,8 @@ import org.esupportail.esupsgcclient.AppSession.READY_CONDITION;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,10 +25,10 @@ public class ReadNfcTaskService extends EsupSgcTaskService {
 	static final String BADGEAGE_SIMPLE = "Badgeage simple";
 
 	@Resource
-	EncodingService encodingService;
+	AppSession appSession;
 
 	@Resource
-	AppSession appSession;
+	private ApplicationContext ctx;
 
 	@Override
 	public List<UiStep> getUiStepsList() {
@@ -35,7 +37,7 @@ public class ReadNfcTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return new ReadNfcTask(uiSteps, encodingService);
+		return ctx.getBean(ReadNfcTask.class, uiSteps);
 	}
 
 	@Override

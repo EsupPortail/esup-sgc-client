@@ -1,6 +1,7 @@
 package org.esupportail.esupsgcclient.tasks.simple;
 
 import com.github.sarxos.webcam.WebcamException;
+import jakarta.annotation.Resource;
 import javafx.beans.property.ObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -11,12 +12,16 @@ import org.esupportail.esupsgcclient.service.webcam.QRCodeReader;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@Component
+@Scope("prototype")
 public class QrCodeTask extends EsupSgcTask {
 
 	private final static Logger log = Logger.getLogger(QrCodeTask.class);
@@ -24,14 +29,15 @@ public class QrCodeTask extends EsupSgcTask {
 	final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{UiStep.qrcode_read, UiStep.encode});
 
 	ObjectProperty<Image> webcamImageProperty;
+
+	@Resource
 	EncodingService encodingService;
+	@Resource
 	QRCodeReader qRCodeReader;
 
-	public QrCodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, EncodingService encodingService, QRCodeReader qRCodeReader) {
+	public QrCodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty) {
 		super(uiSteps);
 		this.webcamImageProperty = webcamImageProperty;
-		this.encodingService = encodingService;
-		this.qRCodeReader = qRCodeReader;
 	}
 
 	@Override

@@ -1,26 +1,31 @@
 package org.esupportail.esupsgcclient.tasks.simple;
 
+import jakarta.annotation.Resource;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@Component
+@Scope("prototype")
 public class ReadNfcTask extends EsupSgcTask {
 
     private final static Logger log = Logger.getLogger(ReadNfcTask.class);
 
     final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{UiStep.encode});
 
+    @Resource
     EncodingService encodingService;
 
-    public ReadNfcTask(Map<UiStep, TextFlow> uiSteps, EncodingService encodingService) {
+    public ReadNfcTask(Map<UiStep, TextFlow> uiSteps) {
         super(uiSteps);
-        this.encodingService = encodingService;
     }
 
     @Override
