@@ -1,20 +1,38 @@
 package org.esupportail.esupsgcclient.service.printer.zebra;
 
+import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
+import com.zebra.sdk.comm.UsbConnection;
 import com.zebra.sdk.common.card.enumerations.CardDestination;
 import com.zebra.sdk.common.card.enumerations.CardSource;
 import com.zebra.sdk.common.card.enumerations.SmartCardEncoderType;
+import com.zebra.sdk.common.card.enumerations.SmartCardType;
+import com.zebra.sdk.common.card.printer.ZebraPrinterZxp;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
+import com.zebra.sdk.device.ZebraIllegalArgumentException;
+import com.zebra.sdk.printer.PrinterReconnectionHandler;
+import com.zebra.sdk.printer.ZebraPrinter;
+import com.zebra.sdk.printer.ZebraPrinterLinkOs;
+import com.zebra.sdk.util.internal.Sleeper;
+import com.zebra.sdk.zxp.job.ZebraCardJobSettingNamesZxp;
+import com.zebra.sdk.zxp.printer.internal.ZxpZebraPrinter;
 import jakarta.annotation.Resource;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.TilePane;
 import org.apache.log4j.Logger;
 
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
+import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
 
 import com.zebra.sdk.comm.Connection;
@@ -46,12 +64,86 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 
 	@Resource
 	ZebraHeartbeatTaskService zebraHeartbeatTaskService;
-	
-	ZebraCardPrinter zebraCardPrinter;
-	ZxpDevice zxpDevice;
-	ZXPPrn zxpPrn;
+
+	@Resource
+	EsupSgcTestPcscDialog esupSgcTestPcscDialog;
+
 	Connection connection;
+	ZebraCardPrinter zebraCardPrinter;
+	ZXPPrn zxpPrn;
 	int jobId;
+
+	@Override
+	public void setupJfxUi(Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
+
+		tooltip.textProperty().bind(zebraHeartbeatTaskService.titleProperty());
+		zebraHeartbeatTaskService.start();
+		zebraHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
+
+		MenuItem zebraReject = new MenuItem();
+		zebraReject.setText("Rejeter la carte");
+		MenuItem zebraPrintEnd = new MenuItem();
+		zebraPrintEnd.setText("Clore la session d'impression");
+		MenuItem testPcsc = new MenuItem();
+		testPcsc.setText("Stress test pc/sc");
+		MenuItem zebraCommand = new MenuItem();
+		zebraCommand.setText("Envoyer une commande avancée à l'imprimante");
+		Menu zebraMenu = new Menu();
+		zebraMenu.setText("Zebra");
+		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc, zebraCommand);
+		menuBar.getMenus().add(zebraMenu);
+
+		zebraReject.setOnAction(actionEvent -> {
+			new Thread(() -> {eject();});
+		});
+
+		testPcsc.setOnAction(actionEvent -> {
+			esupSgcTestPcscDialog.getTestPcscDialog(
+					()-> {
+						launchEncoding();
+						},
+					()->{
+						try {
+							zebraCardPrinter.resume();
+						} catch (ConnectionException|ZebraCardException e) {
+							log.warn(e);
+						}
+						eject();
+					}
+			).show();
+		});
+
+		TilePane r = new TilePane();
+		TextInputDialog td = new TextInputDialog("!CC");
+		td.setHeaderText("Lancer une commande à l'imprimante zebra");
+		td.setContentText("Commande");
+		zebraCommand.setOnAction(actionEvent -> {
+			Optional<String> result = td.showAndWait();
+			result.ifPresent(command -> {
+				new Thread(() -> {
+					logTextarea.appendText("Send command to zebra : " + command + "\n");
+					//connection.write(HexFormat.of().parseHex("1b" + "4d49" + "0d"));
+					//connection.write(HexFormat.of().parseHex("1b" + "4d53" + "0d"));
+					// prefix with ESC and suffix with ReturnCarriage
+					String cmd = (char)27 + command + (char)13;
+
+					String resp = new String();
+					try {
+						if (!connection.isConnected()) {
+							log.info("zebra not connected - try to connect");
+							connection.open();
+						}
+						connection.sendAndWaitForResponse(cmd.getBytes(), 2000, 2000, resp);
+						logTextarea.appendText("Response from zebra : " + resp + "\n");
+					} catch (ConnectionException ex) {
+						log.warn(String.format("zebra exception sending command %s : %s", command, ex.getMessage()), ex);
+						logTextarea.appendText("zebra exception : " + ex.getMessage() + "\n");
+					}
+				}).start();
+			});
+		});
+
+	}
 	
 	public void init() throws ConnectionException{
 
@@ -60,28 +152,33 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		for(DiscoveredUsbPrinter discoveredUsbPrinter : discoveredPrinters) {
 			DiscoveredPrinter discoveredPrinter =  discoveredUsbPrinter;
 			connection = discoveredPrinter.getConnection();
-			
 			try {
-				if (!connection.isConnected()) connection.open();
-				Utils.sleep(1000);
-				zebraCardPrinter = ZebraCardPrinterFactory.getInstance(connection);
-				zxpDevice = new ZxpDevice(connection);
-				zxpPrn = zxpDevice.getZxpPrinter();
+				if (!connection.isConnected()) {
+					log.info("zebra not connected - try to connect");
+					connection.open();
+				}
+				zebraCardPrinter = ZebraCardPrinterFactory.getZxpPrinter(connection);
+				ZxpDevice zxpDevice = new ZxpDevice(connection);
+                zxpPrn = zxpDevice.getZxpPrinter();
 				break;
-			}catch(Exception e) {
+			} catch(Exception e) {
 				log.error("Zebra init error", e);
 				throw new ConnectionException(e);
 			}
 		}
-		if(zebraCardPrinter != null ) {
-				setSmartcardJob();
-		}
 
-
+		//connection.write(HexFormat.of().parseHex("1b" + "4d49" + "0d"));
+		//connection.write(HexFormat.of().parseHex("1b" + "4d53" + "0d"));
+		//String cmd = "MM " + Integer.toString(4000) + " " + Integer.toString(1);
+		//connection.write(HexFormat.of().parseHex("1b" + HexFormat.of().formatHex(cmd.getBytes()) + "0d"));
 
 		try {
-			zebraCardPrinter.setSetting(ZebraCardSettingNames.SMARTCARD_X_OFFSET, "0");
-			log.info(String.format("AllSetting : %s", zebraCardPrinter.getAllSettingValues()));
+			log.info("Settings range of offset : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.SMARTCARD_X_OFFSET));
+			log.info("Settings range of internal encoder contactless : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.INTERNAL_ENCODER_CONTACTLESS_ENCODER));
+			// zebraCardPrinter.setSetting(ZebraCardSettingNames.SMARTCARD_X_OFFSET, "350");
+			log.info(String.format("Printer Firmware : %s", zebraCardPrinter.getPrinterInformation().firmwareVersion));
+			log.info(String.format("Printer cards count : %s", zebraCardPrinter.getCardCount().totalCards));
+			log.info(String.format("Printer sensor states : %s", zebraCardPrinter.getSensorStates()));
 		} catch (Exception e) {
 			log.warn(e);
 		}
@@ -99,8 +196,8 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	public void launchEncoding() {
 		try {
 			setSmartcardJob();
-			jobId = zebraCardPrinter.smartCardEncode(1);
-		} catch (SettingsException | ZebraCardException | ConnectionException e) {
+			zebraCardPrinter.positionCard();
+		} catch (Exception e) {
 			log.error("Zebra card encoder activation error", e);
 		}
 	}
@@ -237,27 +334,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		return getStatus();
 	}
 
-	@Override
-	public void setupJfxUi(Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
-		try {
-			init();
-		} catch (ConnectionException e) {
-			throw new RuntimeException(e);
-		}
 
-		tooltip.textProperty().bind(zebraHeartbeatTaskService.titleProperty());
-		zebraHeartbeatTaskService.start();
-		zebraHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
-
-		MenuItem zebraReject = new MenuItem();
-		zebraReject.setText("Rejeter la carte");
-		MenuItem zebraPrintEnd = new MenuItem();
-		zebraPrintEnd.setText("Clore la session d'impression");
-		Menu zebraMenu = new Menu();
-		zebraMenu.setText("Zebra");
-		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd);
-		menuBar.getMenus().add(zebraMenu);
-	}
 
 	public void eject() {
 		try {

@@ -26,12 +26,14 @@ public class ZebraHeartbeatTaskService extends Service<Void> {
     protected Task<Void> createTask() {
         return new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call()  {
                 while(true) {
                     try {
                         String printerStatus = zebraPrinterService.getStatus();
                         log.info(String.format("Zebra printer status : %s", printerStatus));
-                        if(printerStatus!=null && !printerStatus.equals(lastPrinterStatus)) {
+                        if(printerStatus==null ) {
+                            zebraPrinterService.init();
+                        } else if(!printerStatus.equals(lastPrinterStatus)) {
                             if(!printerStatus.contains("TODO")) {
                                 appSession.setPrinterReady(true);
                             }
