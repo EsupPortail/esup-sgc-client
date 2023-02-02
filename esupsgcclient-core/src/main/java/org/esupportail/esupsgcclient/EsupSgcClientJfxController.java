@@ -1,7 +1,7 @@
 package org.esupportail.esupsgcclient;
 
 import com.github.sarxos.webcam.Webcam;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

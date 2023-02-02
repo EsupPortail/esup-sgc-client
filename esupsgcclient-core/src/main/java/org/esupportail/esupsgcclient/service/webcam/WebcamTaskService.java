@@ -1,7 +1,7 @@
 package org.esupportail.esupsgcclient.service.webcam;
 
 import com.github.sarxos.webcam.Webcam;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;

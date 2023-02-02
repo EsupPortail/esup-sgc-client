@@ -1,7 +1,7 @@
 package org.esupportail.esupsgcclient.service.pcsc;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;

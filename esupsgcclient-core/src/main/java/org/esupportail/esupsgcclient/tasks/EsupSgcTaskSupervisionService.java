@@ -1,6 +1,6 @@
 package org.esupportail.esupsgcclient.tasks;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
