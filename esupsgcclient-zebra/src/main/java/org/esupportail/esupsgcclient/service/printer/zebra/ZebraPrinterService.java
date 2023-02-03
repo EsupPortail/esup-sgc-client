@@ -1,11 +1,21 @@
 package org.esupportail.esupsgcclient.service.printer.zebra;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.zebra.sdk.common.card.containers.GraphicsInfo;
 import com.zebra.sdk.common.card.enumerations.CardDestination;
+import com.zebra.sdk.common.card.enumerations.CardSide;
 import com.zebra.sdk.common.card.enumerations.CardSource;
+import com.zebra.sdk.common.card.enumerations.GraphicType;
+import com.zebra.sdk.common.card.enumerations.PrintType;
 import com.zebra.sdk.common.card.enumerations.SmartCardEncoderType;
+import com.zebra.sdk.common.card.graphics.ZebraCardGraphics;
+import com.zebra.sdk.common.card.graphics.ZebraCardImageI;
+import com.zebra.sdk.common.card.graphics.ZebraGraphics;
+import com.zebra.sdk.common.card.graphics.enumerations.RotationType;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
 import jakarta.annotation.Resource;
 import javafx.scene.control.Menu;
@@ -14,6 +24,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.TilePane;
 import org.apache.log4j.Logger;
 
@@ -327,5 +338,30 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		} catch (ZebraCardException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void print(String bmpBlackAsBase64, String bmpColorAsBase64, String bmpOverlayAsBase64) {
+		try {
+			List<GraphicsInfo> graphicsData = new ArrayList<GraphicsInfo>();
+			graphicsData.add(drawImage(bmpColorAsBase64, PrintType.Color));
+			graphicsData.add(drawImage(bmpBlackAsBase64, PrintType.MonoK));
+			graphicsData.add(drawImage(bmpOverlayAsBase64, PrintType.Overlay));
+			zebraCardPrinter.print(jobId, graphicsData);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private GraphicsInfo drawImage(String imageData, PrintType printerType) throws IOException, ConnectionException, ZebraCardException {
+		ZebraGraphics graphics = new ZebraCardGraphics(zebraCardPrinter);
+		graphics.drawImage(imageData.getBytes(), 0, 0, 0, 0, RotationType.RotateNoneFlipNone);
+		ZebraCardImageI zebraCardImage = graphics.createImage();
+		GraphicsInfo graphicsInfo = new GraphicsInfo();
+		graphicsInfo.side = CardSide.Front;
+		graphicsInfo.fillColor = PrintType.Color.equals(printerType) ? 1 : -1;
+		graphicsInfo.graphicData = zebraCardImage;
+		graphicsInfo.graphicType = GraphicType.BMP;
+		graphicsInfo.printType = printerType;
+		return graphicsInfo;
 	}
 }
