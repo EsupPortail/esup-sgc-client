@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.tasks.zebra;
 
+import jakarta.annotation.Resource;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
@@ -8,11 +9,15 @@ import org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@Component
+@Scope("prototype")
 public class ZebraReadNfcTask extends EsupSgcTask {
 
     private final static Logger log = Logger.getLogger(ZebraReadNfcTask.class);
@@ -21,12 +26,13 @@ public class ZebraReadNfcTask extends EsupSgcTask {
             UiStep.printer_nfc,
             UiStep.encode});
 
+    @Resource
     ZebraPrinterService zebraPrinterService;
+
+    @Resource
     EncodingService encodingService;
-    public ZebraReadNfcTask(Map<UiStep, TextFlow> uiSteps, ZebraPrinterService zebraPrinterService, EncodingService encodingService) {
+    public ZebraReadNfcTask(Map<UiStep, TextFlow> uiSteps) {
         super(uiSteps);
-        this.zebraPrinterService = zebraPrinterService;
-        this.encodingService = encodingService;
     }
 
     @Override

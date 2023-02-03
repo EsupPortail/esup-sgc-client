@@ -11,6 +11,7 @@ import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,10 +25,7 @@ public class ZebraReadNfcTaskService extends EsupSgcTaskService {
 	static final String BADGEAGE_EN_SERIE_VIA_ZEBRA = "Badgeage en série via Imprimante Zebra";
 
 	@Resource
-	EncodingService encodingService;
-
-	@Resource
-	ZebraPrinterService zebraPrinterService;
+	private ApplicationContext ctx;
 
 	@Resource
 	AppSession appSession;
@@ -39,7 +37,7 @@ public class ZebraReadNfcTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return new ZebraReadNfcTask(uiSteps, zebraPrinterService, encodingService);
+		return ctx.getBean(ZebraReadNfcTask.class, uiSteps);
 	}
 
 	@Override
