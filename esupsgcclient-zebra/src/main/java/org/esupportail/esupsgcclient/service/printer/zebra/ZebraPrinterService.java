@@ -1,7 +1,9 @@
 package org.esupportail.esupsgcclient.service.printer.zebra;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,9 +12,11 @@ import com.zebra.sdk.common.card.enumerations.CardDestination;
 import com.zebra.sdk.common.card.enumerations.CardSide;
 import com.zebra.sdk.common.card.enumerations.CardSource;
 import com.zebra.sdk.common.card.enumerations.GraphicType;
+import com.zebra.sdk.common.card.enumerations.OrientationType;
 import com.zebra.sdk.common.card.enumerations.PrintType;
 import com.zebra.sdk.common.card.enumerations.SmartCardEncoderType;
 import com.zebra.sdk.common.card.graphics.ZebraCardGraphics;
+import com.zebra.sdk.common.card.graphics.ZebraCardImage;
 import com.zebra.sdk.common.card.graphics.ZebraCardImageI;
 import com.zebra.sdk.common.card.graphics.ZebraGraphics;
 import com.zebra.sdk.common.card.graphics.enumerations.RotationType;
@@ -346,22 +350,24 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			graphicsData.add(drawImage(bmpColorAsBase64, PrintType.Color));
 			graphicsData.add(drawImage(bmpBlackAsBase64, PrintType.MonoK));
 			graphicsData.add(drawImage(bmpOverlayAsBase64, PrintType.Overlay));
-			zebraCardPrinter.print(jobId, graphicsData);
+			jobId = zebraCardPrinter.print(1, graphicsData);
+			pollJobStatus();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private GraphicsInfo drawImage(String imageData, PrintType printerType) throws IOException, ConnectionException, ZebraCardException {
+	private GraphicsInfo drawImage(String imageData, PrintType printType) throws IOException, ConnectionException, ZebraCardException {
 		ZebraGraphics graphics = new ZebraCardGraphics(zebraCardPrinter);
-		graphics.drawImage(imageData.getBytes(), 0, 0, 0, 0, RotationType.RotateNoneFlipNone);
+		graphics.initialize(0, 0, OrientationType.Landscape, printType, Color.WHITE);
+		graphics.drawImage(Base64.getDecoder().decode(imageData), 0, 0, 1016, 648, RotationType.RotateNoneFlipNone);
 		ZebraCardImageI zebraCardImage = graphics.createImage();
 		GraphicsInfo graphicsInfo = new GraphicsInfo();
 		graphicsInfo.side = CardSide.Front;
-		graphicsInfo.fillColor = PrintType.Color.equals(printerType) ? 1 : -1;
+		graphicsInfo.fillColor = PrintType.Color.equals(printType) ? 1 : -1;
 		graphicsInfo.graphicData = zebraCardImage;
 		graphicsInfo.graphicType = GraphicType.BMP;
-		graphicsInfo.printType = printerType;
+		graphicsInfo.printType = printType;
 		return graphicsInfo;
 	}
 }

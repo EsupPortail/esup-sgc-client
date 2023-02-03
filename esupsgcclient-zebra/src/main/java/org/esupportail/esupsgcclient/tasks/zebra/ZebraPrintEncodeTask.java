@@ -27,9 +27,6 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
             UiStep.long_poll,
             UiStep.bmp_black,
             UiStep.bmp_color,
-            UiStep.printer_color,
-            UiStep.printer_black,
-            UiStep.printer_overlay,
             UiStep.printer_print,
             UiStep.printer_nfc,
             UiStep.encode});
@@ -72,8 +69,8 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.bmp_color);
             String bmpOverlayAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.overlay);
             zebraPrinterService.print(bmpBlackAsBase64, bmpColorAsBase64, bmpOverlayAsBase64);
+            setUiStepSuccess(UiStep.printer_print);
             zebraPrinterService.launchEncoding();
-            zebraPrinterService.pollJobStatus();
             setUiStepSuccess(UiStep.printer_nfc);
             encodingService.encode(this);
             setUiStepSuccess(UiStep.encode);
