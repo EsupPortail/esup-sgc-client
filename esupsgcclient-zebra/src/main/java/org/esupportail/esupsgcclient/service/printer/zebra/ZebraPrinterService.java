@@ -1,26 +1,12 @@
 package org.esupportail.esupsgcclient.service.printer.zebra;
 
-import java.util.Arrays;
-import java.util.HexFormat;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
-import com.zebra.sdk.comm.UsbConnection;
 import com.zebra.sdk.common.card.enumerations.CardDestination;
 import com.zebra.sdk.common.card.enumerations.CardSource;
 import com.zebra.sdk.common.card.enumerations.SmartCardEncoderType;
-import com.zebra.sdk.common.card.enumerations.SmartCardType;
-import com.zebra.sdk.common.card.printer.ZebraPrinterZxp;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
-import com.zebra.sdk.device.ZebraIllegalArgumentException;
-import com.zebra.sdk.printer.PrinterReconnectionHandler;
-import com.zebra.sdk.printer.ZebraPrinter;
-import com.zebra.sdk.printer.ZebraPrinterLinkOs;
-import com.zebra.sdk.util.internal.Sleeper;
-import com.zebra.sdk.zxp.job.ZebraCardJobSettingNamesZxp;
-import com.zebra.sdk.zxp.printer.internal.ZxpZebraPrinter;
 import jakarta.annotation.Resource;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -45,7 +31,6 @@ import com.zebra.sdk.common.card.exceptions.ZebraCardException;
 import com.zebra.sdk.common.card.jobSettings.ZebraCardJobSettingNames;
 import com.zebra.sdk.common.card.printer.ZebraCardPrinter;
 import com.zebra.sdk.common.card.printer.ZebraCardPrinterFactory;
-import com.zebra.sdk.printer.discovery.DiscoveredPrinter;
 import com.zebra.sdk.printer.discovery.DiscoveredUsbPrinter;
 import com.zebra.sdk.printer.discovery.UsbDiscoverer;
 import com.zebra.sdk.settings.SettingsException;
@@ -53,7 +38,6 @@ import com.zebra.sdk.zxp.comm.internal.ZXPBase.Response;
 import com.zebra.sdk.zxp.comm.internal.ZXPPrn;
 import com.zebra.sdk.zxp.device.internal.ZxpDevice;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 public class ZebraPrinterService extends EsupSgcPrinterService {
@@ -122,11 +106,8 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			result.ifPresent(command -> {
 				new Thread(() -> {
 					logTextarea.appendText("Send command to zebra : " + command + "\n");
-					//connection.write(HexFormat.of().parseHex("1b" + "4d49" + "0d"));
-					//connection.write(HexFormat.of().parseHex("1b" + "4d53" + "0d"));
 					// prefix with ESC and suffix with ReturnCarriage
 					String cmd = (char)27 + command + (char)13;
-
 					String resp = new String();
 					try {
 						if (!connection.isConnected()) {
@@ -174,15 +155,9 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			}
 		}
 
-		//connection.write(HexFormat.of().parseHex("1b" + "4d49" + "0d"));
-		//connection.write(HexFormat.of().parseHex("1b" + "4d53" + "0d"));
-		//String cmd = "MM " + Integer.toString(4000) + " " + Integer.toString(1);
-		//connection.write(HexFormat.of().parseHex("1b" + HexFormat.of().formatHex(cmd.getBytes()) + "0d"));
-
 		try {
 			log.info("Settings range of offset : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.SMARTCARD_X_OFFSET));
 			log.info("Settings range of internal encoder contactless : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.INTERNAL_ENCODER_CONTACTLESS_ENCODER));
-			// zebraCardPrinter.setSetting(ZebraCardSettingNames.SMARTCARD_X_OFFSET, "350");
 			log.info(String.format("Printer Firmware : %s", zebraCardPrinter.getPrinterInformation().firmwareVersion));
 			log.info(String.format("Printer cards count : %s", zebraCardPrinter.getCardCount().totalCards));
 			log.info(String.format("Printer sensor states : %s", zebraCardPrinter.getSensorStates()));
@@ -203,7 +178,8 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	public void launchEncoding() {
 		try {
 			setSmartcardJob();
-			zebraCardPrinter.positionCard();
+			jobId = zebraCardPrinter.smartCardEncode(1);
+			pollJobStatus();
 		} catch (Exception e) {
 			log.error("Zebra card encoder activation error", e);
 		}
