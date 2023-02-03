@@ -131,24 +131,31 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	}
 	
 	public void init() throws ConnectionException{
-
+		log.info("Zebra init connection ...");
 		DiscoveredUsbPrinter[] discoveredPrinters;
 		discoveredPrinters = UsbDiscoverer.getZebraUsbPrinters();
-		for(DiscoveredUsbPrinter discoveredUsbPrinter : discoveredPrinters) {
-			DiscoveredPrinter discoveredPrinter =  discoveredUsbPrinter;
-			connection = discoveredPrinter.getConnection();
-			try {
-				if (!connection.isConnected()) {
-					log.info("zebra not connected - try to connect");
-					connection.open();
+		while(zebraCardPrinter == null) {
+			for (DiscoveredUsbPrinter discoveredPrinter : discoveredPrinters) {
+				log.info("Discover Zebra printer ...");
+				connection = discoveredPrinter.getConnection();
+				try {
+					if (!connection.isConnected()) {
+						log.info("zebra not connected - try to connect");
+						connection.open();
+					}
+					zebraCardPrinter = ZebraCardPrinterFactory.getZxpPrinter(connection);
+					ZxpDevice zxpDevice = new ZxpDevice(connection);
+					zxpPrn = zxpDevice.getZxpPrinter();
+					log.info("Zebra connection OK");
+					break;
+				} catch (Exception e) {
+					log.error("Zebra init error", e);
+					throw new ConnectionException(e);
 				}
-				zebraCardPrinter = ZebraCardPrinterFactory.getZxpPrinter(connection);
-				ZxpDevice zxpDevice = new ZxpDevice(connection);
-                zxpPrn = zxpDevice.getZxpPrinter();
-				break;
-			} catch(Exception e) {
-				log.error("Zebra init error", e);
-				throw new ConnectionException(e);
+			}
+			if(zebraCardPrinter == null) {
+				log.warn("Cant connect Zebra printer, retry in 3 sec");
+				Utils.sleep(2000);
 			}
 		}
 
