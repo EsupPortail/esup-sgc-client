@@ -1,6 +1,6 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.springframework.stereotype.Component;
 

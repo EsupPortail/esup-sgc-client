@@ -1,9 +1,8 @@
 package org.esupportail.esupsgcclient.ui;
 
+import jakarta.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 
 @Component

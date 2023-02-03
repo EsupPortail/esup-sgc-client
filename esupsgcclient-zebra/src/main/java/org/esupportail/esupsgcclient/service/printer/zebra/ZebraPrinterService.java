@@ -1,12 +1,27 @@
 package org.esupportail.esupsgcclient.service.printer.zebra;
 
-import java.util.List;;
+import java.util.Arrays;
+import java.util.HexFormat;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+
+import com.zebra.sdk.comm.UsbConnection;
 import com.zebra.sdk.common.card.enumerations.CardDestination;
 import com.zebra.sdk.common.card.enumerations.CardSource;
 import com.zebra.sdk.common.card.enumerations.SmartCardEncoderType;
+import com.zebra.sdk.common.card.enumerations.SmartCardType;
+import com.zebra.sdk.common.card.printer.ZebraPrinterZxp;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
-import javax.annotation.Resource;
+import com.zebra.sdk.device.ZebraIllegalArgumentException;
+import com.zebra.sdk.printer.PrinterReconnectionHandler;
+import com.zebra.sdk.printer.ZebraPrinter;
+import com.zebra.sdk.printer.ZebraPrinterLinkOs;
+import com.zebra.sdk.util.internal.Sleeper;
+import com.zebra.sdk.zxp.job.ZebraCardJobSettingNamesZxp;
+import com.zebra.sdk.zxp.printer.internal.ZxpZebraPrinter;
+import jakarta.annotation.Resource;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;

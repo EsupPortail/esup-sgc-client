@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -49,13 +48,13 @@ public class AppSession {
     SimpleBooleanProperty taskIsRunning = new SimpleBooleanProperty();
 
     public Map<READY_CONDITION, ObservableBooleanValue> getReadyConditions() {
-        return new HashMap<READY_CONDITION, ObservableBooleanValue>() {{
-            put(READY_CONDITION.webcam, webcamReady);
-            put(READY_CONDITION.auth, authReady);
-            put(READY_CONDITION.nfc, nfcReady);
-            put(READY_CONDITION.nfc_desfire, authType.isEqualTo("DESFIRE"));
-            put(READY_CONDITION.printer, printerReady);
-            }};
+        return Map.of(
+                READY_CONDITION.webcam, webcamReady,
+                READY_CONDITION.auth, authReady,
+                READY_CONDITION.nfc, nfcReady,
+                READY_CONDITION.nfc_desfire, authType.isEqualTo("DESFIRE"),
+                READY_CONDITION.printer, printerReady
+        );
     }
 
     public String getNumeroId() {

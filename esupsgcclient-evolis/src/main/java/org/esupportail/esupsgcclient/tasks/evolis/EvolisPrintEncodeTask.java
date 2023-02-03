@@ -1,6 +1,6 @@
 package org.esupportail.esupsgcclient.tasks.evolis;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;

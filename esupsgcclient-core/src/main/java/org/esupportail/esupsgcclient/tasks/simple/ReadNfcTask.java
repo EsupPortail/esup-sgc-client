@@ -1,6 +1,6 @@
 package org.esupportail.esupsgcclient.tasks.simple;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;

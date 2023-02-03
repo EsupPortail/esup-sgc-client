@@ -1,6 +1,6 @@
 package org.esupportail.esupsgcclient.service.printer.zebra;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
