@@ -130,16 +130,4 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
         bmpBlackImageView.setImage(null);
     }
 
-    private void updateBmpUi(String bmpAsBase64, ImageView bmpImageView) {
-        try {
-            byte[] bmp = Base64.getDecoder().decode(bmpAsBase64.getBytes());
-            BufferedImage input_image = ImageIO.read(new ByteArrayInputStream(bmp));
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ImageIO.write(input_image, "PNG", out);
-            bmpImageView.setImage(new Image(new ByteArrayInputStream(out.toByteArray()), 200, 200, true, true));
-        } catch (Exception e) {
-            log.warn("pb refreshing bmpImageView with bmpAsBase64", e);
-        }
-    }
-
 }

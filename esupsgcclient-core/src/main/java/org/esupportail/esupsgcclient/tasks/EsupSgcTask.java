@@ -2,11 +2,18 @@ package org.esupportail.esupsgcclient.tasks;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -92,6 +99,18 @@ public abstract class EsupSgcTask extends Task<String> {
          if(currentUiStep!=null) {
              setUiStepFailed(currentUiStep, exception);
          }
+    }
+
+    protected void updateBmpUi(String bmpAsBase64, ImageView bmpImageView) {
+        try {
+            byte[] bmp = Base64.getDecoder().decode(bmpAsBase64.getBytes());
+            BufferedImage input_image = ImageIO.read(new ByteArrayInputStream(bmp));
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ImageIO.write(input_image, "PNG", out);
+            bmpImageView.setImage(new Image(new ByteArrayInputStream(out.toByteArray()), 200, 200, true, true));
+        } catch (Exception e) {
+            log.warn("pb refreshing bmpImageView with bmpAsBase64", e);
+        }
     }
 
 }
