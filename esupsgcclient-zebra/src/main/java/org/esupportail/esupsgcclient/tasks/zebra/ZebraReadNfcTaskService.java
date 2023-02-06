@@ -1,14 +1,12 @@
 package org.esupportail.esupsgcclient.tasks.zebra;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.AppSession.READY_CONDITION;
-import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
-import org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.context.ApplicationContext;

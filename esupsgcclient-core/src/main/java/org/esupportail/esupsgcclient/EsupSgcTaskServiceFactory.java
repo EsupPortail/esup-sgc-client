@@ -1,6 +1,6 @@
 package org.esupportail.esupsgcclient;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
@@ -12,7 +12,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.TextFlow;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcHeartbeatService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;

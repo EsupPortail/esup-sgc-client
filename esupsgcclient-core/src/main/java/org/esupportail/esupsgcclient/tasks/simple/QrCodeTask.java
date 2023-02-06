@@ -1,7 +1,7 @@
 package org.esupportail.esupsgcclient.tasks.simple;
 
 import com.github.sarxos.webcam.WebcamException;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import javafx.beans.property.ObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;

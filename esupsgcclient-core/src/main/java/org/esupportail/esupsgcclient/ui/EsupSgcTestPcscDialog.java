@@ -17,8 +17,6 @@ import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
-import javax.smartcardio.CardException;
-
 @Component
 public class EsupSgcTestPcscDialog {
 

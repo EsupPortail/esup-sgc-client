@@ -16,19 +16,16 @@ import com.zebra.sdk.common.card.enumerations.OrientationType;
 import com.zebra.sdk.common.card.enumerations.PrintType;
 import com.zebra.sdk.common.card.enumerations.SmartCardEncoderType;
 import com.zebra.sdk.common.card.graphics.ZebraCardGraphics;
-import com.zebra.sdk.common.card.graphics.ZebraCardImage;
 import com.zebra.sdk.common.card.graphics.ZebraCardImageI;
 import com.zebra.sdk.common.card.graphics.ZebraGraphics;
 import com.zebra.sdk.common.card.graphics.enumerations.RotationType;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
-import jakarta.annotation.Resource;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.TilePane;
 import org.apache.log4j.Logger;
 
@@ -53,6 +50,8 @@ import com.zebra.sdk.zxp.comm.internal.ZXPBase.Response;
 import com.zebra.sdk.zxp.comm.internal.ZXPPrn;
 import com.zebra.sdk.zxp.device.internal.ZxpDevice;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 @Component
 public class ZebraPrinterService extends EsupSgcPrinterService {

@@ -1,6 +1,6 @@
 package org.esupportail.esupsgcclient.ui;
 
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
 import org.springframework.core.io.ClassPathResource;
@@ -25,7 +25,7 @@ public class FileLocalStorage {
 
 	private File file;
 
-	@jakarta.annotation.Resource
+	@javax.annotation.Resource
 	AppSession appSession;
 
 	@PostConstruct

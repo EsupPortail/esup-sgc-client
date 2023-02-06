@@ -1,6 +1,6 @@
 package org.esupportail.esupsgcclient.service.sgc;
 
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;

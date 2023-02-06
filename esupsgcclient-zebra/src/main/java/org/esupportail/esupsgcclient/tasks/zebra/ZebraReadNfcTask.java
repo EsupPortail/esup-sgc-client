@@ -1,6 +1,5 @@
 package org.esupportail.esupsgcclient.tasks.zebra;
 
-import jakarta.annotation.Resource;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
@@ -12,6 +11,7 @@ import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
