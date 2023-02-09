@@ -15,7 +15,7 @@ qui peut lui-même être généré depuis un simple formulaire web en ligne via 
 esup-sgc-client est une application java/spring/javafx utilisant maven pour gérer la compilation 
 et les dépendances des librairies utilisées.
 
-Pour fonctionner, il requiert un openjdk 17 (ou supérieur) et openjfx
+Pour fonctionner, il requiert un openjdk 8 (ou supérieur) et openjfx
 
 ## Environnement de développement
 
@@ -44,6 +44,8 @@ _Sous intelliJ, pour pouvoir sélectionner `-cp esupsgclient-evolis` vous devez 
 
 En optant pour `-cp esupsgclient-core` vous aurez le client sans module/profile supplémentaire.
 
+Pour le profile/module zebra, vous pouvez ajouter le "classpath of module" `-cp esupsgclient-zebra` .
+
 ## SceneBuilder
 
 L'interface homme machine (IHM / GUI) est décrite en FXML. 
@@ -64,17 +66,18 @@ boostrapfx étant en fait réellement intégré dans l'application en tant que l
 esup-sgc-client fonctionne avec :
 * requis
   * un serveur esup-nfc-tag 
-  * un lecteur NFC USB permettant de passer des APDUs (notamment Mifare DESFIRE) via PC/SC, celui-ci peut correspondre au lecteur NFC de l'imprimante Evolis Primacy (1 ou 2)
+  * un lecteur NFC USB permettant de passer des APDUs (notamment Mifare DESFIRE) via PC/SC, celui-ci peut correspondre au lecteur NFC de l'imprimante Evolis Primacy (1 ou 2) ou Zebra
 * optionnel
   * une webcam 
-  * une imprimante evolis primacy 1 ou 2 (ou plus exactement Evolis Premium Suite 1 ou 2)
+  * une imprimante evolis primacy 1 ou 2 (ou plus exactement Evolis Premium Suite 1 ou 2) ou zebra
   * un serveur esup-sgc
 
 
 ### modules maven
 
-Des sous-modules maven peuvent être utilisés pour ajouter le support aux imprimantes evolis (et bientôt zebra).
+Des sous-modules maven peuvent être utilisés pour ajouter le support aux imprimantes evolis ou zebra.
 Pour ajouter le module evolis, vous pouvez ajouter `-P evolis` à vos commandes maven.
+Pour zebra, ajoutez `-P zebra` à vos commandes maven
 
 Ainsi
 ````
@@ -82,7 +85,7 @@ mvn -P evolis clean package
 ````
 permet de récupérer le client esup-sg-client avec le module esupsgcclient-evolis ici : `esupsgcclient-assembly/target/esup-sgc-client-final.jar`
 
-De même, pour lancer directement cette application avec esupsgcclient-evolis de chargé via meven, vous pouvez lancer :
+De même, pour lancer directement cette application avec esupsgcclient-evolis de chargé via maven, vous pouvez lancer :
 ````
 mvn -P evolis clean javafx:run
 ````
@@ -138,6 +141,44 @@ python3 dummyEvolisPrinterCenter.py
 Ce script, basique, ne fait que répondre ``{"id":"1","jsonrpc":"2.0","result":"OK"}`` à toute requête émanant de esup-sgc-client.
 
 Il est donc loin de 'simuler' à proprement parler les interactions avec evolis primacy 2; mais ça reste tout à fait suffisant pour une grand part du développement.
+
+### zebra
+
+En plus du driver Zebra récupérable depuis https://www.zebra.com/fr/fr/support-downloads/printers/card/zc300.html , il vous faut installer le driver de votre encodeur NFC intégré à votre Zebra.
+Nous avons développé et donc validé le bon fonctionnement de l'imprimante Zebra ZC 300 dotée d'un encodeur ELATEC GmbH TWN4/B1.50/NPF4.51/S1SC1.60 (vous pouvez récupérer le nom de l'encodeur depuis le gestionnaire de périphériques windows ou plus simplement via un `lsusb` sous linux).
+
+Pour que cet encodeur fonctionne correctement avec la Zebra ZC 300, il nous a fallu mettre à jour son firmware avec la version du firmware proposé dans le "DevPack 4.51" que l'on peut obtenir depuis https://www.elatec-rfid.com/int/twn4-dev-pack (en indiquant son mail).
+Sans cette mise à jour de firmware (notre zebra ZC 300 reçue en février 2023 proposait un firmware ancien), l'encodeur était vu comme deux lecteurs NFC et n'était pas capable de lire les cartes Mifare Desfire.
+Pour effectuer cette mise à jour du firmware, depuis un windows, et une fois récupéré et dézippé votre fichier TWN4DevPack45.zip, vous pouvez taper en ligne de commande : 
+```
+TWN4DevPack451\Tools\flash.exe --noprog USB TWN4DevPack451\Firmware\TWN4_xPx451_S1SC160_Multi_CCID_1Slot_Standard.bix
+```
+Cela vous permet de récupérer quelques informations, la mise à jour du firmware effective étant faite par la commande : 
+```
+TWN4DevPack451\Tools\flash.exe USB TWN4DevPack451\Firmware\TWN4_xPx451_S1SC160_Multi_CCID_1Slot_Standard.bix
+```
+
+En plus du driver Zebra et du firmware (du lecteur NFC, celui de la Zebra étant sans doute déjà jour) à mettre éventuellement à jour, il vous faut également télécharger le SDK Zebra depuis https://www.zebra.com/fr/fr/support-downloads/printer-software/developer-tools/card-sdk.html
+Celui-ci a pour nom "LINK-OS MULTIPLATFORM SDK FOR CARD PRINTERS", nous avons utilisé la version v2.14.5198 de ce SDK.
+
+Le répertoire dans lequel le SDK est ainsi installé (et sa version) doit être positionné dans esupsgcclient-zebra/pom.xml 
+```
+    <zebra.link_os_sdk.lib>/opt/link_os_sdk/PC-Card/v2.14.5198/lib</zebra.link_os_sdk.lib>
+    <zebra.link_os_sdk.version>v2.14.5198</zebra.link_os_sdk.version>
+```
+
+Une fois le SDK téléchargé et configuré dans ce fichier, vous devez taper la commande suivante pour le faire connaitre à maven : 
+```
+mvn -P zebra initialize
+```
+
+Sous windows, dans les variables d'environnement, ajoutez également ce répertoire pointant vers la librairie (et DLL) du SDK Zebra.
+
+Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows que sous linux. Sous linux, le dialogue PC/SC avec l'encodeur est réalisé grâce à pcscd avec les pilotes proposés dans libccid.
+
+Comme pour les evolis, le lecteur NFC ne fonctionne que via USB : le client esup-sgc-client doit donc être installé sur le poste (windows ou linux) connecté en USB à l'imprimante.
+
+Pour la phase d'encodage, une fois l'ordre donnée de positionner la carte au niveau de l'encodeur, esup-sgc-client dialogue directement avec l'encodeur NFC en pc/sc.
 
 ### esup-nfc-tag et esup-sgc de démonstration
 
