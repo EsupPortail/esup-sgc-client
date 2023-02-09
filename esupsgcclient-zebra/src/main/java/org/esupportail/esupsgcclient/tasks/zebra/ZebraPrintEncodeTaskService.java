@@ -67,7 +67,7 @@ public class ZebraPrintEncodeTaskService extends EsupSgcTaskService {
 	public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
 		super.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
 		webcamImageView.setVisible(false);
-		bmpColorImageView.setVisible(false);
-		bmpBlackImageView.setVisible(false);
+		bmpColorImageView.setVisible(true);
+		bmpBlackImageView.setVisible(true);
 	}
 }
