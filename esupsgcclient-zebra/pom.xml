@@ -9,6 +9,9 @@
     <version>${revision}</version>
   </parent>
   <artifactId>esupsgcclient-zebra</artifactId>
+  <properties>
+    <zebra.link_os_sdk.lib>/opt/link_os_sdk/PC-Card/v2.14.5198/lib</zebra.link_os_sdk.lib>
+  </properties>
   <dependencies>
       <dependency>
         <groupId>org.esupportail.esupsgcclient</groupId>
@@ -48,24 +51,6 @@
   </dependencies>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <version>1.1.0</version>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <goals>
-              <goal>read-project-properties</goal>
-            </goals>
-            <configuration>
-              <files>
-                <file>${basedir}/../esupsgcclient-core/src/main/resources/esupsgcclient.properties</file>
-              </files>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-install-plugin</artifactId>
