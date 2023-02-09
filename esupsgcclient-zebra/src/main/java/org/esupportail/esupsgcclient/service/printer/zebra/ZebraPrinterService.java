@@ -3,11 +3,13 @@ package org.esupportail.esupsgcclient.service.printer.zebra;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
 import com.zebra.sdk.common.card.containers.GraphicsInfo;
+import com.zebra.sdk.common.card.containers.PrinterStatusInfo;
 import com.zebra.sdk.common.card.enumerations.CardDestination;
 import com.zebra.sdk.common.card.enumerations.CardSide;
 import com.zebra.sdk.common.card.enumerations.CardSource;
@@ -20,6 +22,7 @@ import com.zebra.sdk.common.card.graphics.ZebraCardImageI;
 import com.zebra.sdk.common.card.graphics.ZebraGraphics;
 import com.zebra.sdk.common.card.graphics.enumerations.RotationType;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
+import com.zebra.sdk.zmotif.job.ZebraCardJobSettingNamesZmotif;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -27,8 +30,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.TilePane;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -46,9 +51,6 @@ import com.zebra.sdk.common.card.printer.ZebraCardPrinterFactory;
 import com.zebra.sdk.printer.discovery.DiscoveredUsbPrinter;
 import com.zebra.sdk.printer.discovery.UsbDiscoverer;
 import com.zebra.sdk.settings.SettingsException;
-import com.zebra.sdk.zxp.comm.internal.ZXPBase.Response;
-import com.zebra.sdk.zxp.comm.internal.ZXPPrn;
-import com.zebra.sdk.zxp.device.internal.ZxpDevice;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -66,9 +68,11 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	@Resource
 	EsupSgcTestPcscDialog esupSgcTestPcscDialog;
 
+	@Resource
+	AppConfig appConfig;
+
 	Connection connection;
 	ZebraCardPrinter zebraCardPrinter;
-	ZXPPrn zxpPrn;
 	int jobId;
 
 	@Override
@@ -98,14 +102,13 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		testPcsc.setOnAction(actionEvent -> {
 			esupSgcTestPcscDialog.getTestPcscDialog(
 					()-> {
-						launchEncoding();
-						},
-					()->{
 						try {
-							zebraCardPrinter.resume();
-						} catch (ConnectionException|ZebraCardException e) {
-							log.warn(e);
+							launchEncoding();
+						} catch (SettingsException | ConnectionException | ZebraCardException e) {
+							throw new RuntimeException("Pb when launching zebra encoding", e);
 						}
+					},
+					()->{
 						eject();
 					}
 			).show();
@@ -153,9 +156,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 						log.info("zebra not connected - try to connect");
 						connection.open();
 					}
-					zebraCardPrinter = ZebraCardPrinterFactory.getZxpPrinter(connection);
-					ZxpDevice zxpDevice = new ZxpDevice(connection);
-					zxpPrn = zxpDevice.getZxpPrinter();
+					zebraCardPrinter = ZebraCardPrinterFactory.getInstance(connection);
 					log.info("Zebra connection OK");
 					break;
 				} catch (Exception e) {
@@ -172,34 +173,39 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		try {
 			log.info("Settings range of offset : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.SMARTCARD_X_OFFSET));
 			log.info("Settings range of internal encoder contactless : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.INTERNAL_ENCODER_CONTACTLESS_ENCODER));
+			log.info("Settings range of encoder contactless for printerZebraEncoderType property on esup-sgc config : " + zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS));
 			log.info(String.format("Printer Firmware : %s", zebraCardPrinter.getPrinterInformation().firmwareVersion));
 			log.info(String.format("Printer cards count : %s", zebraCardPrinter.getCardCount().totalCards));
 			log.info(String.format("Printer sensor states : %s", zebraCardPrinter.getSensorStates()));
 		} catch (Exception e) {
-			log.warn(e);
+			log.warn("Pb getting zebra settings", e);
 		}
+
 	}
-	public void setSmartcardJob(){
-		try {
-			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_SOURCE, CardSource.Feeder.name());
-			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_DESTINATION, CardDestination.Hold.name());
-			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS, SmartCardEncoderType.MIFARE.name());
-		} catch (SettingsException e) {
-			log.error("Zebra settings error", e);
+	void setSmartcardJob() throws SettingsException {
+		zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_SOURCE, CardSource.Feeder.name());
+		zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_DESTINATION, CardDestination.Hold.name());
+		String smartCardEncodeTypeSetup = appConfig.getPrinterZebraEncoderType();
+		if(StringUtils.isEmpty(smartCardEncodeTypeSetup)) {
+			String  smartCardEncodeTypeRange = zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS);
+			for(String smartCardEncodeType : Arrays.asList(SmartCardEncoderType.MIFARE.toString().toLowerCase(), SmartCardEncoderType.UHF.toString().toLowerCase(), "hf", SmartCardEncoderType.Other.toString().toLowerCase())) {
+				if(smartCardEncodeTypeRange.contains(smartCardEncodeType)) {
+					smartCardEncodeTypeSetup = smartCardEncodeType;
+					break;
+				}
+			}
 		}
+		log.debug(String.format("zebra smarcard job setup with smartCardEncodeType to %s", smartCardEncodeTypeSetup));
+		zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS, smartCardEncodeTypeSetup);
 	}
 
-	public void launchEncoding() {
-		try {
-			setSmartcardJob();
-			jobId = zebraCardPrinter.smartCardEncode(1);
-			pollJobStatus();
-		} catch (Exception e) {
-			log.error("Zebra card encoder activation error", e);
-		}
+	public void launchEncoding() throws SettingsException, ConnectionException, ZebraCardException {
+		setSmartcardJob();
+		jobId = zebraCardPrinter.smartCardEncode(1);
+		pollJobStatus();
 	}
 	
-	public boolean pollJobStatus(){
+	boolean pollJobStatus(){
 		boolean done = false;
 		long start = System.currentTimeMillis();
 
@@ -275,16 +281,6 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			throw new ZebraCardException("zebraCardPrinter is null - try reset printer");
 		}
 	}
-
-	public void reverseCard() throws ZebraCardException{
-		log.info("try to reverse card");
-		try {
-			zxpPrn.flipCard(new Response(), new CardError());
-		} catch (ConnectionException e) {
-			log.error("Zebra resume error", e);
-			throw new ZebraCardException("zebraCardPrinter is null - try reset printer");
-		}
-	}
 	
 	public void reset() throws ZebraCardException {
 		try {
@@ -301,9 +297,10 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			while(status == null){
 				Utils.sleep(250);
 				try {
-					log.trace(zebraCardPrinter.getPrinterStatus().status +" : " +  zebraCardPrinter.getPrinterStatus().alarmInfo.description);
-					status = zebraCardPrinter.getPrinterStatus().status + " " + zebraCardPrinter.getPrinterStatus().alarmInfo.description;
-				} catch (ConnectionException | SettingsException | ZebraCardException e) {
+					PrinterStatusInfo printerStatusInfo = zebraCardPrinter.getPrinterStatus();
+					status = String.format("%s %s", printerStatusInfo.status, printerStatusInfo.alarmInfo.description);
+					log.trace(status);
+				} catch (Exception e) {
 					log.error(e);
 				}
 			}
@@ -349,6 +346,8 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			graphicsData.add(drawImage(bmpColorAsBase64, PrintType.Color));
 			graphicsData.add(drawImage(bmpBlackAsBase64, PrintType.MonoK));
 			graphicsData.add(drawImage(bmpOverlayAsBase64, PrintType.Overlay));
+			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_SOURCE, CardSource.Feeder.name());
+			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_DESTINATION, CardDestination.Hold.name());
 			jobId = zebraCardPrinter.print(1, graphicsData);
 			pollJobStatus();
 		} catch (Exception e) {
@@ -359,11 +358,11 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	private GraphicsInfo drawImage(String imageData, PrintType printType) throws IOException, ConnectionException, ZebraCardException {
 		ZebraGraphics graphics = new ZebraCardGraphics(zebraCardPrinter);
 		graphics.initialize(0, 0, OrientationType.Landscape, printType, Color.WHITE);
-		graphics.drawImage(Base64.getDecoder().decode(imageData), 0, 0, 1016, 648, RotationType.RotateNoneFlipNone);
+		graphics.drawImage(Base64.getDecoder().decode(imageData), 0, 0, 0, 0, RotationType.RotateNoneFlipNone);
 		ZebraCardImageI zebraCardImage = graphics.createImage();
 		GraphicsInfo graphicsInfo = new GraphicsInfo();
 		graphicsInfo.side = CardSide.Front;
-		graphicsInfo.fillColor = PrintType.Color.equals(printType) ? 1 : -1;
+		graphicsInfo.fillColor = -1;
 		graphicsInfo.graphicData = zebraCardImage;
 		graphicsInfo.graphicType = GraphicType.BMP;
 		graphicsInfo.printType = printType;

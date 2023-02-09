@@ -72,9 +72,11 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.printer_print);
             zebraPrinterService.launchEncoding();
             setUiStepSuccess(UiStep.printer_nfc);
-            encodingService.encode(this);
+            encodingService.encode(this, qrcode);
             setUiStepSuccess(UiStep.encode);
             zebraPrinterService.eject();
+            String msgTimer = String.format("Carte éditée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
+            updateTitle(msgTimer);
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
             zebraPrinterService.cancelJobs();

@@ -47,7 +47,17 @@ public class EsupSgcTestPcscDialog {
             @Override
             protected Void call() {
                 if (runAtStart != null) {
-                    runAtStart.run();
+                    try {
+                        runAtStart.run();
+                    } catch (Exception e) {
+                        final String msg = e.getMessage();
+                        log.error("Pb on start of test pc/sc", e);
+                        Platform.runLater(() ->
+                        {
+                            title.setValue(msg);
+                        });
+                        return null;
+                    }
                 }
                 log.info("wait for terminal ...");
                 String cardTerminalName = null;
@@ -64,6 +74,7 @@ public class EsupSgcTestPcscDialog {
                 log.info("test run for 20 sec");
                 boolean cardWasOk = false;
                 int nbFailed = 0;
+                int nbTest = 0;
                 long time = System.currentTimeMillis();
                 String lastTimeFailed = "";
                 while (System.currentTimeMillis() - time < 20200 && !isCancelled()) {
@@ -72,6 +83,7 @@ public class EsupSgcTestPcscDialog {
                         // Test : card is prsent AND get UID ok AND get challenge (for auth) ok
                         isCardOk = PcscUsbService.isCardPresent() && !StringUtils.isEmpty(PcscUsbService.getCardId()) && !StringUtils.isEmpty(PcscUsbService.sendAPDU("901a0000010000"));
                         cardWasOk = cardWasOk || isCardOk;
+                        nbTest++;
                     } catch (Exception e) {
                         log.error(String.format("Exception after %.2f sec. - reconnect terminal", (System.currentTimeMillis() - time) / 1000.0), e);
                         try {
@@ -92,17 +104,27 @@ public class EsupSgcTestPcscDialog {
                     if (cardWasOk && !isCardOk) {
                         log.warn("card no more present after " + fk);
                         nbFailed++;
-                        final String newTitle = String.format("PC/SC Stress Test - %d error(s) - last error : %s", nbFailed, lastTimeFailed);
-                        Platform.runLater(() ->
-                        {
-                            title.setValue(newTitle);
-                        });
                     }
+                    final String newTitle = String.format("%d PC/SC Stress Test - %d error(s) - last error : %s", nbTest, nbFailed, lastTimeFailed);
+                    Platform.runLater(() ->
+                    {
+                        title.setValue(newTitle);
+                    });
                     Utils.sleep(100);
                 }
                 log.info("test finished - nb failed : " + nbFailed);
                 if (runAtEnd != null) {
-                    runAtEnd.run();
+                    try {
+                        runAtEnd.run();
+                    } catch (Exception e) {
+                        final String msg = e.getMessage();
+                        log.error("Pb on end of test pc/sc", e);
+                        Platform.runLater(() ->
+                        {
+                            title.setValue(msg);
+                        });
+                        return null;
+                    }
                 }
                 return null;
             }

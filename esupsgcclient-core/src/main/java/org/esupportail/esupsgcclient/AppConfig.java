@@ -32,6 +32,9 @@ public class AppConfig {
     @Value("${printerEvolisSet}")
     String printerEvolisSet = "GRibbonType=RC_YMCKO;Duplex=NONE";
 
+   @Value("${printerZebraEncoderType:}")
+   String  printerZebraEncoderType;
+
     public String getEsupNfcTagServerUrl() {
         return esupNfcTagServerUrl;
     }
@@ -60,4 +63,7 @@ public class AppConfig {
         return printerEvolisSet;
     }
 
+    public String getPrinterZebraEncoderType() {
+        return printerZebraEncoderType;
+    }
 }

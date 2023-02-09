@@ -47,7 +47,6 @@ public class ZebraReadNfcTask extends EsupSgcTask {
             setUiStepRunning();
             setUiStepSuccess(null);
             zebraPrinterService.launchEncoding();
-            zebraPrinterService.pollJobStatus();
             setUiStepSuccess(UiStep.printer_nfc);
             encodingService.encode(this);
             setUiStepSuccess(UiStep.encode);
