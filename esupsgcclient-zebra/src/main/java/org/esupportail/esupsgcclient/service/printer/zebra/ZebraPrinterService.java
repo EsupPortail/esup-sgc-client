@@ -8,6 +8,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
+import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.common.card.containers.GraphicsInfo;
 import com.zebra.sdk.common.card.containers.PrinterStatusInfo;
 import com.zebra.sdk.common.card.enumerations.CardDestination;
@@ -38,9 +39,7 @@ import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
 
-import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
-import com.zebra.sdk.common.card.comm.internal.CardError;
 import com.zebra.sdk.common.card.containers.JobStatus;
 import com.zebra.sdk.common.card.containers.JobStatusInfo;
 import com.zebra.sdk.common.card.errors.ZebraCardErrors;
@@ -71,7 +70,6 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	@Resource
 	AppConfig appConfig;
 
-	Connection connection;
 	ZebraCardPrinter zebraCardPrinter;
 	int jobId;
 
@@ -88,11 +86,9 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		zebraPrintEnd.setText("Clore la session d'impression");
 		MenuItem testPcsc = new MenuItem();
 		testPcsc.setText("Stress test pc/sc");
-		MenuItem zebraCommand = new MenuItem();
-		zebraCommand.setText("Envoyer une commande avancée à l'imprimante");
 		Menu zebraMenu = new Menu();
 		zebraMenu.setText("Zebra");
-		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc, zebraCommand);
+		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc);
 		menuBar.getMenus().add(zebraMenu);
 
 		zebraReject.setOnAction(actionEvent -> {
@@ -113,34 +109,6 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 					}
 			).show();
 		});
-
-		TilePane r = new TilePane();
-		TextInputDialog td = new TextInputDialog("!CC");
-		td.setHeaderText("Lancer une commande à l'imprimante zebra");
-		td.setContentText("Commande");
-		zebraCommand.setOnAction(actionEvent -> {
-			Optional<String> result = td.showAndWait();
-			result.ifPresent(command -> {
-				new Thread(() -> {
-					logTextarea.appendText("Send command to zebra : " + command + "\n");
-					// prefix with ESC and suffix with ReturnCarriage
-					String cmd = (char)27 + command + (char)13;
-					String resp = new String();
-					try {
-						if (!connection.isConnected()) {
-							log.info("zebra not connected - try to connect");
-							connection.open();
-						}
-						connection.sendAndWaitForResponse(cmd.getBytes(), 2000, 2000, resp);
-						logTextarea.appendText("Response from zebra : " + resp + "\n");
-					} catch (ConnectionException ex) {
-						log.warn(String.format("zebra exception sending command %s : %s", command, ex.getMessage()), ex);
-						logTextarea.appendText("zebra exception : " + ex.getMessage() + "\n");
-					}
-				}).start();
-			});
-		});
-
 	}
 	
 	public void init() throws ConnectionException{
@@ -150,7 +118,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		while(zebraCardPrinter == null) {
 			for (DiscoveredUsbPrinter discoveredPrinter : discoveredPrinters) {
 				log.info("Discover Zebra printer ...");
-				connection = discoveredPrinter.getConnection();
+				Connection connection = discoveredPrinter.getConnection();
 				try {
 					if (!connection.isConnected()) {
 						log.info("zebra not connected - try to connect");
@@ -251,7 +219,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		}
 		return done;
 	}
-	
+
 	public void cancelJob(){
 		try {
 			zebraCardPrinter.cancel(jobId);
@@ -259,7 +227,6 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		} catch (ConnectionException | ZebraCardException e) {
 			log.error(e);
 		}
-		
 	}
 	
 	public void cancelJobs() throws ConnectionException, ZebraCardException {
@@ -272,25 +239,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			throw new ZebraCardException("zebraCardPrinter is null - try reset printer");
 		}
 	}
-	
-	public void resume() throws ZebraCardException{
-		try {
-			zebraCardPrinter.resume();
-		} catch (ZebraCardException | ConnectionException e) {
-			log.error("Zebra resume error", e);
-			throw new ZebraCardException("zebraCardPrinter is null - try reset printer");
-		}
-	}
-	
-	public void reset() throws ZebraCardException {
-		try {
-			zebraCardPrinter.reset();
-		} catch (ZebraCardException | ConnectionException e) {
-			log.error("Zebra resume error", e);
-			throw new ZebraCardException("zebraCardPrinter is null - try reset printer");
-		}
-	}
-	
+
 	public String getStatus() {
 		String status = null;
 		if(zebraCardPrinter != null) {
@@ -307,10 +256,6 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		}
 		return status;
 	}
-
-	public int getJobId() {
-		return jobId;
-	}
 	
 	public String getStatusMessage(String status) {
 		if(status.toLowerCase().contains("out of cards")) {
@@ -324,8 +269,8 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	}
 
 	@Override
-	public String getMaintenanceInfo() {
-		return getStatus();
+	public String getMaintenanceInfo() throws Exception {
+		return zebraCardPrinter.getCardCount().cardCounterInfo.toString();
 	}
 
 

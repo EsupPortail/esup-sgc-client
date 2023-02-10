@@ -48,7 +48,7 @@ public class ZebraHeartbeatTaskService extends Service<Void> {
                             updateTitle("Statut Zebra : " + lastPrinterStatus);
                         }
                     }
-                    Utils.sleep(2000);
+                    Utils.sleep(5000);
                 }
             }
         };

@@ -6,7 +6,7 @@ import javafx.scene.control.Tooltip;
 
 public abstract class EsupSgcPrinterService {
 
-    public abstract String getMaintenanceInfo();
+    public abstract String getMaintenanceInfo() throws Exception;
 
     public abstract void setupJfxUi(Tooltip tooltip, TextArea logTextarea, MenuBar menuBar);
 
