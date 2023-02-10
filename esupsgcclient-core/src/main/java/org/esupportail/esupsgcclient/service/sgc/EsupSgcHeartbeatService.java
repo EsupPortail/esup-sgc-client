@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 
 
 @Component
@@ -34,6 +35,9 @@ public class EsupSgcHeartbeatService extends Service<Void> {
                         String maintenanceInfo = esupSgcPrinterService.getMaintenanceInfo();
                         log.info("encodePrintHeartbeat - printer maintenanceInfo : " + maintenanceInfo);
                         encodePrintHeartbeat = esupSgcRestClientService.postEncodePrintHeartbeat(maintenanceInfo);
+                    } catch (ResourceAccessException e) {
+                        log.debug("ResourceAccessException - Read timed out ? ... wait 2 sec - " + e.getMessage());
+                        Utils.sleep(2000);
                     } catch (Exception e) {
                         log.info("EsupSgcHeartbeatService failed ... wait 2 sec", e);
                         Utils.sleep(2000);
