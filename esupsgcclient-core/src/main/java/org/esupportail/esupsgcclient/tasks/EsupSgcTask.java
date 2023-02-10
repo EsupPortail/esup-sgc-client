@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.tasks;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,10 +25,19 @@ public abstract class EsupSgcTask extends Task<String> {
 
     Map<UiStep, TextFlow> uiSteps;
 
+    protected ObjectProperty<Image> webcamImageProperty;
+
+    protected ImageView bmpColorImageView;
+
+    protected ImageView bmpBlackImageView;
+
     UiStep lastUiStepSuccess = null;
 
-    public EsupSgcTask(Map<UiStep, TextFlow> uiSteps) {
+    public EsupSgcTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
         this.uiSteps = uiSteps;
+        this.webcamImageProperty = webcamImageProperty;
+        this.bmpColorImageView = bmpColorImageView;
+        this.bmpBlackImageView = bmpBlackImageView;
     }
 
     protected abstract List<UiStep> getUiStepsList();
@@ -122,6 +132,14 @@ public abstract class EsupSgcTask extends Task<String> {
         } catch (Exception e) {
             log.warn("pb refreshing bmpImageView with bmpAsBase64", e);
         }
+    }
+
+
+    protected void resetBmpUi() {
+        Utils.jfxRunLaterIfNeeded(() -> {
+            bmpColorImageView.setImage(null);
+            bmpBlackImageView.setImage(null);
+        });
     }
 
 }

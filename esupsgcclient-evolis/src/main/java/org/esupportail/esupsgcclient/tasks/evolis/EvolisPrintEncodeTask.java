@@ -1,6 +1,8 @@
 package org.esupportail.esupsgcclient.tasks.evolis;
 
 import javax.annotation.Resource;
+
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
@@ -41,9 +43,6 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
             UiStep.encode
     });
 
-    ImageView bmpColorImageView;
-
-    ImageView bmpBlackImageView;
     @Resource
     EsupSgcRestClientService esupSgcRestClientService;
 
@@ -53,11 +52,10 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
     @Resource
     EvolisPrinterService evolisPrinterService;
 
-    public EvolisPrintEncodeTask(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-        super(uiSteps);
-        this.bmpColorImageView = bmpColorImageView;
-        this.bmpBlackImageView = bmpBlackImageView;
+    public EvolisPrintEncodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView);
     }
+
 
     @Override
     protected List<UiStep> getUiStepsList() {
@@ -124,10 +122,5 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
         }
 		return null;
 	}
-
-    private void resetBmpUi() {
-        bmpColorImageView.setImage(null);
-        bmpBlackImageView.setImage(null);
-    }
 
 }

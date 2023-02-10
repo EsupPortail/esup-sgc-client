@@ -37,7 +37,7 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return ctx.getBean(QrCodeTask.class, uiSteps, webcamImageView.imageProperty());
+		return ctx.getBean(QrCodeTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView);
 	}
 
 	@Override

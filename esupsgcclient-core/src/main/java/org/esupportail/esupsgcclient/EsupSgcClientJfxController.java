@@ -201,8 +201,8 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldServiceName, newServiceName) -> {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldServiceName + " - " + newServiceName);
-			if(!StringUtils.isEmpty(newServiceName)) {
-				Utils.jfxRunLaterIfNeeded(() -> {
+			Utils.jfxRunLaterIfNeeded(() -> {
+				if(!StringUtils.isEmpty(newServiceName)) {
 					if(autostart.isSelected() && !StringUtils.isEmpty(oldServiceName)) {
 						esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).removeListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
 					}
@@ -220,11 +220,11 @@ public class EsupSgcClientJfxController implements Initializable {
 						logTextarea.appendText(String.format("Autostart est activé, le service '%s' va démarrer.\n", newServiceName));
 						esupSgcTaskServiceFactory.runService(newServiceName);
 					}
-				});
-			} else {
-				startButton.disableProperty().unbind();
-				startButton.setDisable(true);
-			}
+				} else {
+					startButton.disableProperty().unbind();
+					startButton.setDisable(true);
+				}
+			});
 		});
 
 		pcscTest.setOnAction(event -> esupSgcTestPcscDialog.getTestPcscDialog(null, null).show());
@@ -240,15 +240,17 @@ public class EsupSgcClientJfxController implements Initializable {
 		appSession.nfcReadyProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-				if(newValue) {
-					checkNfc.getStyleClass().clear();
-					checkNfc.getStyleClass().add("btn-success");
-					logTextarea.appendText("PC/SC OK\n");
-				} else {
-					checkNfc.getStyleClass().clear();
-					checkNfc.getStyleClass().add("btn-danger");
-					logTextarea.appendText("PC/SC KO\n");
-				}
+				Utils.jfxRunLaterIfNeeded(() -> {
+					if (newValue) {
+						checkNfc.getStyleClass().clear();
+						checkNfc.getStyleClass().add("btn-success");
+						logTextarea.appendText("PC/SC OK\n");
+					} else {
+						checkNfc.getStyleClass().clear();
+						checkNfc.getStyleClass().add("btn-danger");
+						logTextarea.appendText("PC/SC KO\n");
+					}
+				});
 			}
 		});
 
@@ -379,20 +381,26 @@ public class EsupSgcClientJfxController implements Initializable {
 					}
 					webcamTaskService.init(newWebcamName, webcamImageView);
 					webcamTaskService.restart();
-					checkCamera.getTooltip().setText(newWebcamName);
-					for (MenuItem menuItem : camerasMenu.getItems()) {
-						if (!menuItem.getText().equals(newWebcamName) && ((CheckMenuItem) menuItem).isSelected()) {
-							((CheckMenuItem) menuItem).setSelected(false);
-							menuItem.setDisable(false);
+					Utils.jfxRunLaterIfNeeded(() -> {
+						checkCamera.getTooltip().setText(newWebcamName);
+						for (MenuItem menuItem : camerasMenu.getItems()) {
+							if (!menuItem.getText().equals(newWebcamName) && ((CheckMenuItem) menuItem).isSelected()) {
+								((CheckMenuItem) menuItem).setSelected(false);
+								menuItem.setDisable(false);
+							}
 						}
-					}
-					webcamMenuItem.setDisable(true);
+						webcamMenuItem.setDisable(true);
+					});
 				}
 			});
-			camerasMenu.getItems().add(webcamMenuItem);
+			Utils.jfxRunLaterIfNeeded(() -> {
+				camerasMenu.getItems().add(webcamMenuItem);
+			});
 		}
 		if(!webcamSelected && camerasMenu.getItems().size()>0) {
-			((CheckMenuItem)camerasMenu.getItems().get(0)).selectedProperty().setValue(true);
+			Utils.jfxRunLaterIfNeeded(() -> {
+				((CheckMenuItem) camerasMenu.getItems().get(0)).selectedProperty().setValue(true);
+			});
 		}
 	}
 	public synchronized void removeWebcamMenuItem(String webcamName) {
@@ -404,7 +412,10 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		}
 		if(webcamMenuItem != null) {
-			camerasMenu.getItems().remove(webcamMenuItem);
+			final MenuItem webcamMenuItem2remove = webcamMenuItem;
+			Utils.jfxRunLaterIfNeeded(() -> {
+				camerasMenu.getItems().remove(webcamMenuItem2remove);
+			});
 		}
 	}
 

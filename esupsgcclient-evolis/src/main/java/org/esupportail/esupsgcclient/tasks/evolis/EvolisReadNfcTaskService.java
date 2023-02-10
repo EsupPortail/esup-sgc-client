@@ -43,7 +43,7 @@ public class EvolisReadNfcTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return ctx.getBean(EvolisReadNfcTask.class, uiSteps);
+		return ctx.getBean(EvolisReadNfcTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package org.esupportail.esupsgcclient.tasks.zebra;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
@@ -31,20 +33,15 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
             UiStep.printer_nfc,
             UiStep.encode});
 
-    ImageView bmpColorImageView;
-
-    ImageView bmpBlackImageView;
-
     @Resource
     EsupSgcRestClientService esupSgcRestClientService;
     @Resource
     ZebraPrinterService zebraPrinterService;
     @Resource
     EncodingService encodingService;
-    public ZebraPrintEncodeTask(Map<UiStep, TextFlow> uiSteps, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-        super(uiSteps);
-        this.bmpColorImageView = bmpColorImageView;
-        this.bmpBlackImageView = bmpBlackImageView;
+
+    public ZebraPrintEncodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView);
     }
 
     @Override
@@ -80,11 +77,11 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
             zebraPrinterService.cancelJobs();
-            //zebraPrinterService.reset();
             updateTitle("Carte rejetée");
             throw new RuntimeException("Exception on  ZebraReadNfcTask : " + e.getMessage(), e);
         } finally {
             zebraPrinterService.cancelJob();
+            resetBmpUi();
         }
         updateTitle4thisTask("ZebraReadNfcTask OK");
 		return null;

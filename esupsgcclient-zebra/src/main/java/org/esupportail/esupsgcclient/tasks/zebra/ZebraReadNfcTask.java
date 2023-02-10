@@ -1,5 +1,8 @@
 package org.esupportail.esupsgcclient.tasks.zebra;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
@@ -31,8 +34,9 @@ public class ZebraReadNfcTask extends EsupSgcTask {
 
     @Resource
     EncodingService encodingService;
-    public ZebraReadNfcTask(Map<UiStep, TextFlow> uiSteps) {
-        super(uiSteps);
+
+    public ZebraReadNfcTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView);
     }
 
     @Override

@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import javafx.beans.property.ObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
@@ -28,17 +29,15 @@ public class QrCodeTask extends EsupSgcTask {
 
 	final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{UiStep.qrcode_read, UiStep.encode});
 
-	ObjectProperty<Image> webcamImageProperty;
-
 	@Resource
 	EncodingService encodingService;
 	@Resource
 	QRCodeReader qRCodeReader;
 
-	public QrCodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty) {
-		super(uiSteps);
-		this.webcamImageProperty = webcamImageProperty;
+	public QrCodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+		super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView);
 	}
+
 
 	@Override
 	protected List<UiStep> getUiStepsList() {

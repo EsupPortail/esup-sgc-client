@@ -44,8 +44,7 @@ public class WebcamTaskService extends Service<Void> {
                 webcam.open();
                 ObjectProperty<Image> imageProperty = webcamImageView.imageProperty();
                 webcamImageView.setRotate(180);
-                BufferedImage webcamBufferedImage = null;
-                BufferedImage newWebcamBufferedImage = null;
+
                 appSession.setWebcamReady(true);
                 while (true) {
                     try {
@@ -56,12 +55,14 @@ public class WebcamTaskService extends Service<Void> {
                             appSession.setWebcamReady(false);
                             return null;
                         }
-                        if ((newWebcamBufferedImage = webcam.getImage()) != null) {
-                            webcamBufferedImage = newWebcamBufferedImage;
-                            ref.set(SwingFXUtils.toFXImage(webcamBufferedImage, ref.get()));
-                            webcamBufferedImage.flush();
-                            imageProperty.set(ref.get());
-                            appSession.setWebcamReady(true);
+                        BufferedImage webcamBufferedImage = webcam.getImage();
+                        if (webcamBufferedImage != null) {
+                            Utils.jfxRunLaterIfNeeded(() -> {
+                                ref.set(SwingFXUtils.toFXImage(webcamBufferedImage, ref.get()));
+                                webcamBufferedImage.flush();
+                                imageProperty.set(ref.get());
+                                appSession.setWebcamReady(true);
+                            });
                         } else {
                             log.warn("image is null");
                             this.cancel();
