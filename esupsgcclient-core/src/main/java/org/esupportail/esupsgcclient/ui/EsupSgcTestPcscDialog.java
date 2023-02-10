@@ -1,7 +1,6 @@
 package org.esupportail.esupsgcclient.ui;
 
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 import javafx.scene.chart.CategoryAxis;
@@ -52,7 +51,7 @@ public class EsupSgcTestPcscDialog {
                     } catch (Exception e) {
                         final String msg = e.getMessage();
                         log.error("Pb on start of test pc/sc", e);
-                        Platform.runLater(() ->
+                        Utils.jfxRunLaterIfNeeded(() ->
                         {
                             title.setValue(msg);
                         });
@@ -96,7 +95,7 @@ public class EsupSgcTestPcscDialog {
                     final String fk = String.format("%.1f sec", (System.currentTimeMillis() - time) / 1000.0);
                     final int fv = isCardOk ? 1 : 0;
                     lastTimeFailed = isCardOk ? lastTimeFailed : fk;
-                    Platform.runLater(() ->
+                    Utils.jfxRunLaterIfNeeded(() ->
                             {
                                 series.getData().add(new XYChart.Data(fk, fv));
                             }
@@ -106,7 +105,7 @@ public class EsupSgcTestPcscDialog {
                         nbFailed++;
                     }
                     final String newTitle = String.format("%d PC/SC Stress Test - %d error(s) - last error : %s", nbTest, nbFailed, lastTimeFailed);
-                    Platform.runLater(() ->
+                    Utils.jfxRunLaterIfNeeded(() ->
                     {
                         title.setValue(newTitle);
                     });
@@ -119,7 +118,7 @@ public class EsupSgcTestPcscDialog {
                     } catch (Exception e) {
                         final String msg = e.getMessage();
                         log.error("Pb on end of test pc/sc", e);
-                        Platform.runLater(() ->
+                        Utils.jfxRunLaterIfNeeded(() ->
                         {
                             title.setValue(msg);
                         });

@@ -1,11 +1,9 @@
 package org.esupportail.esupsgcclient;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
@@ -15,11 +13,8 @@ import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
+import org.esupportail.esupsgcclient.utils.Utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 
 public class EsupSgcTaskUi {
@@ -57,7 +52,7 @@ public class EsupSgcTaskUi {
             @Override
             public void handle(WorkerStateEvent t) {
                 log.error("Exception when procressing card ...", service.getException());
-                Platform.runLater(() -> {
+                Utils.jfxRunLaterIfNeeded(() -> {
                     progressBar.setStyle("-fx-accent:red");
                     if (service.getException() != null && service.getException().getMessage() != null) {
                         logTextarea.appendText(service.getException().getMessage() + "\n");
@@ -72,7 +67,7 @@ public class EsupSgcTaskUi {
             @Override
             public void handle(WorkerStateEvent t) {
                 log.info("Cancel called");
-                Platform.runLater(() -> {
+                Utils.jfxRunLaterIfNeeded(() -> {
                     logTextarea.appendText("Service stoppé\n");
                     progressBar.setStyle("-fx-accent:red");
                     textPrincipal.textProperty().unbind();
@@ -81,7 +76,7 @@ public class EsupSgcTaskUi {
             }
         });
         service.titleProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(() -> {
+            Utils.jfxRunLaterIfNeeded(() -> {
                 if (newValue.length() > 1) {
                     logTextarea.appendText(newValue + "\n");
                     log.info(newValue);
@@ -100,7 +95,7 @@ public class EsupSgcTaskUi {
     public void runTaskService() {
         service.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
         service.restart();
-        Platform.runLater(() -> {
+        Utils.jfxRunLaterIfNeeded(() -> {
             progressBar.setStyle("");
             progressBar.progressProperty().bind(service.progressProperty());
             textPrincipal.textProperty().bind(Bindings.format("%.60s", service.titleProperty()));
@@ -119,7 +114,7 @@ public class EsupSgcTaskUi {
     }
 
     public void cancelTaskService() {
-        Platform.runLater(() -> {
+        Utils.jfxRunLaterIfNeeded(() -> {
                 this.service.cancel();
         });
     }

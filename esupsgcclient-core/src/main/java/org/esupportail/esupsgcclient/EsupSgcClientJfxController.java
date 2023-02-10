@@ -2,7 +2,7 @@ package org.esupportail.esupsgcclient;
 
 import com.github.sarxos.webcam.Webcam;
 import javax.annotation.Resource;
-import javafx.application.Platform;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -202,7 +202,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldServiceName, newServiceName) -> {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldServiceName + " - " + newServiceName);
 			if(!StringUtils.isEmpty(newServiceName)) {
-				Platform.runLater(() -> {
+				Utils.jfxRunLaterIfNeeded(() -> {
 					if(autostart.isSelected() && !StringUtils.isEmpty(oldServiceName)) {
 						esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).removeListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
 					}
@@ -255,7 +255,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		appSession.authReadyProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-				Platform.runLater(() -> {
+				Utils.jfxRunLaterIfNeeded(() -> {
 					if (newValue) {
 						checkAuth.getStyleClass().clear();
 						checkAuth.getStyleClass().add("btn-success");
@@ -275,7 +275,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		appSession.printerReadyProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-				Platform.runLater(() -> {
+				Utils.jfxRunLaterIfNeeded(() -> {
 					if(newValue) {
 						checkPrinter.getStyleClass().clear();
 						checkPrinter.getStyleClass().add("btn-success");
@@ -292,7 +292,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		appSession.webcamReady.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-				Platform.runLater(() -> {
+				Utils.jfxRunLaterIfNeeded(() -> {
 					if (newValue) {
 						checkCamera.getStyleClass().clear();
 						checkCamera.getStyleClass().add("btn-success");
@@ -317,7 +317,7 @@ public class EsupSgcClientJfxController implements Initializable {
 			@Override
 			public void handle(ActionEvent e) {
 				esupSgcTaskServiceFactory.runService(comboBox.getSelectionModel().getSelectedItem());
-				Platform.runLater(() -> {
+				Utils.jfxRunLaterIfNeeded(() -> {
 					logTextarea.appendText(String.format("Service '%s' démarré.\n", comboBox.getSelectionModel().getSelectedItem()));
 				});
 			}
@@ -331,7 +331,7 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		checkNfc.getTooltip().textProperty().bind(nfcHeartbeatTaskService.titleProperty());
 		nfcHeartbeatTaskService.start();
-		nfcHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> logTextarea.appendText(newValue + "\n")));
+		nfcHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(newValue + "\n")));
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		Webcam.getWebcams(); // with this webcams are discovered and listener works at startup
@@ -353,7 +353,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		log.info("Tâche au démarrage : " + fileLocalStorage.getItem("esupsgcTask"));
 		new Thread(() -> {
 			Utils.sleep(2000);
-			Platform.runLater(() -> {comboBox.getSelectionModel().select(fileLocalStorage.getItem("esupsgcTask"));});
+			Utils.jfxRunLaterIfNeeded(() -> {comboBox.getSelectionModel().select(fileLocalStorage.getItem("esupsgcTask"));});
 		}).start();
 	}
 

@@ -1,6 +1,5 @@
 package org.esupportail.esupsgcclient.tasks;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -34,24 +33,30 @@ public abstract class EsupSgcTask extends Task<String> {
     protected abstract List<UiStep> getUiStepsList();
 
     protected void setUiStepFailed(UiStep uiStep, Throwable exception) {
-        uiSteps.get(uiStep).getStyleClass().clear();
-        uiSteps.get(uiStep).getStyleClass().add("alert-danger");
+        Utils.jfxRunLaterIfNeeded(() -> {
+            uiSteps.get(uiStep).getStyleClass().clear();
+            uiSteps.get(uiStep).getStyleClass().add("alert-danger");
+         });
     }
 
     protected void setUiStepRunning() {
-        resetUiSteps();
-        for(UiStep step : getUiStepsList()) {
-            uiSteps.get(step).setVisible(true);
-        }
+        Utils.jfxRunLaterIfNeeded(() -> {
+            resetUiSteps();
+            for (UiStep step : getUiStepsList()) {
+                uiSteps.get(step).setVisible(true);
+            }
+        });
     }
 
     void resetUiSteps() {
-        for(UiStep step : uiSteps.keySet()) {
-            uiSteps.get(step).setVisible(false);
-            uiSteps.get(step).getStyleClass().clear();
-            uiSteps.get(step).getStyleClass().add("alert-info");
-        }
-        lastUiStepSuccess = null;
+        Utils.jfxRunLaterIfNeeded(() -> {
+            for(UiStep step : uiSteps.keySet()) {
+                uiSteps.get(step).setVisible(false);
+                uiSteps.get(step).getStyleClass().clear();
+                uiSteps.get(step).getStyleClass().add("alert-info");
+            }
+            lastUiStepSuccess = null;
+        });
     }
 
    public void  updateTitle4thisTask(String title) {
@@ -61,44 +66,48 @@ public abstract class EsupSgcTask extends Task<String> {
     }
 
 	protected void setUiStepSuccess(UiStep uiStep) {
-        if(uiStep == null) {
-            updateProgress(0, getUiStepsList().size()*PROGRESS_STEP_LENGTH);
-            updateTitle("En attente ...");
-            TextFlow uiStepTextFlow = (TextFlow) uiSteps.get(getUiStepsList().get(0));
-            uiStepTextFlow.getStyleClass().clear();
-            uiStepTextFlow.getStyleClass().add("alert-warning");
-        } else {
-            TextFlow uiStepTextFlow = (TextFlow) uiSteps.get(uiStep);
-            uiStepTextFlow.getStyleClass().clear();
-            uiStepTextFlow.getStyleClass().add("alert-success");
-            updateProgress((getUiStepsList().indexOf(uiStep)+1)*PROGRESS_STEP_LENGTH, getUiStepsList().size()*PROGRESS_STEP_LENGTH);
-            if(getUiStepsList().indexOf(uiStep)+1<getUiStepsList().size()) {
-                UiStep newtUiStep = (UiStep) getUiStepsList().get(getUiStepsList().indexOf(uiStep) + 1);
-                updateTitle(newtUiStep.toString());
-                uiStepTextFlow = (TextFlow) uiSteps.get(newtUiStep);
+        Utils.jfxRunLaterIfNeeded(() -> {
+            if (uiStep == null) {
+                updateProgress(0, getUiStepsList().size() * PROGRESS_STEP_LENGTH);
+                updateTitle("En attente ...");
+                TextFlow uiStepTextFlow = (TextFlow) uiSteps.get(getUiStepsList().get(0));
                 uiStepTextFlow.getStyleClass().clear();
                 uiStepTextFlow.getStyleClass().add("alert-warning");
+            } else {
+                TextFlow uiStepTextFlow = (TextFlow) uiSteps.get(uiStep);
+                uiStepTextFlow.getStyleClass().clear();
+                uiStepTextFlow.getStyleClass().add("alert-success");
+                updateProgress((getUiStepsList().indexOf(uiStep) + 1) * PROGRESS_STEP_LENGTH, getUiStepsList().size() * PROGRESS_STEP_LENGTH);
+                if (getUiStepsList().indexOf(uiStep) + 1 < getUiStepsList().size()) {
+                    UiStep newtUiStep = (UiStep) getUiStepsList().get(getUiStepsList().indexOf(uiStep) + 1);
+                    updateTitle(newtUiStep.toString());
+                    uiStepTextFlow = (TextFlow) uiSteps.get(newtUiStep);
+                    uiStepTextFlow.getStyleClass().clear();
+                    uiStepTextFlow.getStyleClass().add("alert-warning");
+                }
             }
-        }
-        lastUiStepSuccess = uiStep;
+            lastUiStepSuccess = uiStep;
+        });
 	}
 
     public void updateProgressStep() {
-       Platform.runLater(() -> {
+       Utils.jfxRunLaterIfNeeded(() -> {
            updateProgress(getProgress() * getUiStepsList().size() * PROGRESS_STEP_LENGTH + 1, getUiStepsList().size() * PROGRESS_STEP_LENGTH);
        });
     }
 
     protected void setCurrentUiStepFailed(Throwable exception) {
-        UiStep currentUiStep = null;
-        if(lastUiStepSuccess==null) {
-            currentUiStep = getUiStepsList().get(0);
-        } else if(lastUiStepSuccess!=null && getUiStepsList().indexOf(lastUiStepSuccess)+1<getUiStepsList().size()) {
-            currentUiStep = (UiStep) getUiStepsList().get(getUiStepsList().indexOf(lastUiStepSuccess) + 1);
-        }
-         if(currentUiStep!=null) {
-             setUiStepFailed(currentUiStep, exception);
-         }
+        Utils.jfxRunLaterIfNeeded(() -> {
+            UiStep currentUiStep = null;
+            if (lastUiStepSuccess == null) {
+                currentUiStep = getUiStepsList().get(0);
+            } else if (lastUiStepSuccess != null && getUiStepsList().indexOf(lastUiStepSuccess) + 1 < getUiStepsList().size()) {
+                currentUiStep = (UiStep) getUiStepsList().get(getUiStepsList().indexOf(lastUiStepSuccess) + 1);
+            }
+            if (currentUiStep != null) {
+                setUiStepFailed(currentUiStep, exception);
+            }
+        });
     }
 
     protected void updateBmpUi(String bmpAsBase64, ImageView bmpImageView) {
@@ -107,7 +116,9 @@ public abstract class EsupSgcTask extends Task<String> {
             BufferedImage input_image = ImageIO.read(new ByteArrayInputStream(bmp));
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ImageIO.write(input_image, "PNG", out);
-            bmpImageView.setImage(new Image(new ByteArrayInputStream(out.toByteArray()), 200, 200, true, true));
+            Utils.jfxRunLaterIfNeeded(() -> {
+                bmpImageView.setImage(new Image(new ByteArrayInputStream(out.toByteArray()), 200, 200, true, true));
+            });
         } catch (Exception e) {
             log.warn("pb refreshing bmpImageView with bmpAsBase64", e);
         }

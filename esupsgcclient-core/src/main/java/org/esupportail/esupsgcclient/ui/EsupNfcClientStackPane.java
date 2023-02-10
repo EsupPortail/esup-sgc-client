@@ -2,7 +2,7 @@ package org.esupportail.esupsgcclient.ui;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javafx.application.Platform;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
@@ -87,7 +87,7 @@ public class EsupNfcClientStackPane extends StackPane {
     }
 
     public void readLocalStorage() {
-        Platform.runLater(() -> {
+        Utils.jfxRunLaterIfNeeded(() -> {
             JSObject window = (JSObject) webView.getEngine().executeScript("window");
             appSession.setNumeroId(window.getMember("numeroId").toString());
             appSession.setSgcAuthToken(window.getMember("sgcAuthToken").toString());

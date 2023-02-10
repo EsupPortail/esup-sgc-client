@@ -22,15 +22,11 @@ import com.zebra.sdk.common.card.graphics.ZebraCardImageI;
 import com.zebra.sdk.common.card.graphics.ZebraGraphics;
 import com.zebra.sdk.common.card.graphics.enumerations.RotationType;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
-import com.zebra.sdk.zmotif.job.ZebraCardJobSettingNamesZmotif;
-import javafx.application.Platform;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.TilePane;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -80,7 +76,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		this.logTextarea = logTextarea;
 		tooltip.textProperty().bind(zebraHeartbeatTaskService.titleProperty());
 		zebraHeartbeatTaskService.start();
-		zebraHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> logTextarea.appendText(newValue + "\n")));
+		zebraHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(newValue + "\n")));
 
 		MenuItem zebraReject = new MenuItem();
 		zebraReject.setText("Rejeter la carte");
@@ -99,9 +95,9 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			new Thread(() -> {
 				try {
 					cancelJobs();
-					Platform.runLater(() -> logTextarea.appendText("Cancels Jobs OK \n"));
+					Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Cancels Jobs OK \n"));
 				} catch (ConnectionException | ZebraCardException e) {
-					Platform.runLater(() -> logTextarea.appendText(e.getMessage() + "\n"));
+					Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(e.getMessage() + "\n"));
 					throw new RuntimeException(e);
 				}
 			}).start();
@@ -110,7 +106,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		zebraReject.setOnAction(actionEvent -> {
 			new Thread(() -> {
 				eject();
-				Platform.runLater(() -> logTextarea.appendText("Eject OK \n"));
+				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Eject OK \n"));
 			}).start();
 		});
 
@@ -168,7 +164,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			String logText = "Settings range of encoder contactless for printerZebraEncoderType property on esup-sgc config : " + zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS) + "\n" +
 					String.format("Printer Firmware : %s", zebraCardPrinter.getPrinterInformation().firmwareVersion) + "\n";
 			log.info(logText);
-			Platform.runLater(() -> logTextarea.appendText(logText));
+			Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(logText));
 		} catch (Exception e) {
 			log.warn("Pb getting zebra settings", e);
 		}

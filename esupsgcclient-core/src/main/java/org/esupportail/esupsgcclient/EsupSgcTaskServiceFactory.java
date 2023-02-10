@@ -1,7 +1,7 @@
 package org.esupportail.esupsgcclient;
 
 import javax.annotation.Resource;
-import javafx.application.Platform;
+
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
@@ -127,7 +127,7 @@ public class EsupSgcTaskServiceFactory {
 
         esupSgcHeartbeatService.setExecutor(Executors.newFixedThreadPool(1));
 
-        esupSgcHeartbeatService.setOnSucceeded(event ->  Platform.runLater(() -> {
+        esupSgcHeartbeatService.setOnSucceeded(event ->  Utils.jfxRunLaterIfNeeded(() -> {
             // esupSgcHeartbeatService stopped -> esup-sgc restarted ? -> sgcAutoken should be refreshed ? -> iframe on esup-nfc-tag should be refreshed
             appSession.authReadyProperty().set(false);
         }));
@@ -167,7 +167,7 @@ public class EsupSgcTaskServiceFactory {
     }
 
     public void runService(String newServiceName) {
-        Platform.runLater(() -> {
+        Utils.jfxRunLaterIfNeeded(() -> {
             esupSgcTaskUis.get(newServiceName).runTaskService();
         });
     }

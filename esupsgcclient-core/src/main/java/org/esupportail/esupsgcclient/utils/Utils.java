@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient.utils;
 
+import javafx.application.Platform;
 import org.apache.log4j.Logger;
 
 import java.net.NetworkInterface;
@@ -46,6 +47,14 @@ public class Utils {
 
 		}
 		return sb.toString();
+	}
+
+	public static void jfxRunLaterIfNeeded(Runnable runnable) {
+		if(Platform.isFxApplicationThread()) {
+			runnable.run();
+		} else {
+			Platform.runLater(runnable);
+		}
 	}
 	
 }
