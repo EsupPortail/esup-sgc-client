@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.common.card.containers.GraphicsInfo;
@@ -96,12 +95,27 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc, reconnect);
 		menuBar.getMenus().add(zebraMenu);
 
+		zebraPrintEnd.setOnAction(actionEvent -> {
+			new Thread(() -> {
+				try {
+					cancelJobs();
+					Platform.runLater(() -> logTextarea.appendText("Cancels Jobs OK \n"));
+				} catch (ConnectionException | ZebraCardException e) {
+					Platform.runLater(() -> logTextarea.appendText(e.getMessage() + "\n"));
+					throw new RuntimeException(e);
+				}
+			}).start();
+		});
+
 		zebraReject.setOnAction(actionEvent -> {
-			new Thread(() -> {eject();});
+			new Thread(() -> {
+				eject();
+				Platform.runLater(() -> logTextarea.appendText("Eject OK \n"));
+			}).start();
 		});
 
 		reconnect.setOnAction(actionEvent -> {
-			new Thread(() -> {init();});
+			new Thread(() -> {init();}).start();
 		});
 
 		testPcsc.setOnAction(actionEvent -> {
@@ -288,9 +302,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	public void eject() {
 		try {
 			zebraCardPrinter.ejectCard();
-		} catch (ConnectionException e) {
-			throw new RuntimeException(e);
-		} catch (ZebraCardException e) {
+		} catch (ConnectionException | ZebraCardException e) {
 			throw new RuntimeException(e);
 		}
 	}

@@ -81,15 +81,15 @@ public class EsupSgcTaskUi {
             }
         });
         service.titleProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue.length()>1) {
-                Platform.runLater(() -> {
-                            logTextarea.appendText(newValue + "\n");
-                        });
-                log.info(newValue);
-            } else if(newValue.length()==1) {
-                // case of simple '.' or '_' from encoding task
-                Platform.runLater(() -> logTextarea.appendText(newValue));
-            }
+            Platform.runLater(() -> {
+                if (newValue.length() > 1) {
+                    logTextarea.appendText(newValue + "\n");
+                    log.info(newValue);
+                } else if (newValue.length() == 1) {
+                    // case of simple '.' or '_' from encoding task
+                    logTextarea.appendText(newValue);
+                }
+            });
         });
     }
 
