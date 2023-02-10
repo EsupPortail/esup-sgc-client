@@ -57,12 +57,14 @@ public class EsupSgcTaskUi {
             @Override
             public void handle(WorkerStateEvent t) {
                 log.error("Exception when procressing card ...", service.getException());
-                progressBar.setStyle("-fx-accent:red");
-                if(service.getException() != null && service.getException().getMessage()!=null) {
-                    logTextarea.appendText(service.getException().getMessage() + "\n");
-                }
-                textPrincipal.textProperty().unbind();
-                textPrincipal.setText("...");
+                Platform.runLater(() -> {
+                    progressBar.setStyle("-fx-accent:red");
+                    if (service.getException() != null && service.getException().getMessage() != null) {
+                        logTextarea.appendText(service.getException().getMessage() + "\n");
+                    }
+                    textPrincipal.textProperty().unbind();
+                    textPrincipal.setText("...");
+                });
             }
         });
 
@@ -70,19 +72,23 @@ public class EsupSgcTaskUi {
             @Override
             public void handle(WorkerStateEvent t) {
                 log.info("Cancel called");
-                logTextarea.appendText("Service stoppé\n");
-                progressBar.setStyle("-fx-accent:red");
-                textPrincipal.textProperty().unbind();
-                textPrincipal.setText("...");
+                Platform.runLater(() -> {
+                    logTextarea.appendText("Service stoppé\n");
+                    progressBar.setStyle("-fx-accent:red");
+                    textPrincipal.textProperty().unbind();
+                    textPrincipal.setText("...");
+                });
             }
         });
         service.titleProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue.length()>1) {
-                logTextarea.appendText(newValue + "\n");
+                Platform.runLater(() -> {
+                            logTextarea.appendText(newValue + "\n");
+                        });
                 log.info(newValue);
             } else if(newValue.length()==1) {
                 // case of simple '.' or '_' from encoding task
-                logTextarea.appendText(newValue);
+                Platform.runLater(() -> logTextarea.appendText(newValue));
             }
         });
     }
@@ -94,12 +100,14 @@ public class EsupSgcTaskUi {
     public void runTaskService() {
         service.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
         service.restart();
-        progressBar.setStyle("");
-        progressBar.progressProperty().bind(service.progressProperty());
-        textPrincipal.textProperty().bind(Bindings.format("%.60s", service.titleProperty()));
-        for(UiStep uiStep : service.getUiStepsList()) {
-            actionsPane.getChildren().stream().filter(node -> ((Label) ((TextFlow) node).getChildren().get(0)).getText().equals(uiStep.toString())).findFirst().get().toFront();
-        }
+        Platform.runLater(() -> {
+            progressBar.setStyle("");
+            progressBar.progressProperty().bind(service.progressProperty());
+            textPrincipal.textProperty().bind(Bindings.format("%.60s", service.titleProperty()));
+            for(UiStep uiStep : service.getUiStepsList()) {
+                actionsPane.getChildren().stream().filter(node -> ((Label) ((TextFlow) node).getChildren().get(0)).getText().equals(uiStep.toString())).findFirst().get().toFront();
+            }
+        });
     }
 
     public BooleanBinding readyToRunProperty() {

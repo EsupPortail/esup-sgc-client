@@ -255,48 +255,54 @@ public class EsupSgcClientJfxController implements Initializable {
 		appSession.authReadyProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-				if(newValue) {
-					checkAuth.getStyleClass().clear();
-					checkAuth.getStyleClass().add("btn-success");
-					checkAuth.getTooltip().setText(appSession.eppnInit);
-					logTextarea.appendText("Authentification OK : " + appSession.eppnInit + "\n");
-				} else {
-					checkAuth.getStyleClass().clear();
-					checkAuth.getStyleClass().add("btn-danger");
-					checkAuth.getTooltip().setText("...");
-					logTextarea.appendText("Authentification K0 for " + appSession.eppnInit + " - we refresh iframe on esup-nfc-tag\n");
-					esupNfcClientStackPane.init();
-				}
+				Platform.runLater(() -> {
+					if (newValue) {
+						checkAuth.getStyleClass().clear();
+						checkAuth.getStyleClass().add("btn-success");
+						checkAuth.getTooltip().setText(appSession.eppnInit);
+						logTextarea.appendText("Authentification OK : " + appSession.eppnInit + "\n");
+					} else {
+						checkAuth.getStyleClass().clear();
+						checkAuth.getStyleClass().add("btn-danger");
+						checkAuth.getTooltip().setText("...");
+						logTextarea.appendText("Authentification K0 for " + appSession.eppnInit + " - we refresh iframe on esup-nfc-tag\n");
+						esupNfcClientStackPane.init();
+					}
+				});
 			}
 		});
 
 		appSession.printerReadyProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-				if(newValue) {
-					checkPrinter.getStyleClass().clear();
-					checkPrinter.getStyleClass().add("btn-success");
-					logTextarea.appendText("imprimante evolis OK\n");
-				} else {
-					checkPrinter.getStyleClass().clear();
-					checkPrinter.getStyleClass().add("btn-danger");
-					logTextarea.appendText("imprimante evolis KO\n");
-				}
+				Platform.runLater(() -> {
+					if(newValue) {
+						checkPrinter.getStyleClass().clear();
+						checkPrinter.getStyleClass().add("btn-success");
+						logTextarea.appendText("imprimante evolis OK\n");
+					} else {
+						checkPrinter.getStyleClass().clear();
+						checkPrinter.getStyleClass().add("btn-danger");
+						logTextarea.appendText("imprimante evolis KO\n");
+					}
+				});
 			}
 		});
 
 		appSession.webcamReady.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-				if(newValue) {
-					checkCamera.getStyleClass().clear();
-					checkCamera.getStyleClass().add("btn-success");
-					logTextarea.appendText("Caméra OK.\n");
-				} else {
-					checkCamera.getStyleClass().clear();
-					checkCamera.getStyleClass().add("btn-danger");
-					logTextarea.appendText("Caméra déconnectée ?!\n");
-				}
+				Platform.runLater(() -> {
+					if (newValue) {
+						checkCamera.getStyleClass().clear();
+						checkCamera.getStyleClass().add("btn-success");
+						logTextarea.appendText("Caméra OK.\n");
+					} else {
+						checkCamera.getStyleClass().clear();
+						checkCamera.getStyleClass().add("btn-danger");
+						logTextarea.appendText("Caméra déconnectée ?!\n");
+					}
+				});
 			}
 		});
 
@@ -311,7 +317,9 @@ public class EsupSgcClientJfxController implements Initializable {
 			@Override
 			public void handle(ActionEvent e) {
 				esupSgcTaskServiceFactory.runService(comboBox.getSelectionModel().getSelectedItem());
-				logTextarea.appendText(String.format("Service '%s' démarré.\n", comboBox.getSelectionModel().getSelectedItem()));
+				Platform.runLater(() -> {
+					logTextarea.appendText(String.format("Service '%s' démarré.\n", comboBox.getSelectionModel().getSelectedItem()));
+				});
 			}
 		});
 
@@ -323,7 +331,7 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		checkNfc.getTooltip().textProperty().bind(nfcHeartbeatTaskService.titleProperty());
 		nfcHeartbeatTaskService.start();
-		nfcHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
+		nfcHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> logTextarea.appendText(newValue + "\n")));
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		Webcam.getWebcams(); // with this webcams are discovered and listener works at startup

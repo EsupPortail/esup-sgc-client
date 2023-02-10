@@ -2,6 +2,8 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.annotation.Resource;
+
+import javafx.application.Platform;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -65,7 +67,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	public void setupJfxUi(Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
 		tooltip.textProperty().bind(evolisHeartbeatTaskService.titleProperty());
 		evolisHeartbeatTaskService.start();
-		evolisHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
+		evolisHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> logTextarea.appendText(newValue + "\n")));
 
 		MenuItem evolisReject = new MenuItem();
 		evolisReject.setText("Rejeter la carte");
@@ -136,13 +138,13 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 
 	void callCommand(EvolisRequest evolisRequest, TextArea logTextarea) {
 		new Thread(() -> {
-			logTextarea.appendText("Send command to evolis : " + evolisRequest + "\n");
+			Platform.runLater(() -> logTextarea.appendText("Send command to evolis : " + evolisRequest + "\n"));
 			try {
 				EvolisResponse evolisResponse = sendRequest(evolisRequest);
-				logTextarea.appendText("Response from evolis : " + evolisResponse.getResult() + "\n");
+				Platform.runLater(() -> logTextarea.appendText("Response from evolis : " + evolisResponse.getResult() + "\n"));
 			} catch (EvolisSocketException ex) {
 				log.warn(String.format("Evolis exception sending command %s : %s", evolisRequest, ex.getMessage()), ex);
-				logTextarea.appendText("Evolis exception : " + ex.getMessage() + "\n");
+				Platform.runLater(() -> logTextarea.appendText("Evolis exception : " + ex.getMessage() + "\n"));
 			}
 		}).start();
 	}

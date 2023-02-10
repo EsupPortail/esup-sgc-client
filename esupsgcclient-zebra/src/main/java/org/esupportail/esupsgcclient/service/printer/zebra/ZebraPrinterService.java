@@ -24,6 +24,7 @@ import com.zebra.sdk.common.card.graphics.ZebraGraphics;
 import com.zebra.sdk.common.card.graphics.enumerations.RotationType;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
 import com.zebra.sdk.zmotif.job.ZebraCardJobSettingNamesZmotif;
+import javafx.application.Platform;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -73,12 +74,14 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	ZebraCardPrinter zebraCardPrinter;
 	int jobId;
 
+	TextArea logTextarea;
+
 	@Override
 	public void setupJfxUi(Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
-
+		this.logTextarea = logTextarea;
 		tooltip.textProperty().bind(zebraHeartbeatTaskService.titleProperty());
 		zebraHeartbeatTaskService.start();
-		zebraHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextarea.appendText(newValue + "\n"));
+		zebraHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> logTextarea.appendText(newValue + "\n")));
 
 		MenuItem zebraReject = new MenuItem();
 		zebraReject.setText("Rejeter la carte");
@@ -86,13 +89,19 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		zebraPrintEnd.setText("Clore la session d'impression");
 		MenuItem testPcsc = new MenuItem();
 		testPcsc.setText("Stress test pc/sc");
+		MenuItem reconnect = new MenuItem();
+		reconnect.setText("Reconnexion de l'imprimante");
 		Menu zebraMenu = new Menu();
 		zebraMenu.setText("Zebra");
-		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc);
+		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc, reconnect);
 		menuBar.getMenus().add(zebraMenu);
 
 		zebraReject.setOnAction(actionEvent -> {
 			new Thread(() -> {eject();});
+		});
+
+		reconnect.setOnAction(actionEvent -> {
+			new Thread(() -> {init();});
 		});
 
 		testPcsc.setOnAction(actionEvent -> {
@@ -111,40 +120,41 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		});
 	}
 	
-	public void init() throws ConnectionException{
+	public synchronized void init() {
 		log.info("Zebra init connection ...");
-		DiscoveredUsbPrinter[] discoveredPrinters;
-		discoveredPrinters = UsbDiscoverer.getZebraUsbPrinters();
 		while(zebraCardPrinter == null) {
-			for (DiscoveredUsbPrinter discoveredPrinter : discoveredPrinters) {
-				log.info("Discover Zebra printer ...");
-				Connection connection = discoveredPrinter.getConnection();
-				try {
-					if (!connection.isConnected()) {
-						log.info("zebra not connected - try to connect");
-						connection.open();
-					}
-					zebraCardPrinter = ZebraCardPrinterFactory.getInstance(connection);
-					log.info("Zebra connection OK");
-					break;
-				} catch (Exception e) {
-					log.error("Zebra init error", e);
-					throw new ConnectionException(e);
+			try {
+				DiscoveredUsbPrinter[] discoveredPrinters;
+				discoveredPrinters = UsbDiscoverer.getZebraUsbPrinters();
+				for (DiscoveredUsbPrinter discoveredPrinter : discoveredPrinters) {
+					log.info("Discover Zebra printer ...");
+					Connection connection = discoveredPrinter.getConnection();
+						if (!connection.isConnected()) {
+							log.info("zebra not connected - try to connect");
+							connection.open();
+						}
+						zebraCardPrinter = ZebraCardPrinterFactory.getInstance(connection);
+						log.info("Zebra connection OK");
+						break;
 				}
-			}
-			if(zebraCardPrinter == null) {
-				log.warn("Cant connect Zebra printer, retry in 3 sec");
-				Utils.sleep(2000);
+				if(zebraCardPrinter == null) {
+					log.warn("Cant connect Zebra printer, retry in 3 sec");
+					Utils.sleep(2000);
+				}
+			} catch (Exception e) {
+				log.error("Zebra init error", e);
 			}
 		}
 
 		try {
 			log.info("Settings range of offset : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.SMARTCARD_X_OFFSET));
 			log.info("Settings range of internal encoder contactless : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.INTERNAL_ENCODER_CONTACTLESS_ENCODER));
-			log.info("Settings range of encoder contactless for printerZebraEncoderType property on esup-sgc config : " + zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS));
-			log.info(String.format("Printer Firmware : %s", zebraCardPrinter.getPrinterInformation().firmwareVersion));
 			log.info(String.format("Printer cards count : %s", zebraCardPrinter.getCardCount().totalCards));
 			log.info(String.format("Printer sensor states : %s", zebraCardPrinter.getSensorStates()));
+			String logText = "Settings range of encoder contactless for printerZebraEncoderType property on esup-sgc config : " + zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS) + "\n" +
+					String.format("Printer Firmware : %s", zebraCardPrinter.getPrinterInformation().firmwareVersion) + "\n";
+			log.info(logText);
+			Platform.runLater(() -> logTextarea.appendText(logText));
 		} catch (Exception e) {
 			log.warn("Pb getting zebra settings", e);
 		}

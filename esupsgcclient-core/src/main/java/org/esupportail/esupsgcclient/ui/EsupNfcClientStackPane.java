@@ -44,8 +44,6 @@ public class EsupNfcClientStackPane extends StackPane {
 
     @PostConstruct
     public void init() throws HeadlessException {
-
-        Platform.runLater(() -> {
             webView.setPrefWidth(500);
             webView.getEngine().setJavaScriptEnabled(true);
             if (fileLocalStorage.getItem("numeroId") != null) {
@@ -70,7 +68,6 @@ public class EsupNfcClientStackPane extends StackPane {
             webView.getEngine().locationProperty().addListener(new ChangeListener<String>() {
 
                 public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-
                     if (newValue.length() >= 12) {
                         if ("download-jar".equals(newValue.substring(newValue.length() - 12))) {
                             try {
@@ -80,13 +77,11 @@ public class EsupNfcClientStackPane extends StackPane {
                             } catch (IOException e) {
                                 log.error("jar download error", e);
                             }
-
                         }
                     }
                 }
 
             });
-        });
         StackPane webviewPane = new StackPane(webView);
         getChildren().add(webviewPane);
     }
