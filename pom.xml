@@ -13,7 +13,7 @@
 		<revision>2.4-SNAPSHOT</revision>
 		<spring.version>5.3.25</spring.version>
 		<jackson.version>2.14.1</jackson.version>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<openjfx.version>11</openjfx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -82,6 +82,10 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<compilerArgs>
+						<arg>--add-modules</arg>
+						<arg>java.smartcardio</arg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>
