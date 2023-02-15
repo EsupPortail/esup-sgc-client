@@ -25,7 +25,7 @@ public abstract class EsupSgcTask extends Task<String> {
 
     Map<UiStep, TextFlow> uiSteps;
 
-    protected ObjectProperty<Image> webcamImageProperty;
+    public ObjectProperty<Image> webcamImageProperty;
 
     protected ImageView bmpColorImageView;
 
@@ -141,5 +141,6 @@ public abstract class EsupSgcTask extends Task<String> {
             bmpBlackImageView.setImage(null);
         });
     }
+
 
 }

@@ -1,9 +1,7 @@
 package org.esupportail.esupsgcclient.tasks.simple;
 
-import com.github.sarxos.webcam.WebcamException;
 import javax.annotation.Resource;
 import javafx.beans.property.ObjectProperty;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
@@ -12,11 +10,9 @@ import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.webcam.QRCodeReader;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.UiStep;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +44,7 @@ public class QrCodeTask extends EsupSgcTask {
 	protected String call() throws Exception {
 		setUiStepRunning();
 		setUiStepSuccess(null);
-		String qrcode = getQrcode();
+		String qrcode = qRCodeReader.getQrcode(this);
 		if(qrcode == null) return null;
 		long start = System.currentTimeMillis();
 		updateTitle4thisTask("qrcode détecté : " + qrcode);
@@ -71,26 +67,6 @@ public class QrCodeTask extends EsupSgcTask {
 			updateTitle4thisTask("Carte retirée");
 		}
 		return null;
-	}
-
-	public String getQrcode() {
-		String qrcode = null;
-		while (true) {
-			if(isCancelled()) {
-				return null;
-			}
-			BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(webcamImageProperty.get(), null);
-			qrcode = qRCodeReader.readQrCode(webcamBufferedImage);
-			if(webcamBufferedImage != null) {
-				if (qrcode != null) {
-					break;
-				}
-			} else {
-				throw new WebcamException("no image");
-			}
-			Utils.sleep(200);
-		}
-		return qrcode;
 	}
 
 
