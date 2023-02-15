@@ -161,8 +161,9 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			log.info("Settings range of internal encoder contactless : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.INTERNAL_ENCODER_CONTACTLESS_ENCODER));
 			log.info(String.format("Printer cards count : %s", zebraCardPrinter.getCardCount().totalCards));
 			log.info(String.format("Printer sensor states : %s", zebraCardPrinter.getSensorStates()));
-			String logText = "Settings range of encoder contactless for printerZebraEncoderType property on esup-sgc config : " + zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS) + "\n" +
-					String.format("Printer Firmware : %s", zebraCardPrinter.getPrinterInformation().firmwareVersion) + "\n";
+			String logText = String.format("Printer Firmware : %s", zebraCardPrinter.getPrinterInformation().firmwareVersion) + "\n" +
+					"Settings range of encoder contactless for printerZebraEncoderType property on esup-sgc-client config : " + zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS) + "\n" +
+					String.format("printerZebraEncoderType : %s", appConfig.getPrinterZebraEncoderType()) + "\n";
 			log.info(logText);
 			Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(logText));
 		} catch (Exception e) {
