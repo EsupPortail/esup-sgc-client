@@ -38,7 +38,7 @@ public class ZebraPrintEncodeTaskService extends EsupSgcTaskService {
 
 	@Override
 	public List<UiStep> getUiStepsList() {
-		return ZebraReadNfcTask.UI_STEPS_LIST;
+		return ZebraPrintEncodeTask.UI_STEPS_LIST;
 	}
 
 	@Override
