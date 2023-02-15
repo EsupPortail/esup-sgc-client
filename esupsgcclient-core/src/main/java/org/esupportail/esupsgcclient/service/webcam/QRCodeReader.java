@@ -50,9 +50,10 @@ public class QRCodeReader {
 		}
 	}
 
-	public String getQrcode(EsupSgcTask esupSgcTask) {
+	public String getQrcode(EsupSgcTask esupSgcTask, int nbRetryMax) {
 		String qrcode = null;
-		while (true) {
+		long nbRetry = 0;
+		while (true && nbRetryMax>0 && nbRetry<nbRetryMax) {
 			if(esupSgcTask.isCancelled()) {
 				return null;
 			}
@@ -65,6 +66,7 @@ public class QRCodeReader {
 			} else {
 				throw new WebcamException("no image");
 			}
+			nbRetry++;
 			Utils.sleep(200);
 		}
 		return qrcode;
