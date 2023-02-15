@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 
 import com.zebra.sdk.comm.Connection;
+import com.zebra.sdk.common.card.comm.internal.CardError;
 import com.zebra.sdk.common.card.containers.GraphicsInfo;
 import com.zebra.sdk.common.card.containers.PrinterStatusInfo;
 import com.zebra.sdk.common.card.enumerations.CardDestination;
@@ -22,6 +24,11 @@ import com.zebra.sdk.common.card.graphics.ZebraCardImageI;
 import com.zebra.sdk.common.card.graphics.ZebraGraphics;
 import com.zebra.sdk.common.card.graphics.enumerations.RotationType;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
+import com.zebra.sdk.zxp.comm.internal.ZXPBase;
+import com.zebra.sdk.zxp.comm.internal.ZXPPrn;
+import com.zebra.sdk.zxp.device.internal.ZxpDevice;
+import com.zebra.sdk.zxp.printer.internal.ZxpPrinterImpl;
+import com.zebra.sdk.zxp.printer.internal.ZxpZebraPrinter;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -193,7 +200,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		jobId = zebraCardPrinter.smartCardEncode(1);
 		pollJobStatus();
 	}
-	
+
 	boolean pollJobStatus(){
 		boolean done = false;
 		long start = System.currentTimeMillis();
@@ -331,5 +338,18 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		graphicsInfo.graphicType = GraphicType.BMP;
 		graphicsInfo.printType = printType;
 		return graphicsInfo;
+	}
+
+	public void flipCard() {
+		if(zebraCardPrinter instanceof ZxpZebraPrinter) {
+			try {
+				ZxpDevice zxpDevice = new ZxpDevice(zebraCardPrinter.getConnection());
+				ZXPPrn zxpPrn = zxpDevice.getZxpPrinter();
+				zxpPrn.flipCard(new ZXPBase.Response(), new CardError());
+			} catch (ConnectionException e) {
+				log.error("Exception when flip card", e);
+				return;
+			}
+		}
 	}
 }
