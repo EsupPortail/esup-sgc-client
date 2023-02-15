@@ -53,7 +53,7 @@ public class QRCodeReader {
 	public String getQrcode(EsupSgcTask esupSgcTask, int nbRetryMax) {
 		String qrcode = null;
 		long nbRetry = 0;
-		while (true && nbRetryMax>0 && nbRetry<nbRetryMax) {
+		while (nbRetryMax<0 || nbRetry<=nbRetryMax) {
 			if(esupSgcTask.isCancelled()) {
 				return null;
 			}
