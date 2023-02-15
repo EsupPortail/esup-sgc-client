@@ -281,11 +281,11 @@ public class EsupSgcClientJfxController implements Initializable {
 					if(newValue) {
 						checkPrinter.getStyleClass().clear();
 						checkPrinter.getStyleClass().add("btn-success");
-						logTextarea.appendText("imprimante evolis OK\n");
+						logTextarea.appendText("imprimante OK\n");
 					} else {
 						checkPrinter.getStyleClass().clear();
 						checkPrinter.getStyleClass().add("btn-danger");
-						logTextarea.appendText("imprimante evolis KO\n");
+						logTextarea.appendText("imprimante KO\n");
 					}
 				});
 			}
