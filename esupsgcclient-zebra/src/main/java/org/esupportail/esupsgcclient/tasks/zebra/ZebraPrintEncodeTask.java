@@ -81,7 +81,7 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
             setCurrentUiStepFailed(e);
             zebraPrinterService.cancelJobs();
             updateTitle("Carte rejetée");
-            throw new RuntimeException("Exception on  ZebraReadNfcTask : " + e.getMessage(), e);
+            throw new RuntimeException("Exception on ZebraPrintEncodeTask : " + e.getMessage(), e);
         } finally {
             zebraPrinterService.cancelJob();
             resetBmpUi();

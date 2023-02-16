@@ -85,12 +85,13 @@ public class EvolisEncodeTask extends EsupSgcTask {
                 encodingService.encode(this, qrcode);
                 setUiStepSuccess(UiStep.encode);
                 evolisPrinterService.eject();
+                String msgTimer = String.format("Carte encodée en %.2f secondes\n", (System.currentTimeMillis() - start) / 1000.0);
+                updateTitle(msgTimer);
             }
-            String msgTimer = String.format("Carte encodée en %.2f secondes\n", (System.currentTimeMillis() - start) / 1000.0);
-            updateTitle(msgTimer);
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
             evolisPrinterService.reject();
+            throw new RuntimeException("Exception on  EvolisTask : " + e.getMessage(), e);
         } 
 		return null;
 	}

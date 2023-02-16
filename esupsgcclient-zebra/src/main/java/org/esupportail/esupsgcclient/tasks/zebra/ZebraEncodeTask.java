@@ -58,6 +58,11 @@ public class ZebraEncodeTask extends EsupSgcTask {
             }
             long start = System.currentTimeMillis();
             zebraPrinterService.launchEncoding();
+           String zebraStatus = zebraPrinterService.getStatus();
+            updateTitle4thisTask(zebraStatus);
+            if(zebraStatus.contains("Out of cards")) {
+                throw new RuntimeException("Out of cards");
+            }
             setUiStepSuccess(UiStep.printer_nfc);
             String qrcode = qRCodeReader.getQrcode(this, 50);
             if(qrcode == null) {
@@ -70,12 +75,13 @@ public class ZebraEncodeTask extends EsupSgcTask {
                 encodingService.encode(this, qrcode);
                 setUiStepSuccess(UiStep.encode);
                 zebraPrinterService.eject();
+                String msgTimer = String.format("Carte encodée en %.2f secondes\n", (System.currentTimeMillis() - start) / 1000.0);
+                updateTitle(msgTimer);
             }
-            String msgTimer = String.format("Carte encodée en %.2f secondes\n", (System.currentTimeMillis() - start) / 1000.0);
-            updateTitle(msgTimer);
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
             zebraPrinterService.reject();
+            throw new RuntimeException("Exception on ZebraEncodeTask : " + e.getMessage(), e);
         } finally {
             zebraPrinterService.cancelJob();
             updateTitle("Carte rejetée");
