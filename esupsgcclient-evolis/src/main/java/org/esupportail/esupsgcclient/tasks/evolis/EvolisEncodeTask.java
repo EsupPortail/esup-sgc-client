@@ -57,6 +57,9 @@ public class EvolisEncodeTask extends EsupSgcTask {
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
+            if(isCancelled()) {
+                throw new RuntimeException("Task is cancelled");
+            }
             long start = System.currentTimeMillis();
             evolisPrinterService.insertCardToContactLessStation(this);
             String evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();

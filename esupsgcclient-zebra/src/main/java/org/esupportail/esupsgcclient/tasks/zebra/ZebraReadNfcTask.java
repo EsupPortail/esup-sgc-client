@@ -50,6 +50,9 @@ public class ZebraReadNfcTask extends EsupSgcTask {
             Utils.sleep(500);
             setUiStepRunning();
             setUiStepSuccess(null);
+            if(isCancelled()) {
+                throw new RuntimeException("Task is cancelled");
+            }
             zebraPrinterService.launchEncoding();
             setUiStepSuccess(UiStep.printer_nfc);
             encodingService.encode(this);
@@ -64,7 +67,6 @@ public class ZebraReadNfcTask extends EsupSgcTask {
         } finally {
             zebraPrinterService.cancelJob();
         }
-        updateTitle4thisTask("ZebraReadNfcTask OK");
 		return null;
 	}
 

@@ -44,6 +44,9 @@ public class QrCodeTask extends EsupSgcTask {
 	protected String call() throws Exception {
 		setUiStepRunning();
 		setUiStepSuccess(null);
+		if(isCancelled()) {
+			throw new RuntimeException("Task is cancelled");
+		}
 		String qrcode = qRCodeReader.getQrcode(this, -1);
 		if(qrcode == null) return null;
 		long start = System.currentTimeMillis();

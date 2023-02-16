@@ -55,7 +55,7 @@ public class QRCodeReader {
 		long nbRetry = 0;
 		while (nbRetryMax<0 || nbRetry<=nbRetryMax) {
 			if(esupSgcTask.isCancelled()) {
-				return null;
+				throw new RuntimeException("Task is cancelled");
 			}
 			BufferedImage webcamBufferedImage = SwingFXUtils.fromFXImage(esupSgcTask.webcamImageProperty.get(), null);
 			qrcode = readQrCode(webcamBufferedImage);

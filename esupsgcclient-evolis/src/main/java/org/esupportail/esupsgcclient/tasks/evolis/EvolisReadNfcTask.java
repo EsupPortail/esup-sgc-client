@@ -50,6 +50,9 @@ public class EvolisReadNfcTask extends EsupSgcTask {
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
+            if(isCancelled()) {
+                throw new RuntimeException("Task is cancelled");
+            }
             // evolisPrinterService.setupCardToContactLessStation();
             evolisPrinterService.insertCardToContactLessStation(this);
             String evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();

@@ -54,6 +54,9 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
+            if(isCancelled()) {
+                throw new RuntimeException("Task is cancelled");
+            }
             log.debug("try to get qrcode ...");
             String qrcode = esupSgcRestClientService.getQrCode(this, null);
             long start = System.currentTimeMillis();
@@ -83,7 +86,6 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
             zebraPrinterService.cancelJob();
             resetBmpUi();
         }
-        updateTitle4thisTask("ZebraReadNfcTask OK");
 		return null;
 	}
 

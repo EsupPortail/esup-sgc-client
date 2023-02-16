@@ -67,6 +67,9 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
+            if(isCancelled()) {
+                throw new RuntimeException("Task is cancelled");
+            }
             log.debug("try to get qrcode ...");
             String qrcode = esupSgcRestClientService.getQrCode(this, null);
             long start = System.currentTimeMillis();

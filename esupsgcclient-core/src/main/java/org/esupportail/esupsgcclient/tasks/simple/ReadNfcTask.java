@@ -42,6 +42,9 @@ public class ReadNfcTask extends EsupSgcTask {
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
+            if(isCancelled()) {
+                throw new RuntimeException("Task is cancelled");
+            }
             encodingService.encode(this);
             setUiStepSuccess(UiStep.encode);
             updateTitle4thisTask("Badgeage OK");

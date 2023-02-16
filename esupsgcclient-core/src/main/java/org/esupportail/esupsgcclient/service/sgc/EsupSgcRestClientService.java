@@ -30,7 +30,7 @@ public class EsupSgcRestClientService {
     public String getQrCode(EsupSgcTask esupSgcTask, String csn) {
         while (true) {
             if(esupSgcTask.isCancelled()) {
-                throw new RuntimeException("EvolisTask is cancelled");
+                throw new RuntimeException("Task is cancelled");
             }
             String sgcAuthToken = appSession.getSgcAuthToken();
             if (sgcAuthToken != null && !sgcAuthToken.equals("") && !"undefined".equals(sgcAuthToken) && !"null".equals(sgcAuthToken)) {

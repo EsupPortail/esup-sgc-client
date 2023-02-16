@@ -53,6 +53,9 @@ public class ZebraEncodeTask extends EsupSgcTask {
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
+            if(isCancelled()) {
+                throw new RuntimeException("Task is cancelled");
+            }
             long start = System.currentTimeMillis();
             zebraPrinterService.launchEncoding();
             setUiStepSuccess(UiStep.printer_nfc);
