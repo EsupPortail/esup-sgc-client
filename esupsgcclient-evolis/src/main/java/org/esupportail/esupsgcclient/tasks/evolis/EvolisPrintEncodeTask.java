@@ -29,7 +29,7 @@ import java.util.Map;
 @Scope("prototype")
 public class EvolisPrintEncodeTask extends EsupSgcTask {
 
-    private final static Logger log = Logger.getLogger(EvolisPrintEncodeTaskService.class);
+    private final static Logger log = Logger.getLogger(EvolisPrintEncodeTask.class);
 
     final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{
             UiStep.long_poll,
