@@ -117,6 +117,9 @@ Une fois ces modifications apportées, vous devez redémarrer le servie windows 
 
 Le fichier de configuration d'esup-sgc-client donné dans [src/main/resources/esupsgcclient.properties](src/main/resources/esupsgcclient.properties) doit reprendre ce même numéro de port.
 
+Notez que la configuration printerEvolisSet vous permet de configurer le type de ruban utilisé, 
+par défaut on propose une configuration proposant l'usage d'un ruban couleur demi-panneau (RC_YMCKOS), pour un ruban couleur plein panneau il faudra positionner RC_YMCKO
+
 ### evolis primacy 1
 
 La mise en place pour Evolis Primacy 1 (par rapport à Primacy 2) est très similaire, il vous faudra cependant installer non pas "Evolis Premium Suite 2" mais "Evolis Premium Suite".
@@ -127,12 +130,16 @@ ESPFServerManager.enabletcpatstart = true
 
 Au niveau d'esup-sgc-client, il faudra spécifier dans src/main/resources/esupsgcclient.properties :
 ```
-printerEvolisVersion=1
+printerDeviceName = Evolis Primacy
 ```
 
-### simulation de evolis primacy 2
+### autres imprimantes evolis
 
-Pour le développement, on peut aussi se contenter de 'simuler' l'API de "Evolis Premium Suite 2" 
+Théoriquement, esup-sgc-client doit supporter les autres imprimantes evolis supportant "Evolis Premium Suite" (1 ou 2), il faudra alors adapter la propriété printerDeviceName en conséquence.
+
+### simulation de evolis
+
+Pour le développement, on peut aussi se contenter de 'simuler' l'API de "Evolis Premium Suite" 
 Pour ce faire, il vous suffit de lancer le script python (python2 ou python3) [src/etc/dummyEvolisPrinterCenter.py](src/etc/dummyEvolisPrinterCenter.py)
 ````
 python3 dummyEvolisPrinterCenter.py
@@ -179,6 +186,10 @@ Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous win
 Comme pour les evolis, le lecteur NFC ne fonctionne que via USB : le client esup-sgc-client doit donc être installé sur le poste (windows ou linux) connecté en USB à l'imprimante.
 
 Pour la phase d'encodage, une fois l'ordre donnée de positionner la carte au niveau de l'encodeur, esup-sgc-client dialogue directement avec l'encodeur NFC en pc/sc.
+
+Dans le fichier de propriétés src/main/resources/esupsgcclient.properties, suivant votre imprimante (et son firmware), vous devrez éventuellement adapter la propriété printerZebraEncoderType
+
+Si la ZC300 attend a priori 'other' pour sépcifier le lecteur NFC USB intégré à celle-ci, la ZXP3 attend par exemple 'MIFARE'.
 
 ### esup-nfc-tag et esup-sgc de démonstration
 
