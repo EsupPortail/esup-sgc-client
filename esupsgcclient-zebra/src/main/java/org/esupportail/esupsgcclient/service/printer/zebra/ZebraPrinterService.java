@@ -24,6 +24,7 @@ import com.zebra.sdk.common.card.graphics.ZebraCardImageI;
 import com.zebra.sdk.common.card.graphics.ZebraGraphics;
 import com.zebra.sdk.common.card.graphics.enumerations.RotationType;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
+import com.zebra.sdk.zmotif.printer.internal.ZmotifPrinterImpl;
 import com.zebra.sdk.zxp.comm.internal.ZXPBase;
 import com.zebra.sdk.zxp.comm.internal.ZXPPrn;
 import com.zebra.sdk.zxp.device.internal.ZxpDevice;
@@ -340,7 +341,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		return graphicsInfo;
 	}
 
-	public void flipCard() {
+	public void reject() {
 		if(zebraCardPrinter instanceof ZxpZebraPrinter) {
 			try {
 				ZxpDevice zxpDevice = new ZxpDevice(zebraCardPrinter.getConnection());
@@ -351,5 +352,6 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 				return;
 			}
 		}
+		this.eject();
 	}
 }
