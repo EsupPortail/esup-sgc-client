@@ -115,6 +115,9 @@ RequestServer.tcpenabled = true
 
 Une fois ces modifications apportées, vous devez redémarrer le servie windows "Evolis Premium Suite 2" (via la gestion classique des "service windows").
 
+Le service et donc le PC windows hôte doit donc écouter en TCP sur le port 18000 en local, c'est par ce biais qu'esup-sgc-client dialogue avec l'imprimante.
+En cas de problème d'écoute sur le port 18000, pensez à vérifier/adapter un éventuel firewall.
+
 Le fichier de configuration d'esup-sgc-client donné dans [src/main/resources/esupsgcclient.properties](src/main/resources/esupsgcclient.properties) doit reprendre ce même numéro de port.
 
 Notez que la configuration printerEvolisSet vous permet de configurer le type de ruban utilisé, 
