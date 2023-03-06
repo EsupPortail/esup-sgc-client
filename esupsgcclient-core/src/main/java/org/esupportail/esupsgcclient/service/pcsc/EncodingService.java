@@ -231,9 +231,9 @@ public class EncodingService {
 		int k = 0;
 		String result = "";
 		while (true) {
-			log.info("RAPDU : " + result);
+			log.trace("RAPDU : " + result);
 			NfcResultBean nfcResultBean = esupNfcTagRestClientService.getApdu(csn, result);
-			log.info("SAPDU : " + nfcResultBean.getFullApdu());
+			log.trace("SAPDU : " + nfcResultBean.getFullApdu());
 			k++;
 			// hack to log progress on textaera
 			esupSgcTask.updateTitle4thisTask(k%2==0 ? "." : "_");
