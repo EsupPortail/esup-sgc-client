@@ -153,6 +153,16 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
+		logTextarea.textProperty().addListener((observable, oldValue, newValue) -> {
+			String value  = newValue;
+			if(newValue != null && oldValue != null) {
+				value = newValue.replace(oldValue, "");
+				if(value.contains("\n")) {
+					log.info(value.replace("\n", ""));
+				}
+			}
+		});
+
 		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane, autostart);
 
 		// redimensionnement possible en fonction de la visible

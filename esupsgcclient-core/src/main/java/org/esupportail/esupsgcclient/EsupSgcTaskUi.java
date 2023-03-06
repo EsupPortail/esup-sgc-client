@@ -79,7 +79,6 @@ public class EsupSgcTaskUi {
             Utils.jfxRunLaterIfNeeded(() -> {
                 if (newValue.length() > 1) {
                     logTextarea.appendText(newValue + "\n");
-                    log.info(newValue);
                 } else if (newValue.length() == 1) {
                     // case of simple '.' or '_' from encoding task
                     logTextarea.appendText(newValue);

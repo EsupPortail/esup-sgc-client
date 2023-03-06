@@ -159,6 +159,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	}
 
 	synchronized EvolisResponse sendRequest(EvolisRequest req) throws EvolisSocketException {
+		log.debug("Request : {}", req);
 		Socket socket = null;
 		try {
 			socket = getSocket();
@@ -198,6 +199,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 			EvolisResponse response = objectMapper.readValue(responseStr, EvolisResponse.class);
 			// close socket - sinon evolis center reste en boucle infinie
 			socketInputStream.close();
+			log.debug("Response : {}", response);
 			if(response.getError()!=null) {
 				throw new EvolisException(response.getError());
 			}
@@ -215,7 +217,6 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		}
 	}
 	EvolisResponse sendRequestAndRetryIfFailed(EvolisRequest evolisRequest) {
-		log.debug("Request : {}", evolisRequest);
 		EvolisResponse response = null;
 		try {
 			response = sendRequest(evolisRequest);
@@ -227,7 +228,6 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 			Utils.sleep(2000);
 			sendRequestAndRetryIfFailed(evolisRequest);
 		}
-		log.debug("Response : {}", response);
 		return response;
 	}
 
