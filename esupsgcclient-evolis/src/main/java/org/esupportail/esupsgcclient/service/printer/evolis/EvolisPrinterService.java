@@ -25,6 +25,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -150,7 +151,8 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 
 	public Socket getSocket() {
 		try {
-			Socket socket = new Socket(appConfig.getPrinterEvolisIp(), appConfig.getPrinterEvolisPort());
+			Socket socket = new Socket();
+			socket.connect(new InetSocketAddress(appConfig.getPrinterEvolisIp(), appConfig.getPrinterEvolisPort()), 500);
 			socket.setSoTimeout(100);
 			return socket;
 		} catch (IOException e) {
