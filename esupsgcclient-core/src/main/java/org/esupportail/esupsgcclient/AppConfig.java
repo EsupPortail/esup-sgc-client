@@ -35,6 +35,9 @@ public class AppConfig {
    @Value("${printerZebraEncoderType:}")
    String  printerZebraEncoderType;
 
+    @Value("${printerZebraHackZxpNfcPower:false}")
+   Boolean printerZebraHackZxpNfcPower;
+
     public String getEsupNfcTagServerUrl() {
         return esupNfcTagServerUrl;
     }
@@ -65,5 +68,13 @@ public class AppConfig {
 
     public String getPrinterZebraEncoderType() {
         return printerZebraEncoderType;
+    }
+
+    public Boolean getPrinterZebraHackZxpNfcPower() {
+        return printerZebraHackZxpNfcPower;
+    }
+
+    public void setPrinterZebraHackZxpNfcPower(Boolean printerZebraHackZxpNfcPower) {
+        this.printerZebraHackZxpNfcPower = printerZebraHackZxpNfcPower;
     }
 }

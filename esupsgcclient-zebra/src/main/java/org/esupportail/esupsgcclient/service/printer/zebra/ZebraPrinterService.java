@@ -200,6 +200,15 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		setSmartcardJob();
 		jobId = zebraCardPrinter.smartCardEncode(1);
 		pollJobStatus();
+		if(zebraCardPrinter instanceof ZxpZebraPrinter && appConfig.getPrinterZebraHackZxpNfcPower()) {
+			// Hack for ZXP3 and SDI010 USB Smart Card Reader on linux to power on nfc reader ?!
+			log.info("HackZxpNfcPower is on ... unloadContactSmartcard so that nfc reader power is on ?!");
+			ZxpDevice zxpDevice = new ZxpDevice(zebraCardPrinter.getConnection());
+			ZXPPrn zxpPrn = zxpDevice.getZxpPrinter();
+			ZXPBase.Response res = new ZXPBase.Response();
+			CardError cardError = new CardError();
+			zxpPrn.unloadContactSmartcard(res, cardError);
+		}
 	}
 
 	boolean pollJobStatus(){
