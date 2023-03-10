@@ -336,7 +336,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		});
 
 		if(esupSgcPrinterService != null) {
-			esupSgcPrinterService.setupJfxUi(checkPrinter.getTooltip(), logTextarea, menuBar);
+			esupSgcPrinterService.setupJfxUi(stage, checkPrinter.getTooltip(), logTextarea, menuBar);
 		} else {
 			checkPrinter.setDisable(true);
 		}

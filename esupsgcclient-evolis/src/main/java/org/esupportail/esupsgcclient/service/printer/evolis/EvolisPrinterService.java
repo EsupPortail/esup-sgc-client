@@ -10,6 +10,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.TilePane;
+import javafx.stage.Stage;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
@@ -64,7 +65,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	}
 
 	@Override
-	public void setupJfxUi(Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
+	public void setupJfxUi(Stage stage, Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
 		tooltip.textProperty().bind(evolisHeartbeatTaskService.titleProperty());
 		evolisHeartbeatTaskService.start();
 		evolisHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(newValue + "\n")));

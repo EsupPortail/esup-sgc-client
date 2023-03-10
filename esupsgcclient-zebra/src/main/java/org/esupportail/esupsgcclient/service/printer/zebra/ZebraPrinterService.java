@@ -1,7 +1,10 @@
 package org.esupportail.esupsgcclient.service.printer.zebra;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -35,6 +38,9 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -80,7 +86,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	TextArea logTextarea;
 
 	@Override
-	public void setupJfxUi(Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
+	public void setupJfxUi(Stage stage, Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
 		this.logTextarea = logTextarea;
 		tooltip.textProperty().bind(zebraHeartbeatTaskService.titleProperty());
 		zebraHeartbeatTaskService.start();
@@ -94,9 +100,11 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		testPcsc.setText("Stress test pc/sc");
 		MenuItem reconnect = new MenuItem();
 		reconnect.setText("Reconnexion de l'imprimante");
+		MenuItem updateFirmware = new MenuItem();
+		updateFirmware.setText("Mise a jour du firmware de l'imprimante");
 		Menu zebraMenu = new Menu();
 		zebraMenu.setText("Zebra");
-		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc, reconnect);
+		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc, reconnect, updateFirmware);
 		menuBar.getMenus().add(zebraMenu);
 
 		zebraPrintEnd.setOnAction(actionEvent -> {
@@ -136,6 +144,23 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 					}
 			).show();
 		});
+
+		final FileChooser fileChooser = new FileChooser();
+		updateFirmware.setOnAction(actionEvent -> {
+			File file = fileChooser.showOpenDialog(stage);
+			if (file != null) {
+				try {
+					logTextarea.appendText(String.format("Envoi du fichier %s pour mise à jour du firmaware de l'imprimante zebra en cours ...\n", file.getAbsolutePath()));
+					zebraCardPrinter.updateFirmware(file.getAbsolutePath());
+					logTextarea.appendText("Mise à jour réussie !\n");
+					logTextarea.appendText("Merci de redémarrer l'application.\n");
+				} catch (Exception e) {
+					logTextarea.appendText(String.format("Mise à jour échouée ... : %s\n", e.getMessage()));
+					log.error("Exception lros de la mise à jour du firmware Zebra", e);
+				}
+			}
+		});
+
 	}
 	
 	public synchronized void init() {
