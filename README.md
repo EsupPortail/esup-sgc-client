@@ -182,7 +182,8 @@ Une fois le SDK téléchargé et configuré dans ce fichier, vous devez taper la
 mvn -P zebra initialize
 ```
 
-Sous windows, dans les variables d'environnement, ajoutez également ce répertoire pointant vers la librairie (et DLL) du SDK Zebra.
+Sous windows, dans les variables d'environnement, ajoutez également ce répertoire pointant vers la librairie (et DLL) du SDK Zebra dans le PATH.
+N'oubliez pas également que sous windows, les DLL zebra actuelles ne fonctionnent que depuis un JDK-8 (test réalisé avec le JDK 1.8.0_333 d'Oracle notamment).
 
 Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows que sous linux. Sous linux, le dialogue PC/SC avec l'encodeur est réalisé grâce à pcscd avec les pilotes proposés dans libccid.
 
