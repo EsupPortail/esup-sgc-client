@@ -185,6 +185,13 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	
 	public synchronized void init() {
 		log.info("Zebra init connection ...");
+		if(zebraCardPrinter!=null) {
+			try {
+				zebraCardPrinter.getConnection().close();
+			} catch (ConnectionException e) {
+				log.error("Zebra close error", e);
+			}
+		}
 		zebraCardPrinter = null;
 		while(zebraCardPrinter == null) {
 			try {
