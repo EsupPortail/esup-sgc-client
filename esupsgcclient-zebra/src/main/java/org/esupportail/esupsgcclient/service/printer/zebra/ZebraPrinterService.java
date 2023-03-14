@@ -1,19 +1,11 @@
 package org.esupportail.esupsgcclient.service.printer.zebra;
 
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-
 import com.zebra.sdk.comm.Connection;
+import com.zebra.sdk.comm.ConnectionException;
 import com.zebra.sdk.common.card.comm.internal.CardError;
 import com.zebra.sdk.common.card.containers.GraphicsInfo;
+import com.zebra.sdk.common.card.containers.JobStatus;
+import com.zebra.sdk.common.card.containers.JobStatusInfo;
 import com.zebra.sdk.common.card.containers.PrinterStatusInfo;
 import com.zebra.sdk.common.card.enumerations.CardDestination;
 import com.zebra.sdk.common.card.enumerations.CardSide;
@@ -22,47 +14,49 @@ import com.zebra.sdk.common.card.enumerations.GraphicType;
 import com.zebra.sdk.common.card.enumerations.OrientationType;
 import com.zebra.sdk.common.card.enumerations.PrintType;
 import com.zebra.sdk.common.card.enumerations.SmartCardEncoderType;
+import com.zebra.sdk.common.card.errors.ZebraCardErrors;
+import com.zebra.sdk.common.card.exceptions.ZebraCardException;
 import com.zebra.sdk.common.card.graphics.ZebraCardGraphics;
 import com.zebra.sdk.common.card.graphics.ZebraCardImageI;
 import com.zebra.sdk.common.card.graphics.ZebraGraphics;
 import com.zebra.sdk.common.card.graphics.enumerations.RotationType;
+import com.zebra.sdk.common.card.jobSettings.ZebraCardJobSettingNames;
+import com.zebra.sdk.common.card.printer.ZebraCardPrinter;
+import com.zebra.sdk.common.card.printer.ZebraCardPrinterFactory;
 import com.zebra.sdk.common.card.settings.ZebraCardSettingNames;
-import com.zebra.sdk.zmotif.printer.internal.ZmotifPrinterImpl;
+import com.zebra.sdk.printer.discovery.DiscoveredUsbPrinter;
+import com.zebra.sdk.printer.discovery.UsbDiscoverer;
+import com.zebra.sdk.settings.SettingsException;
 import com.zebra.sdk.zxp.comm.internal.ZXPBase;
 import com.zebra.sdk.zxp.comm.internal.ZXPPrn;
 import com.zebra.sdk.zxp.device.internal.ZxpDevice;
-import com.zebra.sdk.zxp.printer.internal.ZxpPrinterImpl;
 import com.zebra.sdk.zxp.printer.internal.ZxpZebraPrinter;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.TilePane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
-
-import com.zebra.sdk.comm.ConnectionException;
-import com.zebra.sdk.common.card.containers.JobStatus;
-import com.zebra.sdk.common.card.containers.JobStatusInfo;
-import com.zebra.sdk.common.card.errors.ZebraCardErrors;
-import com.zebra.sdk.common.card.exceptions.ZebraCardException;
-import com.zebra.sdk.common.card.jobSettings.ZebraCardJobSettingNames;
-import com.zebra.sdk.common.card.printer.ZebraCardPrinter;
-import com.zebra.sdk.common.card.printer.ZebraCardPrinterFactory;
-import com.zebra.sdk.printer.discovery.DiscoveredUsbPrinter;
-import com.zebra.sdk.printer.discovery.UsbDiscoverer;
-import com.zebra.sdk.settings.SettingsException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ZebraPrinterService extends EsupSgcPrinterService {
@@ -102,9 +96,11 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		reconnect.setText("Reconnexion de l'imprimante");
 		MenuItem updateFirmware = new MenuItem();
 		updateFirmware.setText("Mise a jour du firmware de l'imprimante");
+		MenuItem zebraCommand = new MenuItem();
+		zebraCommand.setText("Envoyer une commande avancée à l'imprimante");
 		Menu zebraMenu = new Menu();
 		zebraMenu.setText("Zebra");
-		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc, reconnect, updateFirmware);
+		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc, reconnect, updateFirmware, zebraCommand);
 		menuBar.getMenus().add(zebraMenu);
 
 		zebraPrintEnd.setOnAction(actionEvent -> {
@@ -156,15 +152,40 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 					logTextarea.appendText("Merci de redémarrer l'application.\n");
 				} catch (Exception e) {
 					logTextarea.appendText(String.format("Mise à jour échouée ... : %s\n", e.getMessage()));
-					log.error("Exception lros de la mise à jour du firmware Zebra", e);
+					log.error("Exception lors de la mise à jour du firmware Zebra", e);
 				}
 			}
+		});
+
+		TilePane r = new TilePane();
+		TextInputDialog td = new TextInputDialog("+OS 0");
+		td.setHeaderText("Envoyer une commande avancée à l'imprimante");
+		td.setContentText("Commande");
+		zebraCommand.setOnAction(actionEvent -> {
+			Optional<String> result = td.showAndWait();
+			result.ifPresent(command -> {
+				new Thread(() -> {
+					try {
+						Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(String.format("Commande zebra : %s\n", command)));
+							Connection c = zebraCardPrinter.getConnection();
+							if(!c.isConnected()) {
+								c.open();
+							}
+							String zebraResponse = "";
+							c.write(("\u001B" + command + "\r").getBytes("ISO-8859-1"));
+					} catch (Exception e) {
+						Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(String.format("Exception zebra : %s\n", e.getMessage())));
+						log.error("Exception zebra lors de la commande " + command, e);
+					}
+				}).start();
+			});
 		});
 
 	}
 	
 	public synchronized void init() {
 		log.info("Zebra init connection ...");
+		zebraCardPrinter = null;
 		while(zebraCardPrinter == null) {
 			try {
 				DiscoveredUsbPrinter[] discoveredPrinters;
@@ -196,7 +217,8 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			log.info(String.format("Printer sensor states : %s", zebraCardPrinter.getSensorStates()));
 			String logText = String.format("Printer Firmware : %s", zebraCardPrinter.getPrinterInformation().firmwareVersion) + "\n" +
 					"Settings range of encoder contactless for printerZebraEncoderType property on esup-sgc-client config : " + zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS) + "\n" +
-					String.format("printerZebraEncoderType : %s", appConfig.getPrinterZebraEncoderType()) + "\n";
+					String.format("printerZebraEncoderType : %s", appConfig.getPrinterZebraEncoderType()) + "\n" +
+					String.format("Smart Card Offset : %s", zebraCardPrinter.getSettingValue(ZebraCardSettingNames.SMARTCARD_X_OFFSET)) + "\n";
 			log.info(logText);
 			Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(logText));
 		} catch (Exception e) {
