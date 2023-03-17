@@ -76,15 +76,14 @@ public class ZebraEncodeTask extends EsupSgcTask {
                 setUiStepSuccess(UiStep.encode);
                 zebraPrinterService.eject();
                 String msgTimer = String.format("Carte encodée en %.2f secondes\n", (System.currentTimeMillis() - start) / 1000.0);
-                updateTitle(msgTimer);
+                updateTitle4thisTask(msgTimer);
             }
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
-            zebraPrinterService.reject();
-            throw new RuntimeException("Exception on ZebraEncodeTask : " + e.getMessage(), e);
-        } finally {
-            zebraPrinterService.cancelJob();
+            zebraPrinterService.cancelJobs();
             updateTitle("Carte rejetée");
+            throw new RuntimeException("Exception on ZebraPrintEncodeTask : " + e.getMessage(), e);
+        } finally {
             resetBmpUi();
         }
 		return null;

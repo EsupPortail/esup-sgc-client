@@ -415,6 +415,6 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 				return;
 			}
 		}
-		this.eject();
+		this.cancelJob();
 	}
 }
