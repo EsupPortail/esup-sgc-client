@@ -42,7 +42,7 @@ public class ZebraHeartbeatTaskService extends Service<Void> {
                         }
                     } catch(Exception e) {
                         appSession.setPrinterReady(false);
-                        log.trace("pb with zebraPrinterService ...", e);
+                        log.warn("pb with zebraPrinterService ...", e);
                         if( e.getMessage()!=null && ! e.getMessage().equals(lastPrinterStatus)) {
                             lastPrinterStatus = e.getMessage();
                             updateTitle("Statut Zebra : " + lastPrinterStatus);

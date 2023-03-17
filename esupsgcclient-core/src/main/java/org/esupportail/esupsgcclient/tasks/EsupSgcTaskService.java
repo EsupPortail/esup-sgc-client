@@ -1,11 +1,11 @@
 package org.esupportail.esupsgcclient.tasks;
 
-import com.beust.jcommander.Strings;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
+import jdk.internal.joptsimple.internal.Strings;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.ui.UiStep;
@@ -60,7 +60,7 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
                 .collect(Collectors.toMap(e->e.getKey(),e->e.getValue()));
         List<String> pbs = readyToRunConditionsFailedMap.keySet().stream().map(k -> " * " + k + " : KO").collect(Collectors.toList());
         log.warn(pbs);
-        return Strings.join("\n", pbs) + "\n";
+        return String.join("\n", pbs) + "\n";
     }
 
 }

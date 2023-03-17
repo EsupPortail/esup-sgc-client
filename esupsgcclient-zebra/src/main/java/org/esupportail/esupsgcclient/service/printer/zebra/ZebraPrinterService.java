@@ -404,7 +404,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		return graphicsInfo;
 	}
 
-	public void reject() {
+	public void flipCard() {
 		if(zebraCardPrinter instanceof ZxpZebraPrinter) {
 			try {
 				ZxpDevice zxpDevice = new ZxpDevice(zebraCardPrinter.getConnection());
@@ -415,6 +415,5 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 				return;
 			}
 		}
-		this.cancelJob();
 	}
 }

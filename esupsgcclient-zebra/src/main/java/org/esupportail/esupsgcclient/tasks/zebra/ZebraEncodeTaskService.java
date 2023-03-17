@@ -24,9 +24,6 @@ public class ZebraEncodeTaskService extends EsupSgcTaskService {
 	static final String ROBOT_ENCODAGE_VIA_ZEBRA = "Robot encodage via Webcam et Imprimante Zebra";
 
 	@Resource
-	ZebraPrinterService zebraPrinterService;
-
-	@Resource
 	private ApplicationContext ctx;
 
 	@Resource

@@ -17,7 +17,10 @@ import org.esupportail.esupsgcclient.tasks.simple.QrCodeTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -29,20 +32,31 @@ public class QRCodeReader {
 
 	private final static Logger log = Logger.getLogger(QRCodeReader.class);
 
+	MultiFormatReader qrReader;
+
+	Map<DecodeHintType, Object> hints;
+
+	public QRCodeReader() {
+		qrReader = new MultiFormatReader();
+		 hints = new EnumMap<DecodeHintType, Object>(DecodeHintType.class);
+		hints.put(DecodeHintType.CHARACTER_SET, "UTF-8");
+		hints.put(DecodeHintType.TRY_HARDER, true);
+		List<BarcodeFormat> barcodeFormats = new ArrayList<BarcodeFormat>();
+		barcodeFormats.add(BarcodeFormat.QR_CODE);
+		hints.put(DecodeHintType.POSSIBLE_FORMATS, barcodeFormats);
+		qrReader.setHints(hints);
+	}
+
 	String readQrCode(BufferedImage esupSGCClientJFrame) {
 		Result result = null;
 		LuminanceSource source = new BufferedImageLuminanceSource(esupSGCClientJFrame);
 		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 		try {
-			MultiFormatReader qrReader = new MultiFormatReader();
-			Map<DecodeHintType, Object> hints = new EnumMap<DecodeHintType, Object>(DecodeHintType.class);
-			hints.put(DecodeHintType.CHARACTER_SET, "UTF-8");
-			hints.put(DecodeHintType.TRY_HARDER, true);
-			List<BarcodeFormat> barcodeFormats = new ArrayList<BarcodeFormat>();
-			barcodeFormats.add(BarcodeFormat.QR_CODE);
-			hints.put(DecodeHintType.POSSIBLE_FORMATS, barcodeFormats);
-			qrReader.setHints(hints);
-			result = qrReader.decode(bitmap);
+			/*
+			File outputfile = new File("/tmp/" + System.currentTimeMillis() + ".png");
+    		ImageIO.write(esupSGCClientJFrame, "png", outputfile);
+			 */
+			result = qrReader.decode(bitmap, hints);
 			return result.getText();			
 		} catch (NotFoundException e) {
 			log.trace("QRCode not found");

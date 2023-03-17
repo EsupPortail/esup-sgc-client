@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.service.SgcCheckException;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
@@ -67,23 +68,26 @@ public class ZebraEncodeTask extends EsupSgcTask {
             String qrcode = qRCodeReader.getQrcode(this, 50);
             if(qrcode == null) {
                 updateTitle4thisTask("qrcode non détecté");
-                zebraPrinterService.reject();
+                zebraPrinterService.flipCard();
             } else {
                 updateTitle4thisTask("qrcode détecté : " + qrcode);
                 setUiStepRunning();
                 setUiStepSuccess(UiStep.qrcode_read);
                 encodingService.encode(this, qrcode);
                 setUiStepSuccess(UiStep.encode);
-                zebraPrinterService.eject();
                 String msgTimer = String.format("Carte encodée en %.2f secondes\n", (System.currentTimeMillis() - start) / 1000.0);
                 updateTitle4thisTask(msgTimer);
             }
+        } catch (SgcCheckException e) {
+            setCurrentUiStepFailed(e);
+            updateTitle4thisTask(e.getMessage());
+            zebraPrinterService.flipCard();
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
-            zebraPrinterService.cancelJobs();
-            updateTitle("Carte rejetée");
-            throw new RuntimeException("Exception on ZebraPrintEncodeTask : " + e.getMessage(), e);
+            updateTitle4thisTask(e.getMessage());
+            throw new RuntimeException("Stop ZebraEncodeTask : " + e.getMessage(), e);
         } finally {
+            zebraPrinterService.cancelJobs();
             resetBmpUi();
         }
 		return null;
