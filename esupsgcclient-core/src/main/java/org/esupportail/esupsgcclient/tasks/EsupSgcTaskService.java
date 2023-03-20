@@ -5,7 +5,6 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
-import jdk.internal.joptsimple.internal.Strings;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.ui.UiStep;
