@@ -219,11 +219,14 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 
 		try {
 			log.info("Settings range of offset : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.SMARTCARD_X_OFFSET));
-			log.info("Settings range of internal encoder contactless : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.INTERNAL_ENCODER_CONTACTLESS_ENCODER));
+			if(zebraCardPrinter.getAvailableSettings().contains(ZebraCardSettingNames.INTERNAL_ENCODER_CONTACTLESS_ENCODER)) {
+				log.info("Settings range of internal encoder contactless : " + zebraCardPrinter.getSettingRange(ZebraCardSettingNames.INTERNAL_ENCODER_CONTACTLESS_ENCODER));
+			}
 			log.info(String.format("Printer cards count : %s", zebraCardPrinter.getCardCount().totalCards));
 			log.info(String.format("Printer sensor states : %s", zebraCardPrinter.getSensorStates()));
 			String logText = String.format("Printer Firmware : %s", zebraCardPrinter.getPrinterInformation().firmwareVersion) + "\n" +
-					"Settings range of encoder contactless for printerZebraEncoderType property on esup-sgc-client config : " + zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS) + "\n" +
+					(zebraCardPrinter.getJobSettings().contains(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS) ?
+							("Settings range of encoder contactless for printerZebraEncoderType property on esup-sgc-client config : " + zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS) + "\n") : "") +
 					String.format("printerZebraEncoderType : %s", appConfig.getPrinterZebraEncoderType()) + "\n" +
 					String.format("Smart Card Offset : %s", zebraCardPrinter.getSettingValue(ZebraCardSettingNames.SMARTCARD_X_OFFSET)) + "\n";
 			log.info(logText);
@@ -236,23 +239,31 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	void setSmartcardJob() throws SettingsException {
 		zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_SOURCE, CardSource.Feeder.name());
 		zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_DESTINATION, CardDestination.Hold.name());
-		String smartCardEncodeTypeSetup = appConfig.getPrinterZebraEncoderType();
-		if(StringUtils.isEmpty(smartCardEncodeTypeSetup)) {
-			String  smartCardEncodeTypeRange = zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS);
-			for(String smartCardEncodeType : Arrays.asList(SmartCardEncoderType.MIFARE.toString().toLowerCase(), SmartCardEncoderType.UHF.toString().toLowerCase(), "hf", SmartCardEncoderType.Other.toString().toLowerCase())) {
-				if(smartCardEncodeTypeRange.contains(smartCardEncodeType)) {
-					smartCardEncodeTypeSetup = smartCardEncodeType;
-					break;
+		if(zebraCardPrinter.getJobSettings().contains(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS)) {
+			String smartCardEncodeTypeSetup = appConfig.getPrinterZebraEncoderType();
+			if (StringUtils.isEmpty(smartCardEncodeTypeSetup)) {
+				String smartCardEncodeTypeRange = zebraCardPrinter.getJobSettingRange(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS);
+				for (String smartCardEncodeType : Arrays.asList(SmartCardEncoderType.MIFARE.toString().toLowerCase(), SmartCardEncoderType.UHF.toString().toLowerCase(), "hf", SmartCardEncoderType.Other.toString().toLowerCase())) {
+					if (smartCardEncodeTypeRange.contains(smartCardEncodeType)) {
+						smartCardEncodeTypeSetup = smartCardEncodeType;
+						break;
+					}
 				}
 			}
+			log.debug(String.format("zebra smarcard job setup with smartCardEncodeType to %s", smartCardEncodeTypeSetup));
+			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS, smartCardEncodeTypeSetup);
+		} else {
+			log.debug(String.format("No native support of nfc on this zebra ?"));
 		}
-		log.debug(String.format("zebra smarcard job setup with smartCardEncodeType to %s", smartCardEncodeTypeSetup));
-		zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS, smartCardEncodeTypeSetup);
 	}
 
 	public void launchEncoding() throws SettingsException, ConnectionException, ZebraCardException {
 		setSmartcardJob();
-		jobId = zebraCardPrinter.smartCardEncode(1);
+		if(zebraCardPrinter.getJobSettings().contains(ZebraCardJobSettingNames.SMART_CARD_CONTACTLESS)) {
+			jobId = zebraCardPrinter.smartCardEncode(1);
+		} else {
+			jobId = zebraCardPrinter.positionCard();
+		}
 		pollJobStatus();
 		if(zebraCardPrinter instanceof ZxpZebraPrinter && appConfig.getPrinterZebraHackZxpNfcPower()) {
 			// Hack for ZXP3 and SDI010 USB Smart Card Reader on linux to power on nfc reader ?!
