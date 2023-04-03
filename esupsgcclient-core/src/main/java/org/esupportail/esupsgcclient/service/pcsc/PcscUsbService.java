@@ -4,6 +4,7 @@ import jnasmartcardio.Smartcardio;
 import jnasmartcardio.Smartcardio.JnaPCSCException;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.smartcardio.Card;
@@ -22,7 +23,10 @@ import java.util.List;
 public class PcscUsbService {
 
 	private final Logger log = Logger.getLogger(PcscUsbService.class);
-	
+
+	@Value("${nfcReinitAtEachConnection:false}")
+	boolean nfcReinitAtEachConnection = false;
+
 	private Card card;
 	private CardTerminal cardTerminal;
 	private TerminalFactory context;
@@ -50,7 +54,10 @@ public class PcscUsbService {
 		return cardTerminal.isCardPresent();
 	}
 
-	public String connection() throws CardException{
+	public String connection() throws CardException, PcscException {
+		if(nfcReinitAtEachConnection) {
+			init();
+		}
 		for (CardTerminal terminal : terminals.list()) {
 			if(terminal.isCardPresent()){
 				log.info("Try with terminal " + terminal.getName());

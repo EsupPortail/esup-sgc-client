@@ -77,6 +77,11 @@ public class EncodingService {
 			return true;
 		} catch (CardException e) {
 			log.trace("pcsc connection error : " + e.getMessage());
+			// usually "No NFC reader found with card on it"
+			Utils.sleep(500);
+		} catch (PcscException e) {
+			log.warn("pcsc connection error : " + e.getMessage());
+			Utils.sleep(1000);
 		}
 		return false;
 	}
