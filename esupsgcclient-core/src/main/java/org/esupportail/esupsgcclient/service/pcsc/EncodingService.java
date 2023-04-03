@@ -51,6 +51,9 @@ public class EncodingService {
 	@Resource
 	EsupNfcTagRestClientService esupNfcTagRestClientService;
 
+	@Resource
+	PcscUsbService pcscUsbService;
+
 	@PostConstruct
 	void init() throws CnousFournisseurCarteException {
 
@@ -69,7 +72,7 @@ public class EncodingService {
 
 	public boolean pcscConnection() {
 		try {
-			String cardTerminalName = PcscUsbService.connection();
+			String cardTerminalName = pcscUsbService.connection();
 			log.debug("cardTerminal : " + cardTerminalName);
 			return true;
 		} catch (CardException e) {
@@ -90,7 +93,7 @@ public class EncodingService {
 
 	public String readCsn() throws PcscException {
 		try {
-			String csn = PcscUsbService.byteArrayToHexString(PcscUsbService.hexStringToByteArray(PcscUsbService.getCardId()));
+			String csn = pcscUsbService.byteArrayToHexString(pcscUsbService.hexStringToByteArray(pcscUsbService.getCardId()));
 			log.info("csn : " + csn);
 			return csn;
 		} catch (CardException e) {
@@ -192,7 +195,7 @@ public class EncodingService {
 
 	public boolean waitForCardAbsent(long timeout) {
 		try {
-			return PcscUsbService.waitForCardAbsent(timeout);
+			return pcscUsbService.waitForCardAbsent(timeout);
 		} catch (CardException e) {
 			return false;
 		}
@@ -201,7 +204,7 @@ public class EncodingService {
 
 	public boolean waitForCardPresent(long timeout) {
 		try {
-			return PcscUsbService.waitForCardPresent(timeout);
+			return pcscUsbService.waitForCardPresent(timeout);
 		} catch (CardException e) {
 			return false;
 		}
@@ -209,7 +212,7 @@ public class EncodingService {
 
 	public void pcscDisconnect() throws PcscException {
 		try {
-			PcscUsbService.disconnect();
+			pcscUsbService.disconnect();
 		} catch (PcscException e) {
 			throw new PcscException(e.getMessage(), e);
 		}
@@ -241,7 +244,7 @@ public class EncodingService {
 			if (nfcResultBean.getFullApdu() != null) {
 				if (!"END".equals(nfcResultBean.getFullApdu())) {
 					try {
-						result = PcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
+						result = pcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
 					} catch (CardException e) {
 						esupSgcTask.updateTitle4thisTask("\n");
 						throw new PcscException("pcsc send apdu error", e);
@@ -280,7 +283,7 @@ public class EncodingService {
 	}
 
 	public String getTerminalName() throws CardException, PcscException {
-		return PcscUsbService.getTerminalName();
+		return pcscUsbService.getTerminalName();
 	}
 
 

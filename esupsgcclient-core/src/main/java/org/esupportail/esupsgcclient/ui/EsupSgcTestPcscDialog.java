@@ -16,10 +16,15 @@ import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+
 @Component
 public class EsupSgcTestPcscDialog {
 
     private final static Logger log = Logger.getLogger(EsupSgcTestPcscDialog.class);
+
+    @Resource
+    PcscUsbService pcscUsbService;
 
     public Dialog getTestPcscDialog(Runnable runAtStart, Runnable runAtEnd) {
 
@@ -62,7 +67,7 @@ public class EsupSgcTestPcscDialog {
                 String cardTerminalName = null;
                 while (cardTerminalName == null && !isCancelled()) {
                     try {
-                        cardTerminalName = PcscUsbService.connection();
+                        cardTerminalName = pcscUsbService.connection();
                         log.debug("cardTerminal : " + cardTerminalName);
                     } catch (Exception e) {
                         log.trace("PCSC error : " + e.getMessage());
@@ -80,13 +85,13 @@ public class EsupSgcTestPcscDialog {
                     boolean isCardOk = false;
                     try {
                         // Test : card is prsent AND get UID ok AND get challenge (for auth) ok
-                        isCardOk = PcscUsbService.isCardPresent() && !StringUtils.isEmpty(PcscUsbService.getCardId()) && !StringUtils.isEmpty(PcscUsbService.sendAPDU("901a0000010000"));
+                        isCardOk = pcscUsbService.isCardPresent() && !StringUtils.isEmpty(pcscUsbService.getCardId()) && !StringUtils.isEmpty(pcscUsbService.sendAPDU("901a0000010000"));
                         cardWasOk = cardWasOk || isCardOk;
                         nbTest++;
                     } catch (Exception e) {
                         log.error(String.format("Exception after %.2f sec. - reconnect terminal", (System.currentTimeMillis() - time) / 1000.0), e);
                         try {
-                            cardTerminalName = PcscUsbService.connection();
+                            cardTerminalName = pcscUsbService.connection();
                         } catch (Exception ex) {
                             log.warn(String.format("Can't reconnect terminal at %.2f sec", (System.currentTimeMillis() - time) / 1000.0), e);
                         }

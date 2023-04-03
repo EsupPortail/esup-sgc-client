@@ -4,6 +4,7 @@ import jnasmartcardio.Smartcardio;
 import jnasmartcardio.Smartcardio.JnaPCSCException;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.stereotype.Service;
 
 import javax.smartcardio.Card;
 import javax.smartcardio.CardException;
@@ -17,16 +18,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Service
 public class PcscUsbService {
 
-	private final static Logger log = Logger.getLogger(PcscUsbService.class);
+	private final Logger log = Logger.getLogger(PcscUsbService.class);
 	
-	private static Card card;
-	private static CardTerminal cardTerminal;
-	private static TerminalFactory context;
-	private static CardTerminals terminals;
+	private Card card;
+	private CardTerminal cardTerminal;
+	private TerminalFactory context;
+	private CardTerminals terminals;
 	
-	static void init() throws PcscException {
+	void init() throws PcscException {
 		Security.addProvider(new Smartcardio());
 		try {
 			context = TerminalFactory.getInstance("PC/SC", null, Smartcardio.PROVIDER_NAME);
@@ -36,19 +38,19 @@ public class PcscUsbService {
 		}
 	}
 	
-	public static boolean waitForCardAbsent(long timeout) throws CardException{
+	public boolean waitForCardAbsent(long timeout) throws CardException{
 		return cardTerminal.waitForCardAbsent(timeout);
 	}
 
-	public static boolean waitForCardPresent(long timeout) throws CardException{
+	public boolean waitForCardPresent(long timeout) throws CardException{
 		return cardTerminal.waitForCardPresent(timeout);
 	}
 
-	public static boolean isCardPresent() throws CardException{
+	public boolean isCardPresent() throws CardException{
 		return cardTerminal.isCardPresent();
 	}
 
-	public static String connection() throws CardException{
+	public String connection() throws CardException{
 		for (CardTerminal terminal : terminals.list()) {
 			if(terminal.isCardPresent()){
 				log.info("Try with terminal " + terminal.getName());
@@ -71,7 +73,7 @@ public class PcscUsbService {
 		throw new CardException("No NFC reader found with card on it - NFC reader found : " + getNamesOfTerminals(terminals));
 	}
 
-	private static String getNamesOfTerminals(CardTerminals terminals) throws CardException {
+	private String getNamesOfTerminals(CardTerminals terminals) throws CardException {
 		List<String> terminalsNames = new ArrayList<String>();  
 		for (CardTerminal terminal : terminals.list()) {
 			terminalsNames.add(terminal.getName());
@@ -79,7 +81,7 @@ public class PcscUsbService {
 		return terminalsNames.toString();
 	}
 
-	public static String getTerminalName() throws CardException, PcscException {
+	public String getTerminalName() throws CardException, PcscException {
 		try {
 			if (terminals == null || terminals.list().isEmpty()) {
 				init();
@@ -94,21 +96,21 @@ public class PcscUsbService {
 		return null;
 	}
 	
-	public static String sendAPDU(String apdu) throws CardException{
+	public String sendAPDU(String apdu) throws CardException{
 		ResponseAPDU answer = null;
 		answer = card.getBasicChannel().transmit(new CommandAPDU(hexStringToByteArray(apdu)));
 		return byteArrayToHexString(answer.getBytes());
 
 	}
 
-	public static String getCardId() throws CardException{
+	public String getCardId() throws CardException{
 		ResponseAPDU answer;
 		answer = card.getBasicChannel().transmit(new CommandAPDU(hexStringToByteArray("FFCA000000")));
 		byte[] uid = Arrays.copyOfRange(answer.getBytes(), 0, answer.getBytes().length-2);
 		return byteArrayToHexString(uid);
 	}
 	
-	public static void disconnect() throws PcscException{
+	public void disconnect() throws PcscException{
 		try {
 			card.disconnect(false);
 		} catch (CardException e) {
@@ -116,7 +118,7 @@ public class PcscUsbService {
 		}
 	}
 
-	public static byte[] hexStringToByteArray(String s) {
+	public byte[] hexStringToByteArray(String s) {
 		s = s.replace(" ", "");
 		int len = s.length();
 		byte[] data = new byte[len / 2];
@@ -127,9 +129,9 @@ public class PcscUsbService {
 		return data;
 	}
 
-	final private static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+	final private char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
-	public static String byteArrayToHexString(byte[] bytes) {
+	public String byteArrayToHexString(byte[] bytes) {
 		char[] hexChars = new char[bytes.length*2];
 		int v;
 
