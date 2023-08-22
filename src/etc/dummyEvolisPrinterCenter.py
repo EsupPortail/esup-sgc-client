@@ -17,7 +17,7 @@ try:
             receivedData = newSocket.recv(1024)
             if not receivedData: break
             if "SUPERVISION.List" in str(receivedData):
-                newSocket.send(b'{"id":"1","jsonrpc":"2.0","result":"OK - PRINTER_READY"}')
+                newSocket.send(b'{"id":"1","jsonrpc":"2.0","result":"OK - PRINTER_READY - ENCODING_RUNNING"}')
             else :
                 newSocket.send(b'{"id":"1","jsonrpc":"2.0","result":"OK"}')
         newSocket.close(  )
