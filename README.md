@@ -186,6 +186,12 @@ Sous windows, dans les variables d'environnement, ajoutez également ce réperto
 N'oubliez pas également que sous windows, les DLL zebra actuelles ne fonctionnent que depuis un JDK-8 (test réalisé avec le JDK 1.8.0_333 d'Oracle notamment).
 
 Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows que sous linux. Sous linux, le dialogue PC/SC avec l'encodeur est réalisé grâce à pcscd avec les pilotes proposés dans libccid.
+Sous linux, le dialogue avec l'imprimante nécessite que l'utilisateur ait les droits de lecture/écriture sur le fichier de périphérique (sous peine d'une erreur de type "USB error 3: Unable to open device: Access denied (insufficient permissions)").
+Exemple pour debian : un ls -l sur le /dev nous indique qu'il suffit pour ce faire de mettre l'utilisateur dans les groupes dialout et lp.
+```
+adduser vincent dialout
+adduser vincent lp
+```
 
 Comme pour les evolis, le lecteur NFC ne fonctionne que via USB : le client esup-sgc-client doit donc être installé sur le poste (windows ou linux) connecté en USB à l'imprimante.
 
