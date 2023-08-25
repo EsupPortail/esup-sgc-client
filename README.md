@@ -182,17 +182,6 @@ Une fois le SDK téléchargé et configuré dans ce fichier, vous devez taper la
 mvn -P zebra initialize
 ```
 
-Sous windows, dans les variables d'environnement, ajoutez également ce répertoire pointant vers la librairie (et DLL) du SDK Zebra dans le PATH.
-N'oubliez pas également que sous windows, les DLL zebra actuelles ne fonctionnent que depuis un JDK-8 (test réalisé avec le JDK 1.8.0_333 d'Oracle notamment).
-
-Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows que sous linux. Sous linux, le dialogue PC/SC avec l'encodeur est réalisé grâce à pcscd avec les pilotes proposés dans libccid.
-Sous linux, le dialogue avec l'imprimante nécessite que l'utilisateur ait les droits de lecture/écriture sur le fichier de périphérique (sous peine d'une erreur de type "USB error 3: Unable to open device: Access denied (insufficient permissions)").
-Exemple pour debian : un ls -l sur le /dev nous indique qu'il suffit pour ce faire de mettre l'utilisateur dans les groupes dialout et lp.
-```
-adduser vincent dialout
-adduser vincent lp
-```
-
 Comme pour les evolis, le lecteur NFC ne fonctionne que via USB : le client esup-sgc-client doit donc être installé sur le poste (windows ou linux) connecté en USB à l'imprimante.
 
 Pour la phase d'encodage, une fois l'ordre donnée de positionner la carte au niveau de l'encodeur, esup-sgc-client dialogue directement avec l'encodeur NFC en pc/sc.
@@ -200,6 +189,42 @@ Pour la phase d'encodage, une fois l'ordre donnée de positionner la carte au ni
 Dans le fichier de propriétés src/main/resources/esupsgcclient.properties, suivant votre imprimante (et son firmware), vous devrez éventuellement adapter la propriété printerZebraEncoderType
 
 Si la ZC300 attend a priori 'other' pour sépcifier le lecteur NFC USB intégré à celle-ci, la ZXP3 attend par exemple 'MIFARE'.
+
+Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows que sous linux.
+
+#### Support sous Windows
+
+Sous windows, dans les variables d'environnement, ajoutez le répertoire pointant vers la librairie (et DLL) du SDK Zebra dans le PATH.
+
+Dans variable d'environnement < variables systemes < Path, on ajoute ainsi (v2.14.5198 étant la dernière version du SDK en date au 25/08/2023) :
+"C:\Program Files\Zebra Technologies\link_os_sdk\PC-Card\v2.14.5198\lib"
+
+Lorsque le PATH est bien pris en compte, sans imprimante de connectée, on doit retrouver dans els logs d'esup-sgc-client un WARN du type ci-dessous toutes les 3 secondes environ : 
+```
+6739 [Thread-5] WARN org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService.init(ZebraPrinterService.java:212)  - Cant connect Zebra printer, retry in 3 sec
+```
+
+Ensuite, avec le path bien positionné, et avec une imprimante Zebra de branchée, 2 cas de figure se produisent, suivant la JVM utilisée :
+* crash (core dump) avec la plupart des JVM - ce problème est connu et référencé dans plusieyrs pages : [ici](https://developer.zebra.com/content/zsdkapi-crashing-jvm) et [là](https://developer.zebra.com/content/zebranativeusbadapter64dll-and-jdk-9) par exemple.
+* un fonctionnement correct : l'imprimante est bien reconnue et l'icône dans esup-sgc-client devient ainsi verte, on peut alors lancer un 'stress test pc/sc' depuis le menu zebra
+
+La difficulté de la mise en oeuvre sous windows réside donc à trouver une JVM (JDK ou JRE) supportant le SDK Zebra.
+
+Des tests effectuées, on estime que les JRE suivantes fonctionnent : 
+ * versions JRE 1.8 proposées par Oracle jusqu'à la 1.8.0_251 inclue (l'intérêt de ces versions est que vous pouvez les utilisez en production sans vous acquitter d'un droit de licence) : vous pouvez trouver ces anciennes versions dans [la page de téléchargement présentant ces archives](https://www.oracle.com/fr/java/technologies/javase/javase8-archive-downloads.html).  
+ * versions zulu JRE/JFX 11 en 32 bits proposées sur [AZUL](https://www.azul.com/downloads/?version=java-11-lts&os=windows&architecture=x86-32-bit&package=jre-fx#zulu) zulu11.66.15-ca-fx-jre11.0.20-win_i686 testée avec succès notamment ; à utiliser prioritairement car manitenu et à jour 
+
+#### Support sous Linux
+
+Sous linux, le dialogue PC/SC avec l'encodeur est réalisé grâce à pcscd avec les pilotes proposés dans libccid.
+Le dialogue avec l'imprimante nécessite que l'utilisateur ait les droits de lecture/écriture sur le fichier de périphérique (sous peine d'une erreur de type "USB error 3: Unable to open device: Access denied (insufficient permissions)").
+Exemple pour debian : un ls -l sur le /dev nous indique qu'il suffit pour ce faire de mettre l'utilisateur dans les groupes dialout et lp.
+```
+adduser vincent dialout
+adduser vincent lp
+```
+
+Notez que sous linux, contrairement à sous windows, nous n'avons pas rencontré de difficultés de compatibilité avec les JVM (JDK/JRE) que l'on a pu tester.
 
 ### esup-nfc-tag et esup-sgc de démonstration
 
@@ -217,6 +242,9 @@ esupNfcTagServerUrl = https://esup-nfc-tag-demo.univ-rouen.f
 Finalement, avec la plateforme de démonstration et la simulation de evolis primacy 2, vous n'avez besoin réellement 
 que d'une webcam et d'un lecteur NFC USB pour disposer de l'ensemble des dépendances matérielles et logicielles
 (requises comme optionnelles) pour prendre part au développement d'esup-sgc-client.
+
+Vous pouvez aussi tester esup-sgc-client depuis [la machine virtuelle de démonstration](https://www.esup-portail.org/wiki/display/SGC/VM+ESUP-SGC) qui propose par ailleurs 
+par défaut l'usage de l'imprimante evolis 'simulée' via le script python [src/etc/dummyEvolisPrinterCenter.py](src/etc/dummyEvolisPrinterCenter.py).
 
 ## Copie d'écran
 
