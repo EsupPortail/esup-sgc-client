@@ -228,9 +228,15 @@ Ensuite, avec le path bien positionné, et avec une imprimante Zebra de branché
 
 La difficulté de la mise en oeuvre sous windows réside donc à trouver une JVM (JDK ou JRE) supportant le SDK Zebra.
 
-Des tests effectués, on estime que les JRE suivantes fonctionnent : 
- * versions JRE 1.8 proposées par Oracle jusqu'à la 1.8.0_251 inclue (l'intérêt de ces versions est que vous pouvez les utilisez en production sans vous acquitter d'un droit de licence) : vous pouvez trouver ces anciennes versions dans [la page de téléchargement présentant ces archives](https://www.oracle.com/fr/java/technologies/javase/javase8-archive-downloads.html).  
- * versions zulu JRE/JFX 11 en 32 bits proposées sur [AZUL](https://www.azul.com/downloads/?version=java-11-lts&os=windows&architecture=x86-32-bit&package=jre-fx#zulu) zulu11.66.15-ca-fx-jre11.0.20-win_i686 testée avec succès notamment ; à utiliser prioritairement car manitenu et à jour 
+Des tests effectués, on estime que les JRE suivantes fonctionnent bien : 
+ * versions JRE 1.8 proposées par Oracle jusqu'à la 1.8.0_251 inclue ; pour utiliser en production ue JRE sans vous acquitter d'un droit de licence, prenez la version **8u202** (dernière en date avec une licence gratuite pour un usage en production) : vous pouvez trouver ces anciennes versions dans [la page de téléchargement présentant ces archives](https://www.oracle.com/fr/java/technologies/javase/javase8-archive-downloads.html).
+ 
+Si les versions en 32 bits comme la zulu JRE/JFX 11 en 32 bits proposées sur [AZUL](https://www.azul.com/downloads/?version=java-11-lts&os=windows&architecture=x86-32-bit&package=jre-fx#zulu) 
+sont compatibles avec le SDK Zebra, elles ne le sont pas complètement avec les technologies JFX utilisées par esup-sgc-client, on peut alors obtenir sur certaines actions (formulaires html webview pour l'authentification depuis un WAYF shibboleth notamment) une erreur du type
+```
+7036 [JavaFX Application Thread] ERROR org.esupportail.esupsgcclient.ui.JavaScriptConsoleBridge.windowerror(JavaScriptConsoleBridge.java:32)  - Window Javascript : ReferenceError: Can't find variable: $
+```
+Ce qui peut rendre esup-sgc-client difficilement utilisable (notamment pour la partie authentification) ; si tel est le cas, on vous conseille donc d'utiliser la JRE  1.8.0_202 d'Oracle.
 
 Pour tester sous windows, le plus pratique est de lancer une commande DOS et d'utiliser java.exe (et non javaw.exe) en ligne de commandes, ce qui permet 
 d'avoir le retour (logs) directement dans la commande DOS.
@@ -263,6 +269,7 @@ adduser vincent lp
 ```
 
 Notez que sous linux, contrairement à sous windows, nous n'avons pas rencontré de difficultés de compatibilité avec les JVM (JDK/JRE) que l'on a pu tester.
+De fait, et tant que Zebra n'aura pas réglé ses problèmes de compatibilités avec les JVM sous wondows, on recommande plutôt d'utiliser les Zebra depuis des postes linux.
 
 ### esup-nfc-tag et esup-sgc de démonstration
 
