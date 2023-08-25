@@ -12,8 +12,8 @@ ESUP-SGC-CLIENT
       - [autres imprimantes evolis](#autres-imprimantes-evolis)
       - [simulation de evolis](#simulation-de-evolis)
     + [zebra](#zebra)
-      - [Support sous Windows](#support-sous-windows)
-      - [Support sous Linux](#support-sous-linux)
+      - [support sous Windows](#support-sous-windows)
+      - [support sous Linux](#support-sous-linux)
     + [esup-nfc-tag et esup-sgc de démonstration](#esup-nfc-tag-et-esup-sgc-de-démonstration)
   * [Copie d'écran](#copie-décran)
 
@@ -210,14 +210,14 @@ Si la ZC300 attend a priori 'other' pour sépcifier le lecteur NFC USB intégré
 
 Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows que sous linux.
 
-#### Support sous Windows
+#### support sous Windows
 
 Sous windows, dans les variables d'environnement, ajoutez le répertoire pointant vers la librairie (et DLL) du SDK Zebra dans le PATH.
 
 Dans variable d'environnement < variables systemes < Path, on ajoute ainsi (v2.14.5198 étant la dernière version du SDK en date au 25/08/2023) :
 "C:\Program Files\Zebra Technologies\link_os_sdk\PC-Card\v2.14.5198\lib"
 
-Lorsque le PATH est bien pris en compte, sans imprimante de connectée, on doit retrouver dans els logs d'esup-sgc-client un WARN du type ci-dessous toutes les 3 secondes environ : 
+Lorsque le PATH est bien pris en compte, sans imprimante de connectée, on doit retrouver dans les logs d'esup-sgc-client un WARN du type ci-dessous toutes les 3 secondes environ : 
 ```
 6739 [Thread-5] WARN org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService.init(ZebraPrinterService.java:212)  - Cant connect Zebra printer, retry in 3 sec
 ```
@@ -228,11 +228,31 @@ Ensuite, avec le path bien positionné, et avec une imprimante Zebra de branché
 
 La difficulté de la mise en oeuvre sous windows réside donc à trouver une JVM (JDK ou JRE) supportant le SDK Zebra.
 
-Des tests effectuées, on estime que les JRE suivantes fonctionnent : 
+Des tests effectués, on estime que les JRE suivantes fonctionnent : 
  * versions JRE 1.8 proposées par Oracle jusqu'à la 1.8.0_251 inclue (l'intérêt de ces versions est que vous pouvez les utilisez en production sans vous acquitter d'un droit de licence) : vous pouvez trouver ces anciennes versions dans [la page de téléchargement présentant ces archives](https://www.oracle.com/fr/java/technologies/javase/javase8-archive-downloads.html).  
  * versions zulu JRE/JFX 11 en 32 bits proposées sur [AZUL](https://www.azul.com/downloads/?version=java-11-lts&os=windows&architecture=x86-32-bit&package=jre-fx#zulu) zulu11.66.15-ca-fx-jre11.0.20-win_i686 testée avec succès notamment ; à utiliser prioritairement car manitenu et à jour 
 
-#### Support sous Linux
+Pour tester sous windows, le plus pratique est de lancer une commande DOS et d'utiliser java.exe (et non javaw.exe) en ligne de commandes, ce qui permet 
+d'avoir le retour (logs) directement dans la commande DOS.
+On lance donc dans sous dos (cmd) une commande type :
+```
+"C:\Program Files\EsupSgcClient\java\bin\java.exe"
+-Dcom.sun.webkit.useHTTP2Loader=false -DprinterZebraEncoderType=other
+-jar esup-sgc-client-zebra.jar
+```
+
+Préalablement, vous pouvez vérifier que le répertoire lib du SDK est bien positionné dans votre PATH également ainsi : 
+```
+echo %PATH%
+```
+Résultat type :
+```
+C:\Program Files\Zebra Technologies\link_os_sdk\PC-Card\v2.14.5198\lib;C:\Window
+s\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerS
+hell\v1.0\
+```
+
+#### support sous Linux
 
 Sous linux, le dialogue PC/SC avec l'encodeur est réalisé grâce à pcscd avec les pilotes proposés dans libccid.
 Le dialogue avec l'imprimante nécessite que l'utilisateur ait les droits de lecture/écriture sur le fichier de périphérique (sous peine d'une erreur de type "USB error 3: Unable to open device: Access denied (insufficient permissions)").
