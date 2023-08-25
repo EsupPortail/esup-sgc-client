@@ -1,6 +1,22 @@
 ESUP-SGC-CLIENT
 ===============
 
+  * [Technologies](#technologies)
+  * [Environnement de développement](#environnement-de-développement)
+  * [SceneBuilder](#scenebuilder)
+  * [Dépendances techniques](#dépendances-techniques)
+    + [modules maven](#modules-maven)
+    + [evolis](#evolis)
+      - [evolis primacy 2](#evolis-primacy-2)
+      - [evolis primacy 1](#evolis-primacy-1)
+      - [autres imprimantes evolis](#autres-imprimantes-evolis)
+      - [simulation de evolis](#simulation-de-evolis)
+    + [zebra](#zebra)
+      - [Support sous Windows](#support-sous-windows)
+      - [Support sous Linux](#support-sous-linux)
+    + [esup-nfc-tag et esup-sgc de démonstration](#esup-nfc-tag-et-esup-sgc-de-démonstration)
+  * [Copie d'écran](#copie-décran)
+
 Pour une documentation fonctionnelle de l'outil et sa mise en oeuvre, merci de vous référer 
 à la documentation ici du wiki ESUP-Portail, notamment ici :
  * [projet global esup-sgc](https://www.esup-portail.org/wiki/display/SGC)
@@ -93,7 +109,9 @@ mvn -P evolis clean javafx:run
 Depuis votre IDE (intellij idea par exemple), vous pouvez travailler/lancer l'application en spécifiant le module via `-cp esupsgcclient-evolis` ;
 la classe principale à lancer restant `org.esupportail.esupsgcclient.EsupSgcClientApplication`.
 
-### evolis primacy 2
+### evolis
+
+#### evolis primacy 2
 
 Il vous faut installer le driver de votre encodeur NFC intégré à votre Primacy 2
 (Si vous avez opté pour un encodeur "SpringCard CrazyWriter" par exemple, vous trouverez le driver depuis https://www.springcard.com/en/download/drivers : "PC/SC Driver for USB couplers" / fichier sd16055-2104.exe).
@@ -123,7 +141,7 @@ Le fichier de configuration d'esup-sgc-client donné dans [src/main/resources/es
 Notez que la configuration printerEvolisSet vous permet de configurer le type de ruban utilisé, 
 par défaut on propose une configuration proposant l'usage d'un ruban couleur demi-panneau (RC_YMCKOS), pour un ruban couleur plein panneau il faudra positionner RC_YMCKO
 
-### evolis primacy 1
+#### evolis primacy 1
 
 La mise en place pour Evolis Primacy 1 (par rapport à Primacy 2) est très similaire, il vous faudra cependant installer non pas "Evolis Premium Suite 2" mais "Evolis Premium Suite".
 Le fichier de configuration à modifier est C:\Program Files\Evolis Card Printer\Evolis Premium Suite\ESPFSvc.properties pour activer le support de la communication par TCP (port 18000) :
@@ -136,11 +154,11 @@ Au niveau d'esup-sgc-client, il faudra spécifier dans src/main/resources/esupsg
 printerDeviceName = Evolis Primacy
 ```
 
-### autres imprimantes evolis
+#### autres imprimantes evolis
 
 Théoriquement, esup-sgc-client doit supporter les autres imprimantes evolis supportant "Evolis Premium Suite" (1 ou 2), il faudra alors adapter la propriété printerDeviceName en conséquence.
 
-### simulation de evolis
+#### simulation de evolis
 
 Pour le développement, on peut aussi se contenter de 'simuler' l'API de "Evolis Premium Suite" 
 Pour ce faire, il vous suffit de lancer le script python (python2 ou python3) [src/etc/dummyEvolisPrinterCenter.py](src/etc/dummyEvolisPrinterCenter.py)
