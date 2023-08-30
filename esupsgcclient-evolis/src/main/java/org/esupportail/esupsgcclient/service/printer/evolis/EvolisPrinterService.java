@@ -15,6 +15,7 @@ import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
+import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
@@ -57,6 +58,9 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	EsupSgcTestPcscDialog esupSgcTestPcscDialog;
 
 	@Resource
+	EsupSgcDesfireFullTestPcscDialog esupSgcDesfireFullTestPcscDialog;
+
+	@Resource
 	AppSession appSession;
 
 	@Override
@@ -84,11 +88,13 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		evolisCommand.setText("Envoyer une commande avancée à l'imprimante");
 		MenuItem testPcsc = new MenuItem();
 		testPcsc.setText("Stress test pc/sc");
+		MenuItem pcscDesfireTest = new MenuItem();
+		pcscDesfireTest.setText("Stress test PC/SC DES Blank Desfire");
 		MenuItem stopEvolis = new MenuItem();
 		stopEvolis.setText("Éteindre l'imprimante");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis");
-		evolisMenu.getItems().addAll(evolisReject, evolisClearStatus, evolisPrintEnd, evolisRestoreManufactureParameters,  evolisRestart, evolisCommand, testPcsc, stopEvolis);
+		evolisMenu.getItems().addAll(evolisReject, evolisClearStatus, evolisPrintEnd, evolisRestoreManufactureParameters,  evolisRestart, evolisCommand, testPcsc, pcscDesfireTest, stopEvolis);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisReject.setOnAction(actionEvent -> {
@@ -119,6 +125,14 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 			).show();
 		});
 		testPcsc.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()).or(appSession.printerReadyProperty().not()));
+
+		pcscDesfireTest.setOnAction(actionEvent -> {
+			esupSgcDesfireFullTestPcscDialog.getTestPcscDialog(
+					()->try2sendRequest(evolisPrinterCommands.insertCardToContactLessStation()),
+					()->try2sendRequest(evolisPrinterCommands.eject())
+			).show();
+		});
+		pcscDesfireTest.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()).or(appSession.printerReadyProperty().not()));
 
 		TilePane r = new TilePane();
 		TextInputDialog td = new TextInputDialog("Echo;ESUP-SGC d'ESUP-Portail");

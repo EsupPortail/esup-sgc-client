@@ -29,6 +29,7 @@ import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
 import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
+import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -63,6 +64,9 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	@FXML
 	MenuItem pcscTest;
+
+	@FXML
+	MenuItem pcscDesfireTest;
 
 	@FXML
 	MenuItem exit;
@@ -148,6 +152,8 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Resource
 	EsupSgcTestPcscDialog esupSgcTestPcscDialog;
 
+	@Resource
+	EsupSgcDesfireFullTestPcscDialog esupSgcDesfireFullTestPcscDialog;
 	Stage stage;
 
 	@Override
@@ -239,6 +245,9 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		pcscTest.setOnAction(event -> esupSgcTestPcscDialog.getTestPcscDialog(null, null).show());
 		pcscTest.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()));
+
+		pcscDesfireTest.setOnAction(event -> esupSgcDesfireFullTestPcscDialog.getTestPcscDialog(null, null).show());
+		pcscDesfireTest.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()));
 
 		exit.setOnAction(event -> stage.close());
 

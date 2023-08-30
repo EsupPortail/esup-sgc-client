@@ -44,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
+import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
@@ -72,6 +73,9 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	EsupSgcTestPcscDialog esupSgcTestPcscDialog;
 
 	@Resource
+	EsupSgcDesfireFullTestPcscDialog esupSgcDesfireFullTestPcscDialog;
+
+	@Resource
 	AppConfig appConfig;
 
 	ZebraCardPrinter zebraCardPrinter;
@@ -92,6 +96,8 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		zebraPrintEnd.setText("Clore la session d'impression");
 		MenuItem testPcsc = new MenuItem();
 		testPcsc.setText("Stress test pc/sc");
+		MenuItem pcscDesfireTest = new MenuItem();
+		pcscDesfireTest.setText("Stress test PC/SC DES Blank Desfire");
 		MenuItem reconnect = new MenuItem();
 		reconnect.setText("Reconnexion de l'imprimante");
 		MenuItem updateFirmware = new MenuItem();
@@ -100,7 +106,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		zebraCommand.setText("Envoyer une commande avancée à l'imprimante");
 		Menu zebraMenu = new Menu();
 		zebraMenu.setText("Zebra");
-		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc, reconnect, updateFirmware, zebraCommand);
+		zebraMenu.getItems().addAll(zebraReject, zebraPrintEnd, testPcsc, pcscDesfireTest, reconnect, updateFirmware, zebraCommand);
 		menuBar.getMenus().add(zebraMenu);
 
 		zebraPrintEnd.setOnAction(actionEvent -> {
@@ -128,6 +134,21 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 
 		testPcsc.setOnAction(actionEvent -> {
 			esupSgcTestPcscDialog.getTestPcscDialog(
+					()-> {
+						try {
+							launchEncoding();
+						} catch (SettingsException | ConnectionException | ZebraCardException e) {
+							throw new RuntimeException("Pb when launching zebra encoding", e);
+						}
+					},
+					()->{
+						eject();
+					}
+			).show();
+		});
+
+		pcscDesfireTest.setOnAction(actionEvent -> {
+			esupSgcDesfireFullTestPcscDialog.getTestPcscDialog(
 					()-> {
 						try {
 							launchEncoding();

@@ -17,6 +17,7 @@ import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.smartcardio.CardException;
 
 @Component
 public class EsupSgcTestPcscDialog {
@@ -85,10 +86,12 @@ public class EsupSgcTestPcscDialog {
                     boolean isCardOk = false;
                     try {
                         // Test : card is prsent AND get UID ok AND get challenge (for auth) ok
-                        isCardOk = pcscUsbService.isCardPresent() && !StringUtils.isEmpty(pcscUsbService.getCardId()) && !StringUtils.isEmpty(pcscUsbService.sendAPDU("901a0000010000"));
+                        isCardOk = isCardOk();
                         cardWasOk = cardWasOk || isCardOk;
+                        testApdu();
                         nbTest++;
                     } catch (Exception e) {
+                        isCardOk = false;
                         log.error(String.format("Exception after %.2f sec. - reconnect terminal", (System.currentTimeMillis() - time) / 1000.0), e);
                         try {
                             cardTerminalName = pcscUsbService.connection();
@@ -152,5 +155,16 @@ public class EsupSgcTestPcscDialog {
         log.info("PC/SC Dialog test init OK");
 
         return pcscTestDialog;
+    }
+
+    protected boolean isCardOk() throws CardException {
+        boolean isCardOk = pcscUsbService.isCardPresent() && !StringUtils.isEmpty(pcscUsbService.getCardId());
+        return isCardOk;
+    }
+
+    protected void testApdu() throws CardException {
+        if(StringUtils.isEmpty(pcscUsbService.sendAPDU("901a0000010000"))) {
+            throw new CardException("Nb random Auth Desfire number");
+        }
     }
 }
