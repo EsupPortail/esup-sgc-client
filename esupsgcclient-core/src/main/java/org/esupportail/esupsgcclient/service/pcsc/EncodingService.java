@@ -252,13 +252,7 @@ public class EncodingService {
 						result = pcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
 					} catch (CardException e) {
 						esupSgcTask.updateTitle4thisTask("\n");
-						log.warn("pcsc send apdu error - retry ...", e);
-						try {
-							result = pcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
-						} catch (CardException ee) {
-							esupSgcTask.updateTitle4thisTask("\n");
-							throw new PcscException("pcsc send apdu error", ee);
-						}
+						throw new PcscException("pcsc send apdu error", e);
 					}
 				} else {
 					esupSgcTask.updateTitle4thisTask("\n");
