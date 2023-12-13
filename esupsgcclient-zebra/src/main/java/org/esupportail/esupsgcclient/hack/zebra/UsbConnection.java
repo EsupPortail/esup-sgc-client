@@ -4,7 +4,7 @@ import com.zebra.sdk.comm.ConnectionException;
 import org.apache.log4j.Logger;
 
 /*
-Without this hack, we get this error on our ZXP3 printer :
+Without this hack on HALF ZXP3 command, we get this error on our ZXP3 printer :
     * lcd screen : command error
     * job status : error:3005 (ZMC: Invalid parameter (1))
 
@@ -39,6 +39,12 @@ Without this hack, we get this error on our ZXP3 printer :
 	at com.zebra.sdk.common.card.printer.internal.ZebraCardPrinterFactoryHelper.getInstance(Unknown Source)
 	at com.zebra.sdk.common.card.printer.ZebraCardPrinterFactory.getInstance(Unknown Source)
 
+
+
+Without this hack on GS ZXP3 command, color part is not well printed with half panel ribbon :
+ The card printer produces a blurry effect on the user's photo on the card.
+ This is due to a misalignment between each color (cyan, magenta, yellow) during printing,
+  causing a blurred appearance.
  */
 public class UsbConnection extends com.zebra.sdk.comm.UsbConnection {
 
@@ -51,7 +57,12 @@ public class UsbConnection extends com.zebra.sdk.comm.UsbConnection {
     @Override
     public void write(byte[] bytes, int i, int i1) throws ConnectionException {
         String s = new String(bytes, i, i1);
-        if(s.matches("(?s).*HALF [0-9]+ null.*")) {
+         if(s.matches("(?s).*GS [0-9]+ 32 [0-9]+ 0 [0-9]+ 640.*")) {
+            String olds = s;
+            s = s.replaceFirst("GS ([0-9]+) 32 [0-9]+ 0 [0-9]+ 640", "GS $1 32 0 0 1024 640");
+            log.warn("Bad GS Command caught - replaced : " + formatMsg4Log(olds) + " with " + formatMsg4Log(s));
+            super.write(s.getBytes());
+        } else if(s.matches("(?s).*HALF [0-9]+ null.*")) {
             String olds = s;
             s = s.replaceFirst("(HALF [0-9]+) null", "$1 0");
             log.warn("Bad Half Command caught - replaced : " + formatMsg4Log(olds) + " with " + formatMsg4Log(s));
