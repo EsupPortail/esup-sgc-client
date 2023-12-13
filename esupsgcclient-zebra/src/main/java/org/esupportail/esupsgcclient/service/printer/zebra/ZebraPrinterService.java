@@ -342,9 +342,9 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 				}
 				return false;
 			} else if (jobStatus.printStatus.contains("error") || jobStatus.printStatus.contains("cancelled")) {
-				log.debug("Zebra job error");
+				log.error("Zebra job error" + jobStatus.printStatus);
 			} else if (jobStatus.errorInfo.value > 0) {
-				log.debug("The job encountered an error [" + jobStatus.errorInfo.description + "] and was cancelled.");
+				log.info("The job encountered an error [" + jobStatus.errorInfo.description + "] and was cancelled.");
 				break;
 			} else if (jobStatus.alarmInfo.value > 0) {
 				log.debug("Zebra alarm : " + jobStatus.alarmInfo.value);
