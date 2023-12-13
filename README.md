@@ -206,9 +206,15 @@ Pour la phase d'encodage, une fois l'ordre donnée de positionner la carte au ni
 
 Dans le fichier de propriétés src/main/resources/esupsgcclient.properties, suivant votre imprimante (et son firmware), vous devrez éventuellement adapter la propriété printerZebraEncoderType
 
-Si la ZC300 attend a priori 'other' pour sépcifier le lecteur NFC USB intégré à celle-ci, la ZXP3 attend par exemple 'MIFARE'.
+Si la ZC300 attend a priori 'other' pour spécifier le lecteur NFC USB intégré à celle-ci, la ZXP3 attend par exemple 'MIFARE'.
 
 Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows que sous linux.
+
+Concernant la ZXP3, le SDK java fourni par Zebra pose problème avec les demi-panneaux, un contournement est proposé dans esup-sgc-client pour que cela fonctionne tout de même, pour ce faire il faut positionner
+printerZebraHackZxp3HalfBug à true dans esupsgcclient.properties (ou via une variable d'environnement).
+
+printerZebraHackZxpNfcPower permet quant à lui d'inverser la commande d'alimentation du lecteur NFC ; cela est nécessaire si vous avez mis à jour le firmware du lecteur NFC fourni avec la ZXP3 avec le firmware officiel (SDI010 d'identiv), 
+ce que l'on vous déconseille de faire).
 
 #### support sous Windows
 
