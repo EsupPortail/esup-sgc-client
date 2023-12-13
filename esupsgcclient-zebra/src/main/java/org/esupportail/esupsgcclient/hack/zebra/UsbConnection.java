@@ -50,8 +50,11 @@ public class UsbConnection extends com.zebra.sdk.comm.UsbConnection {
 
     private final static Logger log = Logger.getLogger(UsbConnection.class);
 
-    public UsbConnection(String var1) throws ConnectionException {
+    private String gapGsHalfPanel;
+
+    public UsbConnection(String var1, String gapGsHalfPanel) throws ConnectionException {
         super(var1);
+        this.gapGsHalfPanel = gapGsHalfPanel;
     }
 
     @Override
@@ -59,7 +62,7 @@ public class UsbConnection extends com.zebra.sdk.comm.UsbConnection {
         String s = new String(bytes, i, i1);
          if(s.matches("(?s).*GS [0-9]+ 32 [0-9]+ 0 [0-9]+ 640.*")) {
             String olds = s;
-            s = s.replaceFirst("GS ([0-9]+) 32 [0-9]+ 0 [0-9]+ 640", "GS $1 32 0 0 1024 640");
+            s = s.replaceFirst("GS ([0-9]+) 32 [0-9]+ 0 [0-9]+ 640", "GS $1 32 " + gapGsHalfPanel);
             log.warn("Bad GS Command caught - replaced : " + formatMsg4Log(olds) + " with " + formatMsg4Log(s));
             super.write(s.getBytes());
         } else if(s.matches("(?s).*HALF [0-9]+ null.*")) {

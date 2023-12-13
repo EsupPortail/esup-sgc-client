@@ -88,6 +88,9 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	@Value("${printerZebraHackZxp3HalfBug:false}")
 	Boolean hackZxp3HalfBug;
 
+	@Value("${printerZebraHackZxp3HalfBugGapPanel:8 0 1016 648}")
+	String hackZxp3HalfBugGapPanel;
+
 	@Override
 	public void setupJfxUi(Stage stage, Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
 		this.logTextarea = logTextarea;
@@ -228,7 +231,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 					Connection connection = null;
 					if(hackZxp3HalfBug) {
 						// Hack ZXP3 - debug command error with half command
-						connection = new UsbConnection(discoveredPrinter.address);
+						connection = new UsbConnection(discoveredPrinter.address, hackZxp3HalfBugGapPanel);
 					} else {
 						connection = discoveredPrinter.getConnection();
 					}
