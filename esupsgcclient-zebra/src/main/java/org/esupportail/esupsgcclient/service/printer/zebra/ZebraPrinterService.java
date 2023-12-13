@@ -43,10 +43,12 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
+import org.esupportail.esupsgcclient.hack.zebra.UsbConnection;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -82,6 +84,9 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	int jobId;
 
 	TextArea logTextarea;
+
+	@Value("${printerZebraHackZxp3HalfBug:false}")
+	Boolean hackZxp3HalfBug;
 
 	@Override
 	public void setupJfxUi(Stage stage, Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
@@ -220,14 +225,20 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 				discoveredPrinters = UsbDiscoverer.getZebraUsbPrinters();
 				for (DiscoveredUsbPrinter discoveredPrinter : discoveredPrinters) {
 					log.info("Discover Zebra printer ...");
-					Connection connection = discoveredPrinter.getConnection();
-						if (!connection.isConnected()) {
-							log.info("zebra not connected - try to connect");
-							connection.open();
-						}
-						zebraCardPrinter = ZebraCardPrinterFactory.getInstance(connection);
-						log.info("Zebra connection OK");
-						break;
+					Connection connection = null;
+					if(hackZxp3HalfBug) {
+						// Hack ZXP3 - debug command error with half command
+						connection = new UsbConnection(discoveredPrinter.address);
+					} else {
+						connection = discoveredPrinter.getConnection();
+					}
+					if (!connection.isConnected()) {
+						log.info("zebra not connected - try to connect");
+						connection.open();
+					}
+					zebraCardPrinter = ZebraCardPrinterFactory.getInstance(connection);
+					log.info("Zebra connection OK");
+					break;
 				}
 				if(zebraCardPrinter == null) {
 					log.warn("Cant connect Zebra printer, retry in 3 sec");
