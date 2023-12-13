@@ -334,21 +334,18 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 					jobStatus.contactSmartCard, jobStatus.contactlessSmartCard, jobStatus.alarmInfo.value, alarmDesc, jobStatus.errorInfo.value, errorDesc));
 			if (jobStatus.printStatus.contains("done_ok") || jobStatus.contactlessSmartCard.contains("at_station")) {
 				done = true;
-			} else if (jobStatus.printStatus.contains("cancelled_by_user")
-					|| jobStatus.printStatus.contains("done_error")
-					|| jobStatus.printStatus.contains("error")
-					|| jobStatus.printStatus.contains("cancelled")
-					|| jobStatus.errorInfo.value > 0) {
+			} else if (jobStatus.printStatus.contains("cancelled_by_user") ) {
 				try {
-					log.error("Zebra job error : " + jobStatus.printStatus);
-					if (jobStatus.errorInfo.value > 0) {
-						log.error("The job encountered an error [" + jobStatus.errorInfo.description + "] and was cancelled.");
-					}
 					cancelJobs();
 				} catch (ConnectionException | ZebraCardException e) {
-					log.error("cancel job failed");
+					log.debug("cancel job failed");
 				}
 				return false;
+			} else if (jobStatus.printStatus.contains("error") || jobStatus.printStatus.contains("cancelled")) {
+				log.debug("Zebra job error");
+			} else if (jobStatus.errorInfo.value > 0) {
+				log.debug("The job encountered an error [" + jobStatus.errorInfo.description + "] and was cancelled.");
+				break;
 			} else if (jobStatus.alarmInfo.value > 0) {
 				log.debug("Zebra alarm : " + jobStatus.alarmInfo.value);
 			} else if ((jobStatus.printStatus.contains("in_progress") && jobStatus.cardPosition.contains("feeding")) // ZMotif printers
