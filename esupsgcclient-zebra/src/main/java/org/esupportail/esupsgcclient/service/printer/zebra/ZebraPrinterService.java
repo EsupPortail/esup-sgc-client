@@ -345,7 +345,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			} else if (jobStatus.errorInfo.value > 0) {
 				throw new ZebraCardException("The job encountered an error [" + jobStatus.errorInfo.description + "] and was cancelled.");
 			} else if (jobStatus.alarmInfo.value > 0) {
-				throw new ZebraCardException("Zebra alarm : " + jobStatus.alarmInfo.value);
+				log.warn("Zebra alarm : " + jobStatus.alarmInfo.value);
 			} else if ((jobStatus.printStatus.contains("in_progress") && jobStatus.cardPosition.contains("feeding")) // ZMotif printers
 					|| (jobStatus.printStatus.contains("alarm_handling") && jobStatus.alarmInfo.value == ZebraCardErrors.MEDIA_OUT_OF_CARDS)) { // ZXP printers
 				if (System.currentTimeMillis() > start + CARD_FEED_TIMEOUT) {
