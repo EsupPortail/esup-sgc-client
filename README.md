@@ -210,8 +210,13 @@ Si la ZC300 attend a priori 'other' pour spécifier le lecteur NFC USB intégré
 
 Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows que sous linux.
 
-Concernant la ZXP3, le SDK java fourni par Zebra pose problème avec les demi-panneaux, un contournement est proposé dans esup-sgc-client pour que cela fonctionne tout de même, pour ce faire il faut positionner
-printerZebraHackZxp3HalfBug à true dans esupsgcclient.properties (ou via une variable d'environnement).
+Concernant la ZXP3, le SDK java fourni par Zebra pose nativement un problème avec les demi-panneaux, un contournement est proposé dans esup-sgc-client pour que cela fonctionne, 
+pour ce faire il suffit de positionner printerZebraHackZxp3HalfBug à true dans esupsgcclient.properties (ou via une variable d'environnement).
+
+printerZebraRotation (à false par défaut) permet de retourner la carte avant impression (il faut alors adapter le positionnement de la carte dans l'imprimante).
+Ce paramètre est utile pour la Zebra ZXP3 avec les demi-panneaux : sur ZXP3 c'est au SDK de gérer le positionnement du demi-pannaeu (et non à l'imprimante comme sur ZXP7 ou ZC300), et celui-ci
+ne le fait pas correctement ; en faisant en sorte que la partie couleur soit sur la gauche de la carte lors de l'impression (au début), cela facilite le calcul du décalage par le SDK.
+-> à utiliser sur ZXP3 avec les demi-panneaux si vous avez des problèmes de décalage (et photo/logo couleur flouté). 
 
 printerZebraHackZxpNfcPower permet quant à lui d'inverser la commande d'alimentation du lecteur NFC ; cela est nécessaire si vous avez mis à jour le firmware du lecteur NFC fourni avec la ZXP3 avec le firmware officiel (SDI010 d'identiv), 
 ce que l'on vous déconseille de faire).
