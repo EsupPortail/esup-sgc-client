@@ -88,8 +88,8 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	@Value("${printerZebraHackZxp3HalfBug:false}")
 	Boolean hackZxp3HalfBug;
 
-	@Value("${printerZebraHackZxp3HalfBugGapPanel:8 0 1016 648}")
-	String hackZxp3HalfBugGapPanel;
+	@Value("${printerZebraRotation:false}")
+	Boolean printerZebraRotation;
 
 	@Override
 	public void setupJfxUi(Stage stage, Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
@@ -231,7 +231,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 					Connection connection = null;
 					if(hackZxp3HalfBug) {
 						// Hack ZXP3 - debug command error with half command
-						connection = new UsbConnection(discoveredPrinter.address, hackZxp3HalfBugGapPanel);
+						connection = new UsbConnection(discoveredPrinter.address);
 					} else {
 						connection = discoveredPrinter.getConnection();
 					}
@@ -311,7 +311,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		}
 	}
 
-	boolean pollJobStatus(){
+	boolean pollJobStatus() throws ZebraCardException {
 		boolean done = false;
 		long start = System.currentTimeMillis();
 
@@ -323,8 +323,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			try {
 				jobStatus = zebraCardPrinter.getJobStatus(jobId);
 			} catch (ConnectionException | ZebraCardException e) {
-				log.error("zebra : get job status",e);
-				return false;
+				throw new ZebraCardException("zebra : get job status", e);
 			}
 	
 			String alarmDesc = jobStatus.alarmInfo.value > 0 ? " (" + jobStatus.alarmInfo.description + ")" : "";
@@ -340,18 +339,17 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 				} catch (ConnectionException | ZebraCardException e) {
 					log.debug("cancel job failed");
 				}
-				return false;
+				throw new ZebraCardException("cancelled_by_user");
 			} else if (jobStatus.printStatus.contains("error") || jobStatus.printStatus.contains("cancelled")) {
-				log.error("Zebra job error" + jobStatus.printStatus);
+				throw new ZebraCardException("Zebra job error" + jobStatus.printStatus);
 			} else if (jobStatus.errorInfo.value > 0) {
-				log.info("The job encountered an error [" + jobStatus.errorInfo.description + "] and was cancelled.");
-				break;
+				throw new ZebraCardException("The job encountered an error [" + jobStatus.errorInfo.description + "] and was cancelled.");
 			} else if (jobStatus.alarmInfo.value > 0) {
-				log.debug("Zebra alarm : " + jobStatus.alarmInfo.value);
+				throw new ZebraCardException("Zebra alarm : " + jobStatus.alarmInfo.value);
 			} else if ((jobStatus.printStatus.contains("in_progress") && jobStatus.cardPosition.contains("feeding")) // ZMotif printers
 					|| (jobStatus.printStatus.contains("alarm_handling") && jobStatus.alarmInfo.value == ZebraCardErrors.MEDIA_OUT_OF_CARDS)) { // ZXP printers
 				if (System.currentTimeMillis() > start + CARD_FEED_TIMEOUT) {
-					log.warn("Card feed time out");
+					throw new ZebraCardException("Card feed time out");
 				}
 			}
 		}
@@ -439,7 +437,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 	private GraphicsInfo drawImage(String imageData, PrintType printType) throws IOException, ConnectionException, ZebraCardException {
 		ZebraGraphics graphics = new ZebraCardGraphics(zebraCardPrinter);
 		graphics.initialize(0, 0, OrientationType.Landscape, printType, Color.WHITE);
-		graphics.drawImage(Base64.getDecoder().decode(imageData), 0, 0, 0, 0, RotationType.RotateNoneFlipNone);
+		graphics.drawImage(Base64.getDecoder().decode(imageData), 0, 0, 0, 0, printerZebraRotation ? RotationType.Rotate180FlipNone :  RotationType.RotateNoneFlipNone);
 		ZebraCardImageI zebraCardImage = graphics.createImage();
 		GraphicsInfo graphicsInfo = new GraphicsInfo();
 		graphicsInfo.side = CardSide.Front;

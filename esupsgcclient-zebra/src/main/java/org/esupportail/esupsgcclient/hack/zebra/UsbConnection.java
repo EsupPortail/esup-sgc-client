@@ -41,31 +41,24 @@ Without this hack on HALF ZXP3 command, we get this error on our ZXP3 printer :
 
 
 
-Without this hack on GS ZXP3 command, color part is not well printed with half panel ribbon :
- The card printer produces a blurry effect on the user's photo on the card.
- This is due to a misalignment between each color (cyan, magenta, yellow) during printing,
-  causing a blurred appearance.
+ Color part can not well printed with half panel ribbon  : the card printer produces a blurry effect on the user's photo on the card.
+ This is due to a misalignment between each color (cyan, magenta, yellow) during printing, causing a blurred appearance.
+ This can be caused because with ZXP3, that's the SDK which manages the half position for color printing, not the printer itself.
+ If you are concerned by this issue, you can try to flip horizontally the card when printing it :
+ goal is that the color part is on the left of the card when printing.
  */
 public class UsbConnection extends com.zebra.sdk.comm.UsbConnection {
 
     private final static Logger log = Logger.getLogger(UsbConnection.class);
 
-    private String gapGsHalfPanel;
-
-    public UsbConnection(String var1, String gapGsHalfPanel) throws ConnectionException {
+    public UsbConnection(String var1) throws ConnectionException {
         super(var1);
-        this.gapGsHalfPanel = gapGsHalfPanel;
     }
 
     @Override
     public void write(byte[] bytes, int i, int i1) throws ConnectionException {
         String s = new String(bytes, i, i1);
-         if(s.matches("(?s).*GS [0-9]+ 32 [0-9]+ 0 [0-9]+ 640.*")) {
-            String olds = s;
-            s = s.replaceFirst("GS ([0-9]+) 32 [0-9]+ 0 [0-9]+ 640", "GS $1 32 " + gapGsHalfPanel);
-            log.warn("Bad GS Command caught - replaced : " + formatMsg4Log(olds) + " with " + formatMsg4Log(s));
-            super.write(s.getBytes());
-        } else if(s.matches("(?s).*HALF [0-9]+ null.*")) {
+         if(s.matches("(?s).*HALF [0-9]+ null.*")) {
             String olds = s;
             s = s.replaceFirst("(HALF [0-9]+) null", "$1 0");
             log.warn("Bad Half Command caught - replaced : " + formatMsg4Log(olds) + " with " + formatMsg4Log(s));
@@ -76,6 +69,9 @@ public class UsbConnection extends com.zebra.sdk.comm.UsbConnection {
             }
             if(log.isTraceEnabled()) {
                 log.trace("Command sent : " + formatMsg4Log(s));
+            }
+            if(s.matches("(?s).*GS [0-9]+ 32 .*")) {
+                log.info("GS Command : " + formatMsg4Log(s));
             }
             super.write(bytes, i, i1);
         }
