@@ -218,9 +218,11 @@ Ce paramètre est utile pour la Zebra ZXP3 avec les demi-panneaux : sur ZXP3 c'e
 ne le fait pas correctement ; en faisant en sorte que la partie couleur soit sur la gauche de la carte lors de l'impression (au début), cela facilite le calcul du décalage par le SDK.
 -> à utiliser sur ZXP3 avec les demi-panneaux si vous avez des problèmes de décalage (et photo/logo couleur flouté). 
 
-printerZebraHackZxpNfcPower permet quant à lui d'inverser la commande d'alimentation du lecteur NFC ; cela est nécessaire si vous avez mis à jour le firmware du lecteur NFC fourni avec la ZXP3 avec le firmware officiel (SDI010 d'identiv), 
-ce que l'on vous déconseille de faire ... sauf si vous souhaitez utiliser votre ZXP3 sur linux ; mais elle ne fonctionnera plus correctement sous windows (crash java) et la mise à jour du formware est irréversible
-car le firmware initial est celui de zebra et non disponible au téléchargement.
+printerZebraHackZxpNfcPower permet quant à lui d'inverser la commande d'alimentation du lecteur NFC ; 
+cela est nécessaire si vous avez mis à jour le firmware du lecteur NFC fourni avec la ZXP3 avec le firmware officiel (SDI010 d'identiv) ;
+ce que l'on vous déconseille fortement de faire : elle ne fonctionnera plus correctement sous windows (crash java), 
+et sous linux le lecteur NFC fonctionnera mais de manière instable (de nos tests, des erreurs pc/sc peuvent survenir), de plus la mise à jour du firmware est **irréversible**
+car le firmware initial est celui de zebra qui est non disponible au téléchargement.
 
 #### support sous Windows
 
