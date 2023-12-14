@@ -219,7 +219,8 @@ ne le fait pas correctement ; en faisant en sorte que la partie couleur soit sur
 -> à utiliser sur ZXP3 avec les demi-panneaux si vous avez des problèmes de décalage (et photo/logo couleur flouté). 
 
 printerZebraHackZxpNfcPower permet quant à lui d'inverser la commande d'alimentation du lecteur NFC ; cela est nécessaire si vous avez mis à jour le firmware du lecteur NFC fourni avec la ZXP3 avec le firmware officiel (SDI010 d'identiv), 
-ce que l'on vous déconseille de faire).
+ce que l'on vous déconseille de faire (sauf si vous souhaitez utiliser votre ZXP3 sur linux ; mais elle ne fonctionnera plus correctement sous windows (crash java) et la mise à jour du formware est irréversible
+car le firmware initial est celui de zebra et non disponible au téléchargement).
 
 #### support sous Windows
 
