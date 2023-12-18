@@ -12,6 +12,8 @@
   <properties>
     <zebra.link_os_sdk.lib>/opt/link_os_sdk/PC-Card/v2.14.5198/lib</zebra.link_os_sdk.lib>
     <zebra.link_os_sdk.version>v2.14.5198</zebra.link_os_sdk.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
   </properties>
   <dependencies>
       <dependency>
