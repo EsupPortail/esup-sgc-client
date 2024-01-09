@@ -46,6 +46,9 @@ Without this hack on HALF ZXP3 command, we get this error on our ZXP3 printer :
  This can be caused because with ZXP3, that's the SDK which manages the half position for color printing, not the printer itself.
  If you are concerned by this issue, you can try to flip horizontally the card when printing it :
  goal is that the color part is on the left of the card when printing.
+
+ Last, the DLL used by the SDK for USB connection crash the JVM when closing the connection, so we do nothing on close() method.
+
  */
 public class UsbConnection extends com.zebra.sdk.comm.UsbConnection {
 
@@ -53,6 +56,10 @@ public class UsbConnection extends com.zebra.sdk.comm.UsbConnection {
 
     public UsbConnection(String var1) throws ConnectionException {
         super(var1);
+    }
+
+    public void close() throws ConnectionException {
+        log.warn("Call to close UsbConnection but dll used for this crash the JVM, so we do nothing");
     }
 
     @Override
@@ -84,4 +91,5 @@ public class UsbConnection extends com.zebra.sdk.comm.UsbConnection {
         output = output.replaceAll("\r", "[CR]"); // Pour Mac
         return output;
     }
+
 }
