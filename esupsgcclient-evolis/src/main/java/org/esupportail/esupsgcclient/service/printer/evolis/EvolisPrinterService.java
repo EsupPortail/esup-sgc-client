@@ -115,7 +115,6 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 
 		evolisRestart.setOnAction(actionEvent -> {
 			callCommand(evolisPrinterCommands.evolisRestart(), logTextarea);
-			new Thread(() -> evolisRestart()).start();
 		});
 
 		testPcsc.setOnAction(actionEvent -> {
