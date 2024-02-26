@@ -266,7 +266,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 			}
 			log.warn("Exception when sending evolis request (we retry it in 2 sec) : " + evolisRequest, e);
 			Utils.sleep(2000);
-			sendRequestAndRetryIfFailed(evolisRequest, timeout);
+			response = sendRequestAndRetryIfFailed(evolisRequest, timeout);
 		}
 		return response;
 	}
