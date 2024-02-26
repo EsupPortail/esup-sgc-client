@@ -48,9 +48,12 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	
 	final static Logger log = LoggerFactory.getLogger(EvolisPrinterService.class);
 
-	final static long DEFAULT_TIMEOUT = 3000;
+	final static long DEFAULT_TIMEOUT = 5000;
 
-	final static long DEFAULT_TIMEOUT_PRINT = 28000;
+	// 60 sec. : si une boite de dialogue evolis print center apparait lors de l'impression,
+	// le temps de cliquer est comptabilisé dans l'impression ... et donc dans les 60 sec. de timeout
+	// d'où le fait de ne pas mettre 'seulement' 30 sec ici par exemple
+	final static long DEFAULT_TIMEOUT_PRINT = 60000;
 
 	ObjectMapper objectMapper = new ObjectMapper();
 
@@ -222,7 +225,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 						if(System.currentTimeMillis()-time>timeout) {
 							// close socket - sinon evolis center reste en boucle infinie
 							socketInputStream.close();
-							throw new EvolisSocketException("No response of Evolis after 60 sec -> abort", null);
+							throw new EvolisSocketException("No response of Evolis after"  + timeout/1000 + " sec -> abort", null);
 						} else if(System.currentTimeMillis()-time>1000*k) {
 							k++;
 							log.debug("SocketTimeoutException after " + k + " sec - but no response - we continue ...");
