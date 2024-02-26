@@ -81,6 +81,7 @@ public class EvolisPrintEncodeTask extends EsupSgcTask {
             updateBmpUi(bmpColorAsBase64, bmpColorImageView);
             setUiStepSuccess(UiStep.bmp_color);
             String bmpOverlayAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.overlay);
+            evolisPrinterService.printEnd(); // in case of previous error
             String evolisPrinterStatus = evolisPrinterService.getPrinterStatus().getResult();
             while(!evolisPrinterStatus.contains("PRINTER_READY")) {
                 updateTitle(String.format("Status de l'imprimante evolis non prête (%s) - en attente ...", evolisPrinterStatus));

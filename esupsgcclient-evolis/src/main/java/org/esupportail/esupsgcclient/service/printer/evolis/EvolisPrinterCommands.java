@@ -15,6 +15,12 @@ public class EvolisPrinterCommands {
 
 	static String JOB_ID = "JOB000001";
 
+	// must be less than EvolisPrinterService.DEFAULT_TIMEOUT
+	final static String DEFAULT_TIMEOUT = "2000";
+
+	// must be less than EvolisPrinterService.DEFAULT_TIMEOUT_PRINT
+	final static String DEFAULT_TIMEOUT_PRINT = "25000";
+
 	@Resource
 	AppConfig appConfig;
 
@@ -30,7 +36,7 @@ public class EvolisPrinterCommands {
 		EvolisRequest req = new EvolisRequest();
 		req.getParams().put("command", "Ss");
 		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
+		req.getParams().put("timeout", DEFAULT_TIMEOUT);
 		return req;
 	}
 
@@ -72,14 +78,14 @@ public class EvolisPrinterCommands {
 		req.getParams().put("face", "front");
 		req.getParams().put("panel", panel);
 		req.getParams().put("data", "base64:" + bmpAsBase64);
-		req.getParams().put("timeout", "5000");
+		req.getParams().put("timeout", DEFAULT_TIMEOUT);
 		return req;
 	}
 	EvolisRequest print() {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.Print");
 		req.getParams().put("session", JOB_ID);
-		req.getParams().put("timeout", "20000");
+		req.getParams().put("timeout", DEFAULT_TIMEOUT_PRINT);
 		return req;
 	}
 
@@ -87,7 +93,7 @@ public class EvolisPrinterCommands {
 		EvolisRequest req = new EvolisRequest();
 		req.setMethod("PRINT.End");
 		req.getParams().put("session", JOB_ID);
-		req.getParams().put("timeout", "5000");
+		req.getParams().put("timeout", DEFAULT_TIMEOUT);
 		return req;
 	}
 
@@ -131,7 +137,7 @@ public class EvolisPrinterCommands {
 			req.getParams().put("command", "Rco;rc");
 		}
 		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
+		req.getParams().put("timeout", DEFAULT_TIMEOUT);
 
 		return req;
 	}
@@ -163,7 +169,7 @@ public class EvolisPrinterCommands {
 		EvolisRequest req = new EvolisRequest();
 		req.getParams().put("command", plainTextCommand);
 		req.getParams().put("device", getDeviceName());
-		req.getParams().put("timeout", "5000");
+		req.getParams().put("timeout", DEFAULT_TIMEOUT);
 		return req;
 	}
 

@@ -11,15 +11,19 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Stage;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
+import org.esupportail.esupsgcclient.ui.evolis.EvolisTestPrintDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -31,6 +35,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 
@@ -42,6 +47,10 @@ import java.util.Optional;
 public class EvolisPrinterService extends EsupSgcPrinterService {
 	
 	final static Logger log = LoggerFactory.getLogger(EvolisPrinterService.class);
+
+	final static long DEFAULT_TIMEOUT = 3000;
+
+	final static long DEFAULT_TIMEOUT_PRINT = 28000;
 
 	ObjectMapper objectMapper = new ObjectMapper();
 
@@ -62,6 +71,9 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 
 	@Resource
 	AppSession appSession;
+
+	@Resource
+	EvolisTestPrintDialog evolisTestPrintDialog;
 
 	@Override
 	public String getMaintenanceInfo() {
@@ -90,11 +102,13 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		testPcsc.setText("Stress test pc/sc");
 		MenuItem pcscDesfireTest = new MenuItem();
 		pcscDesfireTest.setText("Stress test PC/SC DES Blank Desfire");
+		MenuItem printFakeTest = new MenuItem();
+		printFakeTest.setText("Stress test print evolis");
 		MenuItem stopEvolis = new MenuItem();
 		stopEvolis.setText("Éteindre l'imprimante");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis");
-		evolisMenu.getItems().addAll(evolisReject, evolisClearStatus, evolisPrintEnd, evolisRestoreManufactureParameters,  evolisRestart, evolisCommand, testPcsc, pcscDesfireTest, stopEvolis);
+		evolisMenu.getItems().addAll(evolisReject, evolisClearStatus, evolisPrintEnd, evolisRestoreManufactureParameters,  evolisRestart, evolisCommand, testPcsc, pcscDesfireTest, printFakeTest, stopEvolis);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisReject.setOnAction(actionEvent -> {
@@ -132,6 +146,11 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 			).show();
 		});
 		pcscDesfireTest.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()).or(appSession.printerReadyProperty().not()));
+
+		printFakeTest.setOnAction(actionEvent -> {
+			evolisTestPrintDialog.getEvolisTestPrintDialog(this, logTextarea).show();
+		});
+		printFakeTest.disableProperty().bind(appSession.taskIsRunningProperty().or(appSession.printerReadyProperty().not()));
 
 		TilePane r = new TilePane();
 		TextInputDialog td = new TextInputDialog("Echo;ESUP-SGC d'ESUP-Portail");
@@ -174,7 +193,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		}
 	}
 
-	synchronized EvolisResponse sendRequest(EvolisRequest req) throws EvolisSocketException {
+	synchronized EvolisResponse sendRequest(EvolisRequest req, long timeout) throws EvolisSocketException {
 		log.debug("Request : {}", req);
 		Socket socket = null;
 		try {
@@ -200,7 +219,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 						log.trace(responseStr.length() > 200 ? responseStr.substring(0, 200) : responseStr);
 						break;
 					} else {
-						if(System.currentTimeMillis()-time>60000) {
+						if(System.currentTimeMillis()-time>timeout) {
 							// close socket - sinon evolis center reste en boucle infinie
 							socketInputStream.close();
 							throw new EvolisSocketException("No response of Evolis after 60 sec -> abort", null);
@@ -232,19 +251,28 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 			}
 		}
 	}
-	EvolisResponse sendRequestAndRetryIfFailed(EvolisRequest evolisRequest) {
+
+	synchronized EvolisResponse sendRequest(EvolisRequest req) throws EvolisSocketException {
+		return sendRequest(req, DEFAULT_TIMEOUT);
+	}
+
+	EvolisResponse sendRequestAndRetryIfFailed(EvolisRequest evolisRequest, long timeout) {
 		EvolisResponse response = null;
 		try {
-			response = sendRequest(evolisRequest);
+			response = sendRequest(evolisRequest, timeout);
 		} catch (EvolisSocketException e) {
 			if(e.getMessage().contains("Communication session already reserved")) {
 				throw new RuntimeException("Exception when sending evolis request - Communication session already reserved : " + evolisRequest, e);
 			}
 			log.warn("Exception when sending evolis request (we retry it in 2 sec) : " + evolisRequest, e);
 			Utils.sleep(2000);
-			sendRequestAndRetryIfFailed(evolisRequest);
+			sendRequestAndRetryIfFailed(evolisRequest, timeout);
 		}
 		return response;
+	}
+
+	EvolisResponse sendRequestAndRetryIfFailed(EvolisRequest evolisRequest) {
+		return sendRequestAndRetryIfFailed(evolisRequest, DEFAULT_TIMEOUT);
 	}
 
 	public EvolisResponse getPrinterStatus() throws EvolisSocketException {
@@ -276,7 +304,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	}
 
 	public void print() {
-		sendRequestAndRetryIfFailed(evolisPrinterCommands.print());
+		sendRequestAndRetryIfFailed(evolisPrinterCommands.print(), DEFAULT_TIMEOUT_PRINT);
 	}
 
 	public void noEject() {
