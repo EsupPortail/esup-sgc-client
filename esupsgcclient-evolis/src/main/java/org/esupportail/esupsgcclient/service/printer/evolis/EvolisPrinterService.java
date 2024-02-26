@@ -287,14 +287,6 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.noEject());
 	}
 
-	private void evolisShutdown() {
-		sendRequestAndRetryIfFailed(evolisPrinterCommands.shutdown());
-	}
-
-	private void evolisClearStatus() {
-		sendRequestAndRetryIfFailed(evolisPrinterCommands.evolisClearStatus());
-	}
-
 	public EvolisResponse insertCardToContactLessStation(EsupSgcTask esupSgcTask) {
 		EvolisResponse response = sendRequestAndRetryIfFailed(evolisPrinterCommands.insertCardToContactLessStation());
 		while(!"OK".equals(response.getResult())) {
@@ -331,15 +323,6 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	public void endSequence() {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.endSequence());
 	}
-
-	void restoreManufactureParameters() {
-		sendRequestAndRetryIfFailed(evolisPrinterCommands.restoreManufactureParameters());
-	}
-
-	void evolisRestart() {
-		sendRequestAndRetryIfFailed(evolisPrinterCommands.evolisRestart());
-	}
-
 
 	public EvolisResponse getNextCleaningSteps() {
 		try {
