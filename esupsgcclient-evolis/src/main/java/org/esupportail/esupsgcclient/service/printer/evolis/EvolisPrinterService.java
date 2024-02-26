@@ -247,10 +247,6 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		return response;
 	}
 
-	public EvolisResponse insertCard() {
-		return sendRequestAndRetryIfFailed(evolisPrinterCommands.insertCard());
-	}
-
 	public EvolisResponse getPrinterStatus() throws EvolisSocketException {
 		return sendRequest(evolisPrinterCommands.getPrinterStatus());
 	}
