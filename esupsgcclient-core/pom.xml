@@ -13,7 +13,7 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <build.date>${maven.build.timestamp}</build.date>
-    <maven.build.timestamp.format>dd/MM/yyyy HH:mm UTC</maven.build.timestamp.format>
+    <maven.build.timestamp.format>dd/MM/yyyy HH:mm 'UTC'</maven.build.timestamp.format>
   </properties>
   <dependencies>
     <dependency>
