@@ -16,10 +16,10 @@ public class EvolisPrinterCommands {
 	static String JOB_ID = "JOB000001";
 
 	// must be less than EvolisPrinterService.DEFAULT_TIMEOUT
-	final static String DEFAULT_TIMEOUT = "4000";
+	final static String DEFAULT_TIMEOUT = Long.toString(EvolisPrinterService.DEFAULT_TIMEOUT-500);
 
 	// must be less than EvolisPrinterService.DEFAULT_TIMEOUT_PRINT
-	final static String DEFAULT_TIMEOUT_PRINT = "55000";
+	final static String DEFAULT_TIMEOUT_PRINT = Long.toString(EvolisPrinterService.DEFAULT_TIMEOUT_PRINT-5000);
 
 	@Resource
 	AppConfig appConfig;

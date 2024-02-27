@@ -6,8 +6,6 @@ import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.AppSession.READY_CONDITION;
-import org.esupportail.esupsgcclient.service.printer.evolis.EvolisPrinterService;
-import org.esupportail.esupsgcclient.service.sgc.EsupSgcHeartbeatService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.springframework.context.ApplicationContext;
@@ -23,9 +21,6 @@ public class EvolisEncodeTaskService extends EsupSgcTaskService {
 	private final static Logger log = Logger.getLogger(EvolisEncodeTaskService.class);
 
 	static final String ROBOT_ENCODAGE_VIA_EVOLIS = "Robot encodage via webcam et imprimante Evolis";
-
-	@Resource
-	EvolisPrinterService evolisPrinterService;
 
 	@Resource
 	AppSession appSession;

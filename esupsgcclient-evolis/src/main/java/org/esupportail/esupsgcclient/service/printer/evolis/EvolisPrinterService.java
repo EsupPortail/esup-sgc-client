@@ -11,8 +11,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Stage;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
@@ -23,7 +21,6 @@ import org.esupportail.esupsgcclient.ui.evolis.EvolisTestPrintDialog;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -48,11 +45,12 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	
 	final static Logger log = LoggerFactory.getLogger(EvolisPrinterService.class);
 
-	final static long DEFAULT_TIMEOUT = 5000;
+	final static long DEFAULT_TIMEOUT = 3000;
 
 	// 60 sec. : si une boite de dialogue evolis print center apparait lors de l'impression,
 	// le temps de cliquer est comptabilisé dans l'impression ... et donc dans les 60 sec. de timeout
-	// d'où le fait de ne pas mettre 'seulement' 30 sec ici par exemple
+	// d'où le fait de ne pas mettre 'seulement' 30 sec ici
+	// -> on conseille aux gestionnaires de désactiver les notifications dans evolis print center
 	final static long DEFAULT_TIMEOUT_PRINT = 60000;
 
 	ObjectMapper objectMapper = new ObjectMapper();
