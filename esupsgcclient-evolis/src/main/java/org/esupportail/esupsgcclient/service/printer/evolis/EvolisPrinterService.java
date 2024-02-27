@@ -196,7 +196,16 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		}
 	}
 
+
+	synchronized EvolisResponse sendRequest4Status(EvolisRequest req, long timeout) throws EvolisSocketException {
+		return sendRequestNoSynchronized(req, timeout);
+	}
+
 	synchronized EvolisResponse sendRequest(EvolisRequest req, long timeout) throws EvolisSocketException {
+		return sendRequestNoSynchronized(req, timeout);
+	}
+
+	EvolisResponse sendRequestNoSynchronized(EvolisRequest req, long timeout) throws EvolisSocketException {
 		log.debug("Request : {}", req);
 		Socket socket = null;
 		try {
@@ -279,7 +288,7 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 	}
 
 	public EvolisResponse getPrinterStatus() throws EvolisSocketException {
-		return sendRequest(evolisPrinterCommands.getPrinterStatus());
+		return sendRequest4Status(evolisPrinterCommands.getPrinterStatus(), DEFAULT_TIMEOUT);
 	}
 
 	public EvolisResponse printBegin() {
