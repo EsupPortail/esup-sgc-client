@@ -156,6 +156,9 @@ public class EsupSgcClientJfxController implements Initializable {
 	EsupSgcDesfireFullTestPcscDialog esupSgcDesfireFullTestPcscDialog;
 	Stage stage;
 
+	@Resource
+	AppVersion appVersion;
+
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -168,6 +171,8 @@ public class EsupSgcClientJfxController implements Initializable {
 				}
 			}
 		});
+
+		logTextarea.appendText("Esup-SGC-Client " + appVersion.getVersion() + " - compilé le " + appVersion.getBuildDate() + "\n");
 
 		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane, autostart);
 
@@ -362,6 +367,8 @@ public class EsupSgcClientJfxController implements Initializable {
 	public void initializeFromFileLocalStorage(Stage stage) {
 
 		this.stage = stage;
+
+		stage.setTitle("Esup-SGC-Client " + appVersion.getVersion());
 
 		// initialisation (dé)sélection menu affichage fonction du filelocalstorage
 		buttonDisplayEsupNfcTag.setSelected(!"false".equals(fileLocalStorage.getItem("displayEsupNfcTag")));
