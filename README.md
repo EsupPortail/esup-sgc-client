@@ -141,6 +141,11 @@ Le fichier de configuration d'esup-sgc-client donné dans [src/main/resources/es
 Notez que la configuration printerEvolisSet vous permet de configurer le type de ruban utilisé, 
 par défaut on propose une configuration proposant l'usage d'un ruban couleur demi-panneau (RC_YMCKOS), pour un ruban couleur plein panneau il faudra positionner RC_YMCKO
 
+Enfin nous vous conseillons de désactiver les notifications de l'application "Evolis Premium Suite 2" pour ne pas être gêné par des popups qui bloqueront le process d'édition des cartes pour vous
+notifier d'un nettoyage de cartes à réaliser, d'une fin de ruban, etc. : pour ce faire, dans "Evolis Premium Suite 2", cliquez en haut à droite sur l'icône de "préférences utilisateurs" pour effectivement
+désactiver les notifications. Les popups de notifications sont en effet bloquantes pour esup-sgc-client : l'impression est en attente tant que la popup n'a pas été acquittée ; durant ce laps de temps,
+esup-sgc-client ne recevant pas de réponse à sa commande d'impression de carte, celui-ci tombe en erreur.
+
 #### evolis primacy 1
 
 La mise en place pour Evolis Primacy 1 (par rapport à Primacy 2) est très similaire, il vous faudra cependant installer non pas "Evolis Premium Suite 2" mais "Evolis Premium Suite".
