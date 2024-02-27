@@ -82,12 +82,8 @@ public class EvolisTestPrintDialog {
                     evolisPrinterService.printFrontBlackBmp(bmpBlackAsBase64);
                     Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Stress print test evolis send overlay ...\n"));
                     evolisPrinterService.printFrontVarnish(bmpOverlayAsBase64);
-                    try {
-                        Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Stress print test evolis end ...\n"));
-                        evolisPrinterService.printEnd();
-                    } catch (EvolisSocketException e) {
-                        throw new RuntimeException(e);
-                    }
+                    Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Stress print test evolis end ...\n"));
+                    evolisPrinterService.tryPrintEnd();
                     Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Stress print test evolis end OK\n"));
                     final String fk = String.format("%.1f sec", (System.currentTimeMillis() - time) / 1000.0);
                     final int fv = 1;
