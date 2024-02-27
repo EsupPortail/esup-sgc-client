@@ -303,6 +303,14 @@ public class EvolisPrinterService extends EsupSgcPrinterService {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.printEnd());
 	}
 
+	public void tryPrintEnd() {
+		try {
+			sendRequest(evolisPrinterCommands.printEnd());
+		} catch (Throwable t) {
+			log.debug("No need to call printEnd here : " + t.getMessage());
+		}
+	}
+
 	public void printFrontColorBmp(String bmpColorAsBase64) {
 		sendRequestAndRetryIfFailed(evolisPrinterCommands.printFrontColorBmp(bmpColorAsBase64));
 	}

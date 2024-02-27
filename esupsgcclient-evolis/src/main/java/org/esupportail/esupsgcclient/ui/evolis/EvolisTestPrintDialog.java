@@ -66,6 +66,8 @@ public class EvolisTestPrintDialog {
                     String bmpColorAsBase64 = getBmpAsBase64("test/color.bmp");
                     String bmpBlackAsBase64 = getBmpAsBase64("test/black.bmp");
                     String bmpOverlayAsBase64 = getBmpAsBase64("test/overlay.bmp");
+                    Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Stress print test end if needed ...\n"));
+                    evolisPrinterService.tryPrintEnd();
                     Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Stress print test evolis start sequence ...\n"));
                     evolisPrinterService.startSequence();
                     Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Stress print test evolis no eject ...\n"));
