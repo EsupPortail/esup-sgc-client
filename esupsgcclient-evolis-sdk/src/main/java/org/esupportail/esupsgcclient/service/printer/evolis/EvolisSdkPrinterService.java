@@ -116,9 +116,11 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		testPcsc.setText("Stress test pc/sc");
 		MenuItem pcscDesfireTest = new MenuItem();
 		pcscDesfireTest.setText("Stress test PC/SC DES Blank Desfire");
+		MenuItem stopEvolis = new MenuItem();
+		stopEvolis.setText("Éteindre l'imprimante");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
-		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject, evolisCommand, testPcsc, pcscDesfireTest);
+		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject, evolisCommand, testPcsc, pcscDesfireTest, stopEvolis);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -138,9 +140,11 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		});
 
 		evolisReject.setOnAction(actionEvent -> {
-			Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis reject ... \n"));
-			getEvolisConnection().rejectCard();
-			Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis reject OK \n"));
+			new Thread(() -> {
+				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis reject ... \n"));
+				getEvolisConnection().rejectCard();
+				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis reject OK \n"));
+			}).start();
 		});
 
 
@@ -160,6 +164,13 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		});
 		pcscDesfireTest.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()).or(appSession.printerReadyProperty().not()));
 
+		stopEvolis.setOnAction(actionEvent -> {
+			new Thread(() -> {
+				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis stop ... \n"));
+				getEvolisConnection().sendCommand("Psdc;Force");
+				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis stopped OK \n"));
+			}).start();
+		});
 
 		TilePane r = new TilePane();
 		TextInputDialog td = new TextInputDialog("Echo;ESUP-SGC d'ESUP-Portail");
