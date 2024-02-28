@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.esupportail.esupsgcclient</groupId>
+    <artifactId>esupsgcclient</artifactId>
+    <version>${revision}</version>
+  </parent>
+  <artifactId>esupsgcclient-evolis-sdk</artifactId>
+  <properties>
+    <evolis.sdk.lib>/opt/evolis-sdk-java-wrapper/evolis-sdk-java-8.2.0.jar</evolis.sdk.lib>
+    <evolis.sdk.version>8.2.0</evolis.sdk.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.esupportail.esupsgcclient</groupId>
+      <artifactId>esupsgcclient-core</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.evolis.sdk</groupId>
+      <artifactId>evolis-sdk-java</artifactId>
+      <version>${evolis.sdk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna-platform</artifactId>
+      <version>5.11.0</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>2.5.2</version>
+        <executions>
+          <execution>
+            <id>install-evolis-sdk</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+            <configuration>
+              <file>${evolis.sdk.lib}</file>
+              <groupId>com.evolis.sdk</groupId>
+              <artifactId>evolis-sdk-java</artifactId>
+              <version>${evolis.sdk.version}</version>
+              <packaging>jar</packaging>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

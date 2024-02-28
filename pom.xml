@@ -32,6 +32,12 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>evolis-sdk</id>
+			<modules>
+				<module>esupsgcclient-evolis-sdk</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>zebra</id>
 			<modules>
 				<module>esupsgcclient-zebra</module>
