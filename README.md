@@ -124,9 +124,9 @@ Ensuite, 2 possibilités de connexion à une imprimante evolis sont maintenant s
 
 Ce mode de connexion est le plus simple à mettre en oeuvre, il vous suffit d'installer le driver de votre imprimante evolis.
 
-Les drivers sont disponibles aussi bien sous Windows que sous Linux, aussi votre Evolis Primacy 2 (ou autre) peut fonctionner aussi bien vi un esup-sgc-client depuis linux que depuis windows.
+Les drivers sont disponibles aussi bien sous Windows que sous Linux, aussi votre Evolis Primacy 2 (ou autre) peut fonctionner aussi bien via un esup-sgc-client depuis linux que depuis windows.
 
-Si vous souhaitez compiler vous même le client avec le support evolis via le SDK, vous devez spécifier le profile maven `evolis-sdk` et initialiser votre repository maven local avec le SDK evolis.
+Si vous souhaitez compiler vous même le client avec le support evolis via le SDK, vous devez spécifier le profil maven `evolis-sdk` et initialiser votre repository maven local avec le SDK evolis.
 Cf esupsgclient-evolis-sdk/pom.xml, celui-ci demande à avoir le jar dans /opt/evolis-sdk-java-wrapper/evolis-sdk-java-8.2.0.jar.
 Ce jar sera installé dans votre maven local via cette commande :
 ````
@@ -134,13 +134,15 @@ mvn initialize -P evolis-sdk
 ````
 
 Via ce mode, esup-sgc-client dialogue directement avec l'imprimante via le SDK 3, et les propriétés de configuration de l'imprimante données dans esupgclient.properties ne servent pas : 
-le SDK permet de retrouver simplement et automatiquement l'imprimante evolis connecté notamment. 
+le SDK permet de retrouver simplement et automatiquement l'imprimante evolis connectée, le type de ruban n'est pas non plus à configurer, ... 
 
 #### evolis via evolis print center (1 ou 2)
 
 Via ce mode, esup-sgc-client dialogue par TCP (socket) avec "Evolis Premium Suite 1" ou "Evolis Premium Suite 2" qui se charge de retransmettre les ordres à l'imprimante.
 
 Cela ne fonctionne de fait que depuis windows, puisque Evolis Print Center (Evolis Premium Suite) n'est disponible que pour windows.
+
+C'est l'implémentation initiale pour le support d'Evolis, avant que celui-ci ne proposer son SDK version 3.
 
 ##### evolis primacy 2
 
