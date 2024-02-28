@@ -7,10 +7,12 @@ ESUP-SGC-CLIENT
   * [Dépendances techniques](#dépendances-techniques)
     + [modules maven](#modules-maven)
     + [evolis](#evolis)
-      - [evolis primacy 2](#evolis-primacy-2)
-      - [evolis primacy 1](#evolis-primacy-1)
-      - [autres imprimantes evolis](#autres-imprimantes-evolis)
-      - [simulation de evolis](#simulation-de-evolis)
+      - [evolis en direct via le SDK 3 (supporté depuis mars 2024)](#evolis-en-direct-via-le-sdk-3-supporté-depuis-mars-2024)
+      - [evolis via evolis print center (1 ou 2)](#evolis-via-evolis-print-center-1-ou-2)
+        - [evolis primacy 2](#evolis-primacy-2)
+        - [evolis primacy 1](#evolis-primacy-1)
+        - [autres imprimantes evolis](#autres-imprimantes-evolis)
+        - [simulation de evolis](#simulation-de-evolis)
     + [zebra](#zebra)
       - [support sous Windows](#support-sous-windows)
       - [support sous Linux](#support-sous-linux)
@@ -111,16 +113,42 @@ la classe principale à lancer restant `org.esupportail.esupsgcclient.EsupSgcCli
 
 ### evolis
 
-#### evolis primacy 2
-
 Il vous faut installer le driver de votre encodeur NFC intégré à votre Primacy 2
 (Si vous avez opté pour un encodeur "SpringCard CrazyWriter" par exemple, vous trouverez le driver depuis https://www.springcard.com/en/download/drivers : "PC/SC Driver for USB couplers" / fichier sd16055-2104.exe).
+
+Ensuite, 2 possibilités de connexion à une imprimante evolis sont maintenant supportées : 
+ * via le SDK 3 (supporté depuis mars 2024)
+ * via evolis print center (1 ou 2)
+
+#### evolis en direct via le SDK 3 (supporté depuis mars 2024)
+
+Ce mode de connexion est le plus simple à mettre en oeuvre, il vous suffit d'installer le driver de votre imprimante evolis.
+
+Les drivers sont disponibles aussi bien sous Windows que sous Linux, aussi votre Evolis Primacy 2 (ou autre) peut fonctionner aussi bien vi un esup-sgc-client depuis linux que depuis windows.
+
+Si vous souhaitez compiler vous même le client avec le support evolis via le SDK, vous devez spécifier le profile maven `evolis-sdk` et initialiser votre repository maven local avec le SDK evolis.
+Cf esupsgclient-evolis-sdk/pom.xml, celui-ci demande à avoir le jar dans /opt/evolis-sdk-java-wrapper/evolis-sdk-java-8.2.0.jar.
+Ce jar sera installé dans votre maven local via cette commande :
+````
+mvn initialize -P evolis-sdk
+````
+
+Via ce mode, esup-sgc-client dialogue directement avec l'imprimante via le SDK 3, et les propriétés de configuration de l'imprimante données dans esupgclient.properties ne servent pas : 
+le SDK permet de retrouver simplement et automatiquement l'imprimante evolis connecté notamment. 
+
+#### evolis via evolis print center (1 ou 2)
+
+Via ce mode, esup-sgc-client dialogue par TCP (socket) avec "Evolis Premium Suite 1" ou "Evolis Premium Suite 2" qui se charge de retransmettre les ordres à l'imprimante.
+
+Cela ne fonctionne de fait que depuis windows, puisque Evolis Print Center (Evolis Premium Suite) n'est disponible que pour windows.
+
+##### evolis primacy 2
 
 Pour la primacy 2 en elle-même, il vous faut installer le "Evolis Premium Suite 2" depuis https://myplace.evolis.com/s/quick-install-step-4?language=fr
 
 Notez que "Evolis Premium Suite 2" ne fonctionne que depuis Windows, le lecteur NFC ne fonctionne que via USB : le client esup-sgc-client doit donc être installé sur ce même windows ; en phase de développement on peut se contenter de manipuler à distance.
 
-esup-sgc-client dialogue en effet par TCP avec "Evolis Premium Suite 2" qui se charge de retransmettre les ordres à l'imprimante.
+Dans ce mode, esup-sgc-client dialogue en effet par TCP avec "Evolis Premium Suite 2" qui se charge de retransmettre les ordres à l'imprimante.
 
 Pour la phase d'encodage, une fois l'ordre donnée de positionner la carte au niveau de l'encodeur, esup-sgc-client dialogue directement avec l'encodeur NFC en pc/sc.
 
@@ -146,7 +174,7 @@ notifier d'un nettoyage de cartes à réaliser, d'une fin de ruban, etc. : pour 
 désactiver les notifications. Les popups de notifications sont en effet bloquantes pour esup-sgc-client : l'impression est en attente tant que la popup n'a pas été acquittée ; durant ce laps de temps,
 esup-sgc-client ne recevant pas de réponse à sa commande d'impression de carte, celui-ci tombe en erreur.
 
-#### evolis primacy 1
+##### evolis primacy 1
 
 La mise en place pour Evolis Primacy 1 (par rapport à Primacy 2) est très similaire, il vous faudra cependant installer non pas "Evolis Premium Suite 2" mais "Evolis Premium Suite".
 Le fichier de configuration à modifier est C:\Program Files\Evolis Card Printer\Evolis Premium Suite\ESPFSvc.properties pour activer le support de la communication par TCP (port 18000) :
@@ -159,11 +187,11 @@ Au niveau d'esup-sgc-client, il faudra spécifier dans src/main/resources/esupsg
 printerDeviceName = Evolis Primacy
 ```
 
-#### autres imprimantes evolis
+##### autres imprimantes evolis
 
 Théoriquement, esup-sgc-client doit supporter les autres imprimantes evolis supportant "Evolis Premium Suite" (1 ou 2), il faudra alors adapter la propriété printerDeviceName en conséquence.
 
-#### simulation de evolis
+##### simulation de evolis print center
 
 Pour le développement, on peut aussi se contenter de 'simuler' l'API de "Evolis Premium Suite" 
 Pour ce faire, il vous suffit de lancer le script python (python2 ou python3) [src/etc/dummyEvolisPrinterCenter.py](src/etc/dummyEvolisPrinterCenter.py)
