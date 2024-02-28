@@ -22,7 +22,7 @@ ESUP-SGC-CLIENT
 Pour une documentation fonctionnelle de l'outil et sa mise en oeuvre, merci de vous référer 
 à la documentation ici du wiki ESUP-Portail, notamment ici :
  * [projet global esup-sgc](https://www.esup-portail.org/wiki/display/SGC)
- * [page wiki ESUP spécifiique à esup-sgc-client](https://www.esup-portail.org/wiki/display/SGC/Clients+ESUP-SGC-CLIENT+v2.0)
+ * [page wiki ESUP spécifiique à esup-sgc-client](https://www.esup-portail.org/wiki/pages/viewpage.action?pageId=1221722115)
 
 Dans ces pages, on indique notamment que l'installation de cet outil en production est facilitée par un installateur 
 qui peut lui-même être généré depuis un simple formulaire web en ligne via [esup-sgc-client-installer](https://github.com/EsupPortail/esup-sgc-client-installer)
