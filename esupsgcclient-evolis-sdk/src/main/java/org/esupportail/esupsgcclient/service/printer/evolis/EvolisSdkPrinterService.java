@@ -223,7 +223,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		logTextarea.appendText("Print return code : " + returnCode.name() + "\n");
 	}
 
-	public boolean insertCardToContactLessStation(EvolisSdkPrintEncodeTask evolisSdkPrintEncodeTask) {
+	public boolean insertCardToContactLessStation() {
 		return getEvolisConnection().setCardPos(CardPos.CONTACTLESS);
 	}
 
@@ -233,6 +233,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	public void releaseIfNeeded() {
 		getEvolisConnection().release();
+	}
+
+	public void reject() {
+		getEvolisConnection().rejectCard();
 	}
 }
 

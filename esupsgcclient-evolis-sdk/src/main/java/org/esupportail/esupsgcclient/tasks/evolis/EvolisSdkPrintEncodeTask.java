@@ -92,7 +92,7 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             setUiStepSuccess(UiStep.printer_black);
             evolisPrinterService.print();
             setUiStepSuccess(UiStep.printer_print);
-            while(!evolisPrinterService.insertCardToContactLessStation(this)) {
+            while(!evolisPrinterService.insertCardToContactLessStation()) {
                 updateTitle("Impossible d'insérer la carte dans la station NFC - en attente ...");
                 Utils.sleep(500);
             }
