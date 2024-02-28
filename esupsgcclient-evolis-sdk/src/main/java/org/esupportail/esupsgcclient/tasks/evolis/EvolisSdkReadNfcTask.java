@@ -52,7 +52,7 @@ public class EvolisSdkReadNfcTask extends EsupSgcTask {
             if(isCancelled()) {
                 throw new RuntimeException("Task is cancelled");
             }
-            while(!evolisPrinterService.insertCardToContactLessStation()) {
+            while(!evolisPrinterService.insertCardToContactLessStation(this)) {
                 updateTitle("Impossible d'insérer la carte dans la station NFC - en attente ...");
                 Utils.sleep(500);
             }

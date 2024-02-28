@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
+import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.tasks.evolis.EvolisSdkPrintEncodeTask;
 import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
@@ -223,7 +224,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		logTextarea.appendText("Print return code : " + returnCode.name() + "\n");
 	}
 
-	public boolean insertCardToContactLessStation() {
+	public boolean insertCardToContactLessStation(EsupSgcTask esupSgcTask) {
+		if(esupSgcTask.isCancelled()) {
+			throw new RuntimeException("EvolisTask is cancelled");
+		}
 		return getEvolisConnection().setCardPos(CardPos.CONTACTLESS);
 	}
 
