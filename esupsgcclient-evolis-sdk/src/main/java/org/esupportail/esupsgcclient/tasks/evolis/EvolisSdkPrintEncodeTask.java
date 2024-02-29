@@ -114,6 +114,7 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             updateTitle(msgTimer);
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
+            evolisPrinterService.reject();
             throw new RuntimeException("Exception on  EvolisTask : " + e.getMessage(), e);
         } finally {
             resetBmpUi();
