@@ -179,7 +179,11 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		evolisCommand.setOnAction(actionEvent -> {
 			Optional<String> result = td.showAndWait();
 			result.ifPresent(command -> {
-				getEvolisConnection().sendCommand(command);
+				new Thread(() -> {
+					Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Call : " + command + " ... \n"));
+					String ret = getEvolisConnection().sendCommand(command);
+					Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Return : " + ret + "\n"));
+				}).start();
 			});
 		});
 
