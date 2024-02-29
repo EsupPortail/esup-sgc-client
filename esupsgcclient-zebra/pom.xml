@@ -53,6 +53,15 @@
     </dependency>
   </dependencies>
   <build>
+    <resources>
+        <resource>
+            <directory>${zebra.link_os_sdk.lib}</directory>
+            <includes>
+                <include>ZebraNativeUsbAdapter_32.dll</include>
+                <include>ZebraNativeUsbAdapter_64.dll</include>
+            </includes>
+        </resource>
+    </resources>
     <plugins>
     <plugin>
       <groupId>org.apache.maven.plugins</groupId>
