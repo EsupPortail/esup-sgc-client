@@ -360,7 +360,14 @@ public class EsupSgcClientJfxController implements Initializable {
 		nfcHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(newValue + "\n")));
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
-		Webcam.getWebcams(); // with this webcams are discovered and listener works at startup
+
+		try {
+			Webcam.getWebcams(); // with this webcams are discovered and listener works at startup
+		} catch (Exception e) {
+			// with macosx, it's normal to have an exception here, because permission issue
+			log.error("Webcam discovery failed", e);
+			logTextarea.appendText("Webcam discovery failed\n");
+		}
 
 	}
 
