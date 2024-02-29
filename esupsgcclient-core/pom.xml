@@ -45,6 +45,17 @@
       <groupId>com.github.martinpaljak</groupId>
       <artifactId>apdu4j-jnasmartcardio</artifactId>
       <version>0.2.7+191107</version>
+      <exclusions>
+        <exclusion>
+          <groupId>net.java.dev.jna</groupId>
+          <artifactId>jna</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>5.14.0</version>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
