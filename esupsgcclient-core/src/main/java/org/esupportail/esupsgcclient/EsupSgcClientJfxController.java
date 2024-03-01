@@ -376,6 +376,7 @@ public class EsupSgcClientJfxController implements Initializable {
 				// useful for macOS M1 for example
 				Webcam.setDriver(new NativeDriver());
 				Webcam.getWebcams();
+				log.warn("Webcam discovery success with NativeDriver !", e);
 			} catch (Exception ee) {
 				log.error("Webcam discovery failed", e);
 				logTextarea.appendText("Webcam discovery failed\n");
