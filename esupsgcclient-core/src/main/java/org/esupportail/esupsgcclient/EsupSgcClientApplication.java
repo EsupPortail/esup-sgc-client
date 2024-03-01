@@ -53,11 +53,9 @@ public class EsupSgcClientApplication extends Application {
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent e) {
-				Platform.exit();
-				System.exit(0);
+				esupSgcClientJfxController.exit();
 			}
 		});
-
 		esupSgcClientJfxController.logTextarea.appendText(String.format("Application intialized in %.2f seconds\n", (System.currentTimeMillis()-start)/1000.0));
 	}
 

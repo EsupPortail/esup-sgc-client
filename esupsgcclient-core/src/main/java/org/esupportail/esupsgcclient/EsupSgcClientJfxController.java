@@ -4,6 +4,7 @@ import com.github.eduramiba.webcamcapture.drivers.NativeDriver;
 import com.github.sarxos.webcam.Webcam;
 import javax.annotation.Resource;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -25,7 +26,6 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.bridj.Platform;
 import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
@@ -256,11 +256,13 @@ public class EsupSgcClientJfxController implements Initializable {
 		pcscDesfireTest.setOnAction(event -> esupSgcDesfireFullTestPcscDialog.getTestPcscDialog(null, null).show());
 		pcscDesfireTest.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()));
 
-		exit.setOnAction(event -> stage.close());
+		exit.setOnAction(event -> {
+			this.exit();
+		});
 
 		reinitAndExit.setOnAction(event -> {
 			fileLocalStorage.clear();
-			stage.close();
+			this.exit();
 		});
 
 		appSession.nfcReadyProperty().addListener(new ChangeListener<Boolean>() {
@@ -465,4 +467,13 @@ public class EsupSgcClientJfxController implements Initializable {
 		}
 	}
 
+	public void exit() {
+		logTextarea.appendText("Arrêt demandé\n");
+		esupSgcTaskServiceFactory.cancelService(comboBox.getSelectionModel().getSelectedItem());
+		webcamTaskService.cancel();
+		nfcHeartbeatTaskService.cancel();
+		stage.close();
+		Platform.exit();
+		System.exit(0);
+	}
 }
