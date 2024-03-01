@@ -137,6 +137,17 @@
       <resource>
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
+        <excludes>
+          <exclude>log4j.properties</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <!-- esup-sgc-client-installer uses ${user.home} in log4j.properties and don't have to be replaced at the build phase but at the runtime phase -->
+          <include>log4j.properties</include>
+        </includes>
       </resource>
     </resources>
   </build>
