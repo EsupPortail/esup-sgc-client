@@ -83,6 +83,11 @@
       <version>0.3.12</version>
     </dependency>
     <dependency>
+      <groupId>io.github.eduramiba</groupId>
+      <artifactId>webcam-capture-driver-native</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.zxing</groupId>
       <artifactId>javase</artifactId>
       <version>3.5.2</version>

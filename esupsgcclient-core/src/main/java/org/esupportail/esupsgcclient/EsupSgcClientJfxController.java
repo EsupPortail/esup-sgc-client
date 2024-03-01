@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient;
 
+import com.github.eduramiba.webcamcapture.drivers.NativeDriver;
 import com.github.sarxos.webcam.Webcam;
 import javax.annotation.Resource;
 
@@ -24,6 +25,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.bridj.Platform;
 import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
@@ -163,10 +165,10 @@ public class EsupSgcClientJfxController implements Initializable {
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
 		logTextarea.textProperty().addListener((observable, oldValue, newValue) -> {
-			String value  = newValue;
-			if(newValue != null && oldValue != null) {
+			String value = newValue;
+			if (newValue != null && oldValue != null) {
 				value = newValue.replace(oldValue, "");
-				if(value.contains("\n")) {
+				if (value.contains("\n")) {
 					log.info(value.replace("\n", ""));
 				}
 			}
@@ -221,23 +223,23 @@ public class EsupSgcClientJfxController implements Initializable {
 		comboBox.getItems().addAll(esupSgcTaskServiceFactory.getServicesNames());
 
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldServiceName, newServiceName) -> {
-			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " +  oldServiceName + " - " + newServiceName);
+			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " + oldServiceName + " - " + newServiceName);
 			Utils.jfxRunLaterIfNeeded(() -> {
-				if(!StringUtils.isEmpty(newServiceName)) {
-					if(autostart.isSelected() && !StringUtils.isEmpty(oldServiceName)) {
+				if (!StringUtils.isEmpty(newServiceName)) {
+					if (autostart.isSelected() && !StringUtils.isEmpty(oldServiceName)) {
 						esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).removeListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
 					}
 					esupSgcTaskServiceFactory.resetUiSteps();
 					startButton.disableProperty().bind(appSession.taskIsRunningProperty().or(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).not()));
 					fileLocalStorage.setItem("esupsgcTask", newServiceName);
-					if(!esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
+					if (!esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
 						logTextarea.appendText(String.format("Impossible de démarrer le service '%s' :\n", newServiceName));
 						logTextarea.appendText(esupSgcTaskServiceFactory.readyToRunPropertyDisplayProblem(newServiceName));
 					} else {
 						logTextarea.appendText(String.format("Le service '%s' est prêt à démarrer.\n", newServiceName));
 					}
 					esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).addListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
-					if(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get() && autostart.isSelected()) {
+					if (esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get() && autostart.isSelected()) {
 						logTextarea.appendText(String.format("Autostart est activé, le service '%s' va démarrer.\n", newServiceName));
 						esupSgcTaskServiceFactory.runService(newServiceName);
 					}
@@ -302,7 +304,7 @@ public class EsupSgcClientJfxController implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
 				Utils.jfxRunLaterIfNeeded(() -> {
-					if(newValue) {
+					if (newValue) {
 						checkPrinter.getStyleClass().clear();
 						checkPrinter.getStyleClass().add("btn-success");
 						logTextarea.appendText("imprimante OK\n");
@@ -349,7 +351,7 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
-		if(esupSgcPrinterService != null) {
+		if (esupSgcPrinterService != null) {
 			esupSgcPrinterService.setupJfxUi(stage, checkPrinter.getTooltip(), logTextarea, menuBar);
 		} else {
 			checkPrinter.setDisable(true);
@@ -360,15 +362,25 @@ public class EsupSgcClientJfxController implements Initializable {
 		nfcHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(newValue + "\n")));
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
+		initWebcam(logTextarea);
+	}
 
+	// For macOS, this part must be in the main Thread / Static Method
+	// With this webcams are discovered and listener works at startup
+	static void initWebcam(TextArea logTextarea) {
 		try {
-			Webcam.getWebcams(); // with this webcams are discovered and listener works at startup
+			Webcam.getWebcams();
 		} catch (Exception e) {
-			// with macosx, it's normal to have an exception here, because permission issue
-			log.error("Webcam discovery failed", e);
-			logTextarea.appendText("Webcam discovery failed\n");
+			try{
+				log.warn("Webcam discovery failed, try to use NativeDriver ...", e);
+				// useful for macOS M1 for example
+				Webcam.setDriver(new NativeDriver());
+				Webcam.getWebcams();
+			} catch (Exception ee) {
+				log.error("Webcam discovery failed", e);
+				logTextarea.appendText("Webcam discovery failed\n");
+			}
 		}
-
 	}
 
 	public void initializeFromFileLocalStorage(Stage stage) {
