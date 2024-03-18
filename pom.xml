@@ -26,12 +26,6 @@
 	</modules>
 	<profiles>
 		<profile>
-			<id>evolis</id>
-			<modules>
-				<module>esupsgcclient-evolis</module>
-			</modules>
-		</profile>
-		<profile>
 			<id>evolis-sdk</id>
 			<modules>
 				<module>esupsgcclient-evolis-sdk</module>
