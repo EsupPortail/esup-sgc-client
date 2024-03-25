@@ -158,7 +158,7 @@ Une fois le SDK téléchargé et configuré dans ce fichier, vous devez taper la
 mvn -P zebra initialize
 ```
 
-Comme pour les evolis, le lecteur NFC ne fonctionne que via USB : le client esup-sgc-client doit donc être installé sur le poste (windows ou linux) connecté en USB à l'imprimante.
+Comme pour les evolis, le lecteur NFC ne fonctionne que via USB : le client esup-sgc-client doit donc être installé sur le poste (windows, linux ou macOS) connecté en USB à l'imprimante.
 
 Pour la phase d'encodage, une fois l'ordre donnée de positionner la carte au niveau de l'encodeur, esup-sgc-client dialogue directement avec l'encodeur NFC en pc/sc.
 
@@ -166,7 +166,7 @@ Dans le fichier de propriétés src/main/resources/esupsgcclient.properties, sui
 
 Si la ZC300 attend a priori 'other' pour spécifier le lecteur NFC USB intégré à celle-ci, la ZXP3 attend par exemple 'MIFARE'.
 
-Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows que sous linux.
+Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows, macOS et linux.
 
 Concernant la ZXP3, le SDK java fourni par Zebra pose nativement un problème avec les demi-panneaux, un contournement est proposé dans esup-sgc-client pour que cela fonctionne, 
 pour ce faire il suffit de positionner printerZebraHackZxp3HalfBug à true dans esupsgcclient.properties (ou via une variable d'environnement).
