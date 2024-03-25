@@ -20,18 +20,6 @@ public class AppConfig {
     @Value("${localStorageDir}")
     String localStorageDir;
 
-    @Value("${printerEvolisIp}")
-    String printerEvolisIp = "127.0.0.1";
-
-    @Value("${printerEvolisPort}")
-    int printerEvolisPort = 18000;
-
-    @Value("${printerDeviceName}")
-    String printerDeviceName = "Evolis Primacy 2";
-
-    @Value("${printerEvolisSet}")
-    String printerEvolisSet = "GRibbonType=RC_YMCKO;Duplex=NONE";
-
    @Value("${printerZebraEncoderType:}")
    String  printerZebraEncoderType;
 
@@ -48,22 +36,6 @@ public class AppConfig {
 
     public boolean isEncodeCnous() {
         return encodeCnous;
-    }
-
-    public String getPrinterEvolisIp() {
-        return printerEvolisIp;
-    }
-
-    public int getPrinterEvolisPort() {
-        return printerEvolisPort;
-    }
-
-    public String getPrinterDeviceName() {
-        return printerDeviceName;
-    }
-
-    public String getPrinterEvolisSet() {
-        return printerEvolisSet;
     }
 
     public String getPrinterZebraEncoderType() {
