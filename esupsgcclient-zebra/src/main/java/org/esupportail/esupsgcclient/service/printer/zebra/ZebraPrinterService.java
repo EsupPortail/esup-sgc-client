@@ -43,6 +43,7 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
+import org.esupportail.esupsgcclient.hack.zebra.ForceLoadDll;
 import org.esupportail.esupsgcclient.hack.zebra.UsbConnection;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
@@ -90,6 +91,10 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 
 	@Value("${printerZebraRotation:false}")
 	Boolean printerZebraRotation;
+
+	static {
+		ForceLoadDll.loadDll();
+	}
 
 	@Override
 	public void setupJfxUi(Stage stage, Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
