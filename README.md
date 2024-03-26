@@ -171,7 +171,7 @@ Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous win
 Concernant la ZXP3, le SDK java fourni par Zebra pose nativement un problème avec les demi-panneaux, un contournement est proposé dans esup-sgc-client pour que cela fonctionne, 
 pour ce faire il suffit de positionner printerZebraHackZxp3HalfBug à true dans esupsgcclient.properties (ou via une variable d'environnement).
 
-printerZebraHackZxp3HalfBug à true permet également de ne pas appeler la méthode close de la DLL Zebra qui provoque un crash JVM sous windows. 
+printerZebraHackZxp3HalfBug à true permet également de ne pas appeler la méthode close de la DLL Zebra qui provoque un crash JVM sous windows (ZXP3). 
 
 Mettre printerZebraRotation à true (false par défaut) permet de retourner la carte avant impression (il faut alors adapter le positionnement de la carte dans l'imprimante).
 Ce paramètre est utile pour la Zebra ZXP3 avec les demi-panneaux : sur ZXP3 c'est au SDK de gérer le positionnement du demi-pannaeu (et non à l'imprimante comme sur ZXP7 ou ZC300), et celui-ci
@@ -185,17 +185,7 @@ car le firmware initial est celui de zebra qui est non disponible au télécharg
 
 #### support sous Windows
 
-Sous windows, dans les variables d'environnement, ajoutez le répertoire pointant vers la librairie (et DLL) du SDK Zebra dans le PATH.
-
-Dans variable d'environnement < variables systemes < Path, on ajoute ainsi (v2.14.5198 étant la dernière version du SDK en date au 25/08/2023) :
-"C:\Program Files\Zebra Technologies\link_os_sdk\PC-Card\v2.14.5198\lib"
-
-Lorsque le PATH est bien pris en compte, sans imprimante de connectée, on doit retrouver dans les logs d'esup-sgc-client un WARN du type ci-dessous toutes les 3 secondes environ : 
-```
-6739 [Thread-5] WARN org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService.init(ZebraPrinterService.java:212)  - Cant connect Zebra printer, retry in 3 sec
-```
-
-Ensuite, avec le path bien positionné, et avec une imprimante Zebra de branchée, 2 cas de figure se produisent, suivant la JVM utilisée :
+Avec une imprimante Zebra de branchée sous windows, 2 cas de figure se produisent, suivant la JVM utilisée :
 * crash (core dump) avec la plupart des JVM - ce problème est connu et référencé dans plusieyrs pages : [ici](https://developer.zebra.com/content/zsdkapi-crashing-jvm) et [là](https://developer.zebra.com/content/zebranativeusbadapter64dll-and-jdk-9) par exemple.
 * un fonctionnement correct : l'imprimante est bien reconnue et l'icône dans esup-sgc-client devient ainsi verte, on peut alors lancer un 'stress test pc/sc' depuis le menu zebra
 
@@ -209,7 +199,7 @@ sont compatibles avec le SDK Zebra, elles ne le sont pas complètement avec les 
 ```
 7036 [JavaFX Application Thread] ERROR org.esupportail.esupsgcclient.ui.JavaScriptConsoleBridge.windowerror(JavaScriptConsoleBridge.java:32)  - Window Javascript : ReferenceError: Can't find variable: $
 ```
-Ce qui peut rendre esup-sgc-client difficilement utilisable (notamment pour la partie authentification) ; si tel est le cas, on vous conseille donc d'utiliser la JRE  1.8.0_202 d'Oracle.
+Ce qui peut rendre esup-sgc-client difficilement utilisable (notamment pour la partie authentification) ; si tel est le cas, on vous conseille donc d'utiliser la JRE 1.8.0_202 d'Oracle.
 
 Pour tester sous windows, le plus pratique est de lancer une commande DOS et d'utiliser java.exe (et non javaw.exe) en ligne de commandes, ce qui permet 
 d'avoir le retour (logs) directement dans la commande DOS.
@@ -218,17 +208,6 @@ On lance donc dans sous dos (cmd) une commande type :
 "C:\Program Files\EsupSgcClient\java\bin\java.exe"
 -Dcom.sun.webkit.useHTTP2Loader=false -DprinterZebraEncoderType=other
 -jar esup-sgc-client-zebra.jar
-```
-
-Préalablement, vous pouvez vérifier que le répertoire lib du SDK est bien positionné dans votre PATH également ainsi : 
-```
-echo %PATH%
-```
-Résultat type :
-```
-C:\Program Files\Zebra Technologies\link_os_sdk\PC-Card\v2.14.5198\lib;C:\Window
-s\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerS
-hell\v1.0\
 ```
 
 #### support sous Linux
@@ -243,6 +222,10 @@ adduser vincent lp
 
 Notez que sous linux, contrairement à sous windows, nous n'avons pas rencontré de difficultés de compatibilité avec les JVM (JDK/JRE) que l'on a pu tester.
 De fait, et tant que Zebra n'aura pas réglé ses problèmes de compatibilités avec les JVM sous wondows, on recommande plutôt d'utiliser les Zebra depuis des postes linux.
+
+#### support sous macOS
+
+macOS est également bien supproté par esup-sgc-client et ZC300
 
 ### esup-nfc-tag et esup-sgc de démonstration
 
