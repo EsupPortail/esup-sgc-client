@@ -22,13 +22,13 @@ public class ForceLoadDll {
         if(System.getProperty("os.name").toLowerCase().contains("windows")) {
             log.info("Loading Zebra native library - NativeUsbAdapter.isDriverLoaded = " + NativeUsbAdapter.isDriverLoaded);
             try {
-                String dllPath = System.getProperty("os.arch").contains("32") ? "ZebraNativeUsbAdapter_32.dll" : "ZebraNativeUsbAdapter_64.dll";
+                String dllPath = System.getProperty("sun.arch.data.model").contains("32") ? "ZebraNativeUsbAdapter_32.dll" : "ZebraNativeUsbAdapter_64.dll";
                 log.info("Loading Zebra native library from " + dllPath);
                 InputStream in = ClassLoader.getSystemResourceAsStream(dllPath);
-                File outFile = new File(System.getProperty("java.io.tmpdir") + dllPath);
+                File outFile = new File(System.getProperty("java.io.tmpdir") + "ZebraNativeUsbAdapter-" + new Date().getTime() + ".dll");
                 outFile.deleteOnExit();
                 FileUtils.copyInputStreamToFile(in, outFile);
-                log.debug("Copying " + dllPath + " to " + outFile.getAbsolutePath());
+                log.info("Copying " + dllPath + " to " + outFile.getAbsolutePath());
                 System.load(outFile.getAbsolutePath());
                 log.info("Zebra native library loaded");
                 NativeUsbAdapter.isDriverLoaded = true;
