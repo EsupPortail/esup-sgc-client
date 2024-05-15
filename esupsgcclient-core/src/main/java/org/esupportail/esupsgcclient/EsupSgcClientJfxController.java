@@ -140,6 +140,9 @@ public class EsupSgcClientJfxController implements Initializable {
 	public ImageView bmpColorImageView;
 
 	@FXML
+	public ImageView bmpBackImageView;
+
+	@FXML
 	ProgressBar progressBar;
 
 	@Resource
@@ -176,7 +179,7 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		logTextarea.appendText("Esup-SGC-Client " + appVersion.getVersion() + " - compilé le " + appVersion.getBuildDate() + "\n");
 
-		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, logTextarea, progressBar, textPrincipal, actionsPane, autostart);
+		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView, logTextarea, progressBar, textPrincipal, actionsPane, autostart);
 
 		// redimensionnement possible en fonction de la visible
 		nfcTagPane.managedProperty().bind(nfcTagPane.visibleProperty());

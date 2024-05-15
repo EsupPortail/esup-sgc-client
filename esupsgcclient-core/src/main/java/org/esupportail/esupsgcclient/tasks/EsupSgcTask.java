@@ -31,13 +31,16 @@ public abstract class EsupSgcTask extends Task<String> {
 
     protected ImageView bmpBlackImageView;
 
+    protected ImageView bmpBackImageView;
+
     UiStep lastUiStepSuccess = null;
 
-    public EsupSgcTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+    public EsupSgcTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
         this.uiSteps = uiSteps;
         this.webcamImageProperty = webcamImageProperty;
         this.bmpColorImageView = bmpColorImageView;
         this.bmpBlackImageView = bmpBlackImageView;
+        this.bmpBackImageView = bmpBackImageView;
     }
 
     protected abstract List<UiStep> getUiStepsList();

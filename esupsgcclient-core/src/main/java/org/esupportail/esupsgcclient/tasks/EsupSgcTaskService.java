@@ -22,14 +22,16 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
     protected ImageView webcamImageView;
     protected ImageView bmpColorImageView;
     protected ImageView bmpBlackImageView;
+    protected ImageView bmpBackImageView;
     protected BooleanBinding readyToRunProperty;
 
 
-    public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+    public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
         this.uiSteps = uiSteps;
         this.webcamImageView = webcamImageView;
         this.bmpColorImageView = bmpColorImageView;
         this.bmpBlackImageView = bmpBlackImageView;
+        this.bmpBackImageView = bmpBackImageView;
     }
 
     public abstract AppSession getAppSession();

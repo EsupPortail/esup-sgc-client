@@ -56,8 +56,8 @@ public class ReadNfcTaskService extends EsupSgcTaskService {
 	}
 
 	@Override
-	public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-		super.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
+	public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
+		super.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView);
 		webcamImageView.setVisible(false);
 		bmpColorImageView.setVisible(false);
 		bmpBlackImageView.setVisible(false);

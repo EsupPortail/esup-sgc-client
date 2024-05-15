@@ -40,8 +40,8 @@ public class ZebraEncodeTask extends EsupSgcTask {
     @Resource
     QRCodeReader qRCodeReader;
 
-    public ZebraEncodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView);
+    public ZebraEncodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
+        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView, bmpBackImageView);
     }
 
     @Override

@@ -30,8 +30,8 @@ public class QrCodeTask extends EsupSgcTask {
 	@Resource
 	QRCodeReader qRCodeReader;
 
-	public QrCodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-		super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView);
+	public QrCodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
+		super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView, bmpBackImageView);
 	}
 
 

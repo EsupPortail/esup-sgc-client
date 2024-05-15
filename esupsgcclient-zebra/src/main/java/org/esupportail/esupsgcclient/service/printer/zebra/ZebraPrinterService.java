@@ -424,12 +424,15 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		}
 	}
 
-	public void print(String bmpBlackAsBase64, String bmpColorAsBase64, String bmpOverlayAsBase64) {
+	public void print(String bmpBlackAsBase64, String bmpColorAsBase64, String bmpBackAsBase64, String bmpOverlayAsBase64) {
 		try {
 			List<GraphicsInfo> graphicsData = new ArrayList<GraphicsInfo>();
-			graphicsData.add(drawImage(bmpColorAsBase64, PrintType.Color));
-			graphicsData.add(drawImage(bmpBlackAsBase64, PrintType.MonoK));
-			graphicsData.add(drawImage(bmpOverlayAsBase64, PrintType.Overlay));
+			graphicsData.add(drawImage(bmpColorAsBase64, PrintType.Color, CardSide.Front));
+			graphicsData.add(drawImage(bmpBlackAsBase64, PrintType.MonoK, CardSide.Front));
+			if(StringUtils.isNotEmpty(bmpBackAsBase64)) {
+				graphicsData.add(drawImage(bmpBackAsBase64, PrintType.MonoK, CardSide.Back));
+			}
+			graphicsData.add(drawImage(bmpOverlayAsBase64, PrintType.Overlay, CardSide.Front));
 			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_SOURCE, CardSource.Feeder.name());
 			zebraCardPrinter.setJobSetting(ZebraCardJobSettingNames.CARD_DESTINATION, CardDestination.Hold.name());
 			jobId = zebraCardPrinter.print(1, graphicsData);
@@ -439,13 +442,13 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 		}
 	}
 
-	private GraphicsInfo drawImage(String imageData, PrintType printType) throws IOException, ConnectionException, ZebraCardException {
+	private GraphicsInfo drawImage(String imageData, PrintType printType, CardSide side) throws IOException, ConnectionException, ZebraCardException {
 		ZebraGraphics graphics = new ZebraCardGraphics(zebraCardPrinter);
 		graphics.initialize(0, 0, OrientationType.Landscape, printType, Color.WHITE);
 		graphics.drawImage(Base64.getDecoder().decode(imageData), 0, 0, 0, 0, printerZebraRotation ? RotationType.Rotate180FlipNone :  RotationType.RotateNoneFlipNone);
 		ZebraCardImageI zebraCardImage = graphics.createImage();
 		GraphicsInfo graphicsInfo = new GraphicsInfo();
-		graphicsInfo.side = CardSide.Front;
+		graphicsInfo.side = side;
 		graphicsInfo.fillColor = -1;
 		graphicsInfo.graphicData = zebraCardImage;
 		graphicsInfo.graphicType = GraphicType.BMP;

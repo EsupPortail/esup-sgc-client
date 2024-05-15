@@ -234,6 +234,11 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		return evolisProntSession.setBlack(CardFace.FRONT, bytes, bytes.length);
 	}
 
+	public boolean printBackBmp(String bmpBackAsBase64) {
+		byte[] bytes = Base64.getDecoder().decode(bmpBackAsBase64);
+		return evolisProntSession.setBlack(CardFace.BACK, bytes, bytes.length);
+	}
+
 	public void print() {
 		ReturnCode returnCode = evolisProntSession.print();
 		logTextarea.appendText("Print return code : " + returnCode.name() + "\n");

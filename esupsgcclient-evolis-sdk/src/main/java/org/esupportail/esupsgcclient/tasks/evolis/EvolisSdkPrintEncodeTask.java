@@ -6,6 +6,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisSdkPrinterService;
@@ -30,8 +31,10 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             UiStep.long_poll,
             UiStep.bmp_black,
             UiStep.bmp_color,
+            UiStep.bmp_back,
             UiStep.printer_color,
             UiStep.printer_black,
+            UiStep.printer_back,
             UiStep.printer_print,
             UiStep.printer_nfc,
             UiStep.encode
@@ -46,8 +49,8 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
     @Resource
     EvolisSdkPrinterService evolisPrinterService;
 
-    public EvolisSdkPrintEncodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView);
+    public EvolisSdkPrintEncodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
+        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView, bmpBackImageView);
     }
 
 
@@ -74,6 +77,11 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             String bmpColorAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.color);
             updateBmpUi(bmpColorAsBase64, bmpColorImageView);
             setUiStepSuccess(UiStep.bmp_color);
+            String bmpBackAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.back);
+            if(StringUtils.isNotEmpty(bmpBackAsBase64)) {
+                updateBmpUi(bmpBackAsBase64, bmpBackImageView);
+                setUiStepSuccess(UiStep.bmp_back);
+            }
             evolisPrinterService.releaseIfNeeded();
             String evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
             while(!evolisPrinterStatus.contains("PRINTER_READY")) {
@@ -90,6 +98,12 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
                 throw new RuntimeException("Impossible d'imprimer le bmp noir");
             }
             setUiStepSuccess(UiStep.printer_black);
+            if(StringUtils.isNotEmpty(bmpBackAsBase64)) {
+                if(!evolisPrinterService.printBackBmp(bmpBackAsBase64)) {
+                    throw new RuntimeException("Impossible d'imprimer le bmp verso");
+                }
+                setUiStepSuccess(UiStep.printer_back);
+            }
             evolisPrinterService.print();
             setUiStepSuccess(UiStep.printer_print);
             while(!evolisPrinterService.insertCardToContactLessStation(this)) {

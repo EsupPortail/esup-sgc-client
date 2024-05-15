@@ -56,10 +56,11 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 	}
 
 	@Override
-	public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-		super.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
+	public void setup(Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
+		super.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBlackImageView);
 		webcamImageView.setVisible(true);
 		bmpColorImageView.setVisible(false);
+		bmpBlackImageView.setVisible(false);
 		bmpBlackImageView.setVisible(false);
 	}
 }

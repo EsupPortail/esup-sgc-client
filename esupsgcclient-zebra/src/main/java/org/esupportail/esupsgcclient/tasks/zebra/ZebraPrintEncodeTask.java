@@ -4,6 +4,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService;
@@ -29,6 +30,7 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
             UiStep.long_poll,
             UiStep.bmp_black,
             UiStep.bmp_color,
+            UiStep.bmp_back,
             UiStep.printer_print,
             UiStep.printer_nfc,
             UiStep.encode});
@@ -40,8 +42,8 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
     @Resource
     EncodingService encodingService;
 
-    public ZebraPrintEncodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView);
+    public ZebraPrintEncodeTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
+        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView, bmpBackImageView);
     }
 
     @Override
@@ -67,8 +69,13 @@ public class ZebraPrintEncodeTask extends EsupSgcTask {
             String bmpColorAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.color);
             updateBmpUi(bmpColorAsBase64, bmpColorImageView);
             setUiStepSuccess(UiStep.bmp_color);
+            String bmpBackAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.back);
+            if(StringUtils.isNotEmpty(bmpBackAsBase64)) {
+                updateBmpUi(bmpBackAsBase64, bmpBackImageView);
+                setUiStepSuccess(UiStep.bmp_back);
+            }
             String bmpOverlayAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.overlay);
-            zebraPrinterService.print(bmpBlackAsBase64, bmpColorAsBase64, bmpOverlayAsBase64);
+            zebraPrinterService.print(bmpBlackAsBase64, bmpColorAsBase64, bmpBackAsBase64, bmpOverlayAsBase64);
             setUiStepSuccess(UiStep.printer_print);
             zebraPrinterService.launchEncoding();
             setUiStepSuccess(UiStep.printer_nfc);

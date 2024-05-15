@@ -28,9 +28,10 @@ public class EsupSgcTaskUi {
     ImageView webcamImageView;
     ImageView bmpColorImageView;
     ImageView bmpBlackImageView;
+    ImageView bmpBackImageView;
 
     public EsupSgcTaskUi(EsupSgcTaskService service, FlowPane actionsPane, ProgressBar progressBar, TextArea logTextarea, Label textPrincipal,
-                         Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
+                         Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
         this.service = service;
         this.actionsPane = actionsPane;
         this.progressBar = progressBar;
@@ -40,6 +41,7 @@ public class EsupSgcTaskUi {
         this.webcamImageView = webcamImageView;
         this.bmpColorImageView = bmpColorImageView;
         this.bmpBlackImageView = bmpBlackImageView;
+        this.bmpBackImageView = bmpBackImageView;
 
         service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
@@ -92,7 +94,7 @@ public class EsupSgcTaskUi {
         must be run from App JFX Thread
     */
     public void runTaskService() {
-        service.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView);
+        service.setup(uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView);
         service.restart();
         Utils.jfxRunLaterIfNeeded(() -> {
             progressBar.setStyle("");

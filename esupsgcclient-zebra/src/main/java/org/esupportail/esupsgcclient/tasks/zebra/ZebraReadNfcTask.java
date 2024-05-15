@@ -35,8 +35,8 @@ public class ZebraReadNfcTask extends EsupSgcTask {
     @Resource
     EncodingService encodingService;
 
-    public ZebraReadNfcTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView) {
-        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView);
+    public ZebraReadNfcTask(Map<UiStep, TextFlow> uiSteps, ObjectProperty<Image> webcamImageProperty, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
+        super(uiSteps, webcamImageProperty, bmpColorImageView, bmpBlackImageView, bmpBackImageView);
     }
 
     @Override

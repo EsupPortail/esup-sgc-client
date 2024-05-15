@@ -45,6 +45,8 @@ public class EsupSgcTaskServiceFactory {
 
     ImageView bmpBlackImageView;
 
+    ImageView bmpBackImageView;
+
     TextArea logTextarea;
 
     ProgressBar progressBar;
@@ -77,13 +79,14 @@ public class EsupSgcTaskServiceFactory {
 
     Map<String, ChangeListener<? super Boolean>> startStopListeners = new HashMap<>();
 
-    public void init(ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView,
+    public void init(ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView,
                      TextArea logTextarea, ProgressBar progressBar, Label textPrincipal,
                      FlowPane actionsPane, CheckMenuItem autostart) {
         this.actionsPane = actionsPane;
         this.webcamImageView = webcamImageView;
         this.bmpColorImageView = bmpColorImageView;
         this.bmpBlackImageView = bmpBlackImageView;
+        this.bmpBackImageView = bmpBackImageView;
         this.logTextarea = logTextarea;
         this.progressBar = progressBar;
         this.textPrincipal = textPrincipal;
@@ -107,7 +110,7 @@ public class EsupSgcTaskServiceFactory {
             // 1 thread for all EsupSgcTasks to be sure to avoid multiple runs in parallels
             esupSgcTaskService.setExecutor(sgcTaskExecutor);
             // create esupSgcTaskUis
-            esupSgcTaskUis.put(esupSgcTaskService.getLabel(), new EsupSgcTaskUi(esupSgcTaskService, actionsPane, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView));
+            esupSgcTaskUis.put(esupSgcTaskService.getLabel(), new EsupSgcTaskUi(esupSgcTaskService, actionsPane, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView));
             // add startStopListeners setup by @EsupSfcClientJfxController
             startStopListeners.put(esupSgcTaskService.getLabel(), (ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
                 if(newValue) {
