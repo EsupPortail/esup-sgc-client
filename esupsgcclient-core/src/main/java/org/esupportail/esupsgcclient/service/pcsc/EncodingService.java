@@ -137,10 +137,20 @@ public class EncodingService {
 	}
 
 	public String getBmpAsBase64(String qrcode, BmpType bmpType) {
-		String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=%s", appConfig.getEsupSgcUrl(), appSession.getSgcAuthToken(), qrcode, bmpType);
-		log.debug("Get " + bpmEsupSgcUrl);
-		String bmpAsBase64 = restTemplate.getForObject(bpmEsupSgcUrl, String.class);
-		return bmpAsBase64;
+		try {
+			String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=%s", appConfig.getEsupSgcUrl(), appSession.getSgcAuthToken(), qrcode, bmpType);
+			log.debug("Get " + bpmEsupSgcUrl);
+			String bmpAsBase64 = restTemplate.getForObject(bpmEsupSgcUrl, String.class);
+			return bmpAsBase64;
+		} catch(Throwable t) {
+			if(BmpType.back.equals(bmpType)) {
+				// compatibilité avec ancienne version d'ESUP-SGC qui ne retourne pas de bmp verso
+				log.error("Exception with back bmp for " + qrcode + " - verso will not be printed", t);
+				return "";
+			} else {
+				throw t;
+			}
+		}
 	}
 
 	public boolean cnousEncoding(String cardId) throws CnousFournisseurCarteException {
