@@ -35,7 +35,7 @@ public class ZebraReadNfcTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return ctx.getBean(ZebraReadNfcTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView);
+		return ctx.getBean(ZebraReadNfcTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView, bmpBackImageView);
 	}
 
 	@Override

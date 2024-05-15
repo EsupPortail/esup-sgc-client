@@ -45,7 +45,7 @@ public class EvolisSdkPrintEncodeTaskService extends EsupSgcTaskService {
 	protected Task<String> createTask() {
 		esupSgcHeartbeatService.setEsupSgcPrinterService(evolisPrinterService);
 		esupSgcHeartbeatService.restart();
-		return ctx.getBean(EvolisSdkPrintEncodeTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView);
+		return ctx.getBean(EvolisSdkPrintEncodeTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView, bmpBackImageView);
 	}
 
 	@Override

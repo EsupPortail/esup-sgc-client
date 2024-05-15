@@ -45,7 +45,7 @@ public class ZebraPrintEncodeTaskService extends EsupSgcTaskService {
 	protected Task<String> createTask() {
 		esupSgcHeartbeatService.setEsupSgcPrinterService(zebraPrinterService);
 		esupSgcHeartbeatService.restart();
-		return ctx.getBean(ZebraPrintEncodeTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView);
+		return ctx.getBean(ZebraPrintEncodeTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView, bmpBackImageView);
 	}
 
 	@Override

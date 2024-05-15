@@ -37,7 +37,7 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return ctx.getBean(QrCodeTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView);
+		return ctx.getBean(QrCodeTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView, bmpBackImageView);
 	}
 
 	@Override
@@ -61,6 +61,6 @@ public class QrCodeTaskService extends EsupSgcTaskService {
 		webcamImageView.setVisible(true);
 		bmpColorImageView.setVisible(false);
 		bmpBlackImageView.setVisible(false);
-		bmpBlackImageView.setVisible(false);
+		bmpBackImageView.setVisible(false);
 	}
 }

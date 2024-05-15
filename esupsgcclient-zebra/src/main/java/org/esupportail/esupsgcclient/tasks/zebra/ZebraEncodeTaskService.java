@@ -36,7 +36,7 @@ public class ZebraEncodeTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return ctx.getBean(ZebraEncodeTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView);
+		return ctx.getBean(ZebraEncodeTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView, bmpBackImageView);
 	}
 
 	@Override

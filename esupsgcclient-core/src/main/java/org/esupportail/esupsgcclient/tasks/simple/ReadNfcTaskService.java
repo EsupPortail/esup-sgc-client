@@ -37,7 +37,7 @@ public class ReadNfcTaskService extends EsupSgcTaskService {
 
 	@Override
 	protected Task<String> createTask() {
-		return ctx.getBean(ReadNfcTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView);
+		return ctx.getBean(ReadNfcTask.class, uiSteps, webcamImageView.imageProperty(),  bmpColorImageView, bmpBlackImageView, bmpBackImageView);
 	}
 
 	@Override
@@ -61,6 +61,7 @@ public class ReadNfcTaskService extends EsupSgcTaskService {
 		webcamImageView.setVisible(false);
 		bmpColorImageView.setVisible(false);
 		bmpBlackImageView.setVisible(false);
+		bmpBackImageView.setVisible(false);
 	}
 
 }

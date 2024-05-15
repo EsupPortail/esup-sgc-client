@@ -142,6 +142,7 @@ public abstract class EsupSgcTask extends Task<String> {
         Utils.jfxRunLaterIfNeeded(() -> {
             bmpColorImageView.setImage(null);
             bmpBlackImageView.setImage(null);
+            bmpBackImageView.setImage(null);
         });
     }
 
