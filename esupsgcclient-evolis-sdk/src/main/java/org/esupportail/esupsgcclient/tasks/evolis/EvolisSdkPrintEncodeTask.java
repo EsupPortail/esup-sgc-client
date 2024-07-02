@@ -84,7 +84,7 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             }
             evolisPrinterService.releaseIfNeeded();
             String evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
-            while(!(evolisPrinterStatus.contains("PRINTER_READY") || evolisPrinterStatus.contains("WARNING : DEF_RIBBON_ENDED"))) {
+            while(!evolisPrinterStatus.contains("PRINTER_READY")) {
                 updateTitle(String.format("Status de l'imprimante evolis non prête (%s) - en attente ...", evolisPrinterStatus));
                 Utils.sleep(5000);
                 evolisPrinterStatus = evolisPrinterService.getPrinterStatus();

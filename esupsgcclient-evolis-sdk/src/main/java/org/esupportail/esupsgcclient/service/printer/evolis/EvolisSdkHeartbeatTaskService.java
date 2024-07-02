@@ -30,7 +30,7 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                 while(true) {
                     try {
                         String printerStatus = evolisPrinterService.getPrinterStatus();
-                        if(printerStatus.contains("PRINTER_READY") || printerStatus.contains("WARNING : DEF_RIBBON_ENDED")) {
+                        if(printerStatus.contains("PRINTER_READY")) {
                             if(!appSession.isPrinterReady()) {
                                 evolisPrinterService.init();
                                 appSession.setPrinterReady(true);
