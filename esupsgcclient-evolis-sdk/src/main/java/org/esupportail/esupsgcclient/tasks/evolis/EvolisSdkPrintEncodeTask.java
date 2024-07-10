@@ -133,7 +133,7 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
                 updateTitle("Simulation édition (encodage) ... sleep de 2 sec.");
                 Utils.sleep(2000);
             }
-
+            setUiStepSuccess(UiStep.encode);
             evolisPrinterService.eject();
             String msgTimer = String.format("Carte éditée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
             updateTitle(msgTimer);
