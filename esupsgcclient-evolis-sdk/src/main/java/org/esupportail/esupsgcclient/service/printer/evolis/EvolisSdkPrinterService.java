@@ -236,7 +236,15 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	public synchronized String getPrinterStatus() {
 		State state = getEvolisConnection().getState();
-		return String.format("%s : %s", state.getMajorState(), state.getMinorState());
+		String printerStatus = String.format("%s : %s", state.getMajorState(), state.getMinorState());
+		if(printerStatus.contains("WARNING : DEF_RIBBON_ENDED")) {
+			// Hack - WARNING : DEF_RIBBON_ENDED can be occurred on Evolis Primacy2
+			// even if the ribbon is not ended -> we clear the status to avoid blocking the printer
+			clearPrintStatus();
+			state = getEvolisConnection().getState();
+			printerStatus = String.format("%s : %s", state.getMajorState(), state.getMinorState());
+		}
+		return printerStatus;
 	}
 
 	protected PrintSession getPrintSession() {
