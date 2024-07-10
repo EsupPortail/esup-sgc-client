@@ -10,7 +10,9 @@ import com.evolis.sdk.InputTray;
 import com.evolis.sdk.OutputTray;
 import com.evolis.sdk.PrintSession;
 import com.evolis.sdk.ReturnCode;
+import com.evolis.sdk.Service;
 import com.evolis.sdk.State;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -63,15 +65,17 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	TextArea logTextarea;
 
+	CheckMenuItem simulateMenuItem;
+
 	@Override
-	public String getMaintenanceInfo() {
+	public synchronized String getMaintenanceInfo() {
 		CleaningInfo cleaningInfo = getEvolisConnection().getCleaningInfo();
 		String cleaningInfoString = String.format("Total Card Count : %s, CardCountBeforeWarrantyLost : %s, isPrintHeadUnderWarranty : %s, CardCountBeforeWarning : %s",
 				cleaningInfo.getTotalCardCount(), cleaningInfo.getCardCountBeforeWarrantyLost(), cleaningInfo.isPrintHeadUnderWarranty(), cleaningInfo.getCardCountBeforeWarning());
 		return cleaningInfoString;
 	}
 
-	private Connection getEvolisConnection() {
+	protected Connection getEvolisConnection() {
 		if(evolisConnection == null || !evolisConnection.isOpen()) {
 			init();
 		}
@@ -79,7 +83,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	}
 
 	@Override
-	public void setupJfxUi(Stage stage, Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
+	public synchronized void setupJfxUi(Stage stage, Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
 
 		this.logTextarea = logTextarea;
 		init();
@@ -102,9 +106,15 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		pcscDesfireTest.setText("Stress test PC/SC DES Blank Desfire");
 		MenuItem stopEvolis = new MenuItem();
 		stopEvolis.setText("Éteindre l'imprimante");
+		MenuItem stopEpcSupervision = new MenuItem();
+		stopEpcSupervision.setText("Arrêter la supervision EPC de l'imprimante");
+		MenuItem restartEpcSupervision = new MenuItem();
+		restartEpcSupervision.setText("Redémarrer la supervision EPC de l'imprimante");
+		simulateMenuItem = new CheckMenuItem();
+		simulateMenuItem.setText("Simuler l'impression");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
-		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject, evolisCommand, testPcsc, pcscDesfireTest, stopEvolis);
+		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject, evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, stopEpcSupervision, restartEpcSupervision, simulateMenuItem);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -156,6 +166,22 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			}).start();
 		});
 
+		stopEpcSupervision.setOnAction(actionEvent -> {
+			new Thread(() -> {
+				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Arrêt de la supervision ... \n"));
+				stopEpcSupervision();
+				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("supervision arrêtée : \n"));
+			}).start();
+		});
+
+		restartEpcSupervision.setOnAction(actionEvent -> {
+			new Thread(() -> {
+				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Redémarrage de la supervision ... \n"));
+				stopEpcSupervision();
+				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("supervision démarrée : \n"));
+			}).start();
+		});
+
 		TilePane r = new TilePane();
 		TextInputDialog td = new TextInputDialog("Echo;ESUP-SGC d'ESUP-Portail");
 		td.setHeaderText("Lancer une commande à l'imprimante evolis");
@@ -171,6 +197,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			});
 		});
 
+	}
+
+	public synchronized void insertCardPrinter() {
+		getEvolisConnection().sendCommand("Si;");
 	}
 
 	public synchronized void init() {
@@ -194,57 +224,83 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	}
 
 
-	public String getPrinterStatus() {
+	public synchronized String getPrinterStatus() {
 		State state = getEvolisConnection().getState();
 		return String.format("%s : %s", state.getMajorState(), state.getMinorState());
 	}
 
-	public void startSequence() {
-		evolisProntSession = new PrintSession(evolisConnection);
-		evolisProntSession.setAutoEject(false);
-		getEvolisConnection().setInputTray(InputTray.FEEDER);
-		getEvolisConnection().setOutputTray(OutputTray.STANDARD);
-		getEvolisConnection().setErrorTray(OutputTray.ERROR);
+	protected PrintSession getPrintSession() {
+		if(evolisProntSession == null) {
+			evolisProntSession = new PrintSession(evolisConnection);
+			evolisProntSession.setAutoEject(false);
+			getEvolisConnection().setInputTray(InputTray.FEEDER);
+			getEvolisConnection().setOutputTray(OutputTray.STANDARD);
+			getEvolisConnection().setErrorTray(OutputTray.ERROR);
+			logTextarea.appendText("PrintSession OK\n");
+		}
+		return evolisProntSession;
 	}
 
+	public synchronized void startSequence() {
+		boolean res = getPrintSession().initFromDriverSettings();
+		logTextarea.appendText("PrintSession initialized from driver settings : " + res + "\n");
+	}
 
-	public boolean printFrontColorBmp(String bmpColorAsBase64) {
+	public synchronized boolean printFrontColorBmp(String bmpColorAsBase64) {
 		byte[] bytes = Base64.getDecoder().decode(bmpColorAsBase64);
-		return evolisProntSession.setImage(CardFace.FRONT, bytes, bytes.length);
+		return getPrintSession().setImage(CardFace.FRONT, bytes, bytes.length);
 	}
 
-	public boolean printFrontBlackBmp(String bmpBlackAsBase64) {
+	public synchronized boolean printFrontBlackBmp(String bmpBlackAsBase64) {
 		byte[] bytes = Base64.getDecoder().decode(bmpBlackAsBase64);
-		return evolisProntSession.setBlack(CardFace.FRONT, bytes, bytes.length);
+		return getPrintSession().setBlack(CardFace.FRONT, bytes, bytes.length);
 	}
 
-	public boolean printBackBmp(String bmpBackAsBase64) {
+	public synchronized boolean printBackBmp(String bmpBackAsBase64) {
 		byte[] bytes = Base64.getDecoder().decode(bmpBackAsBase64);
-		return evolisProntSession.setBlack(CardFace.BACK, bytes, bytes.length);
+		return getPrintSession().setBlack(CardFace.BACK, bytes, bytes.length);
 	}
 
-	public void print() {
-		ReturnCode returnCode = evolisProntSession.print();
+	public synchronized void print() {
+		ReturnCode returnCode = getPrintSession().print();
 		logTextarea.appendText("Print return code : " + returnCode.name() + "\n");
 	}
 
-	public boolean insertCardToContactLessStation(EsupSgcTask esupSgcTask) {
+	public synchronized boolean insertCardToContactLessStation(EsupSgcTask esupSgcTask) {
 		if(esupSgcTask.isCancelled()) {
 			throw new RuntimeException("EvolisTask is cancelled");
 		}
 		return getEvolisConnection().setCardPos(CardPos.CONTACTLESS);
 	}
 
-	public void eject() {
+	public synchronized void eject() {
 		getEvolisConnection().ejectCard();
 	}
 
-	public void releaseIfNeeded() {
+	public synchronized void releaseIfNeeded() {
 		getEvolisConnection().release();
 	}
 
-	public void reject() {
+	public synchronized void reject() {
 		getEvolisConnection().rejectCard();
+	}
+
+	public synchronized void stopEpcSupervision() {
+		if(Service.isRunning()) {
+			Service.stop();
+		}
+	}
+
+	public synchronized void restartEpcSupervision() {
+		if(Service.isRunning()) {
+			Service.restart();
+		} else {
+			Service.start();
+		}
+	}
+
+	public boolean isSimulate() {
+		return simulateMenuItem.isSelected();
 	}
 }
 

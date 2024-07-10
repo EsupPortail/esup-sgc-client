@@ -104,7 +104,13 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
                 }
                 setUiStepSuccess(UiStep.printer_back);
             }
-            evolisPrinterService.print();
+            if(!evolisPrinterService.isSimulate()) {
+                evolisPrinterService.print();
+            } else {
+                evolisPrinterService.insertCardPrinter();
+                updateTitle("Simulation édition (impression) ... sleep de 2 sec.");
+                Utils.sleep(2000);
+            }
             setUiStepSuccess(UiStep.printer_print);
             while(!evolisPrinterService.insertCardToContactLessStation(this)) {
                 updateTitle("Impossible d'insérer la carte dans la station NFC - en attente ...");
@@ -121,8 +127,13 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             encodingService.waitForCardPresent(5000);
             String csn = encodingService.readCsn();
             updateTitle4thisTask(csn);
-            encodingService.encode(this, qrcode);
-            setUiStepSuccess(UiStep.encode);
+            if(!evolisPrinterService.isSimulate()) {
+                encodingService.encode(this, qrcode);
+            } else {
+                updateTitle("Simulation édition (encodage) ... sleep de 2 sec.");
+                Utils.sleep(2000);
+            }
+
             evolisPrinterService.eject();
             String msgTimer = String.format("Carte éditée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
             updateTitle(msgTimer);

@@ -155,7 +155,7 @@ public class EsupSgcTaskServiceFactory {
     }
 
     public void cancelService(String oldServiceName) {
-        if(oldServiceName != null) {
+        if(oldServiceName != null && esupSgcTaskUis.get(oldServiceName)!=null) {
             esupSgcTaskUis.get(oldServiceName).cancelTaskService();
         }
         // we destroy all http connections (used by RestTemplate used in all tasks) to help
