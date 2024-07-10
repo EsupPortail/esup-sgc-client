@@ -105,6 +105,8 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		MenuItem pcscDesfireTest = new MenuItem();
 		pcscDesfireTest.setText("Stress test PC/SC DES Blank Desfire");
 		MenuItem stopEvolis = new MenuItem();
+		MenuItem clearPrintStatusMenu = new MenuItem();
+		clearPrintStatusMenu.setText("Clear Printer status");
 		stopEvolis.setText("Éteindre l'imprimante");
 		MenuItem stopEpcSupervision = new MenuItem();
 		stopEpcSupervision.setText("Arrêter la supervision EPC de l'imprimante");
@@ -114,7 +116,9 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		simulateMenuItem.setText("Simuler l'impression");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
-		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject, evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, stopEpcSupervision, restartEpcSupervision, simulateMenuItem);
+		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject,
+				evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, clearPrintStatusMenu,
+				stopEpcSupervision, restartEpcSupervision, simulateMenuItem);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -157,6 +161,12 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			).show();
 		});
 		pcscDesfireTest.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()).or(appSession.printerReadyProperty().not()));
+
+		clearPrintStatusMenu.setOnAction(actionEvent -> {
+			new Thread(() -> {
+				clearPrintStatus();
+			}).start();
+		});
 
 		stopEvolis.setOnAction(actionEvent -> {
 			new Thread(() -> {
@@ -301,6 +311,11 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	public boolean isSimulate() {
 		return simulateMenuItem.isSelected();
+	}
+
+	public synchronized void clearPrintStatus() {
+		Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Clear Printer status ... \n"));
+		getEvolisConnection().sendCommand("Scs;");
 	}
 }
 

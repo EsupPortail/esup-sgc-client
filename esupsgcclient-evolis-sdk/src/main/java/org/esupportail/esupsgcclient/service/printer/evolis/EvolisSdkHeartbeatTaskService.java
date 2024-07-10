@@ -30,6 +30,16 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                 while(true) {
                     try {
                         String printerStatus = evolisPrinterService.getPrinterStatus();
+                        if(printerStatus.contains("WARNING : DEF_RIBBON_ENDED")) {
+                            // Hack - WARNING : DEF_RIBBON_ENDED is can be occured on Evolis Primacy2
+                            // even if the ribbon is not ended -> we clear the status to avoid blocking the printer
+                            evolisPrinterService.clearPrintStatus();
+                            printerStatus = evolisPrinterService.getPrinterStatus();
+                            if(printerStatus.contains("WARNING : DEF_RIBBON_ENDED")) {
+                                log.error("WARNING : DEF_RIBBON_ENDED persists :( ...");
+                                Utils.sleep(5000);
+                            }
+                        }
                         if(printerStatus.contains("PRINTER_READY")) {
                             if(!appSession.isPrinterReady()) {
                                 evolisPrinterService.init();
