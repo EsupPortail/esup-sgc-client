@@ -10,6 +10,7 @@ import com.evolis.sdk.InputTray;
 import com.evolis.sdk.OutputTray;
 import com.evolis.sdk.PrintSession;
 import com.evolis.sdk.ReturnCode;
+import com.evolis.sdk.RibbonInfo;
 import com.evolis.sdk.Service;
 import com.evolis.sdk.State;
 import javafx.scene.control.CheckMenuItem;
@@ -225,6 +226,9 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 					Device device = devices.get(0);
 					logTextarea.appendText("Evolis printer found : " + device.getName() + "\n");
 					evolisConnection = new Connection(device);
+					RibbonInfo ribbonInfo = getEvolisConnection().getRibbonInfo();
+					String progressDesc = String.format ("Ribbon Info - %s : reste %s / %s faces\n", ribbonInfo.getDescription(), ribbonInfo.getRemaining(), ribbonInfo.getCapacity());
+					logTextarea.appendText(progressDesc);
 				}
 			}
 			if (evolisConnection == null) {
