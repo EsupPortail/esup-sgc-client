@@ -226,13 +226,16 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 					Device device = devices.get(0);
 					logTextarea.appendText("Evolis printer found : " + device.getName() + "\n");
 					evolisConnection = new Connection(device);
-					RibbonInfo ribbonInfo = getEvolisConnection().getRibbonInfo();
-					String progressDesc = String.format ("Ribbon Info - %s : reste %s / %s faces\n", ribbonInfo.getDescription(), ribbonInfo.getRemaining(), ribbonInfo.getCapacity());
-					logTextarea.appendText(progressDesc);
 				}
 			}
 			if (evolisConnection == null) {
 				logTextarea.appendText("No evolis printer found\n");
+			} else {
+				RibbonInfo ribbonInfo = getEvolisConnection().getRibbonInfo();
+				if(ribbonInfo != null) {
+					String progressDesc = String.format ("Ribbon Info - %s : reste %s / %s faces\n", ribbonInfo.getDescription(), ribbonInfo.getRemaining(), ribbonInfo.getCapacity());
+					logTextarea.appendText(progressDesc);
+				}
 			}
 		}
 	}
