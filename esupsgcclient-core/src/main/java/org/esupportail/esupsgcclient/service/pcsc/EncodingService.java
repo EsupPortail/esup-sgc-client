@@ -2,6 +2,8 @@ package org.esupportail.esupsgcclient.service.pcsc;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
@@ -141,6 +143,9 @@ public class EncodingService {
 			String bpmEsupSgcUrl = String.format("%s/wsrest/nfc/card-bmp-b64?authToken=%s&qrcode=%s&type=%s", appConfig.getEsupSgcUrl(), appSession.getSgcAuthToken(), qrcode, bmpType);
 			log.debug("Get " + bpmEsupSgcUrl);
 			String bmpAsBase64 = restTemplate.getForObject(bpmEsupSgcUrl, String.class);
+			if(!EncodingService.BmpType.back.equals(bmpType) && StringUtils.isEmpty(bmpAsBase64)) {
+				throw new RuntimeException("Empty bmp " + bmpType.name() + " for " + qrcode);
+			}
 			return bmpAsBase64;
 		} catch(Throwable t) {
 			if(BmpType.back.equals(bmpType)) {
