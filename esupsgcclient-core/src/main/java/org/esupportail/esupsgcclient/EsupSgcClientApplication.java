@@ -38,10 +38,11 @@ public class EsupSgcClientApplication extends Application {
 		VBox root = fxmlLoader.load();
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
-		primaryStage.show();
 
 		EsupSgcClientJfxController esupSgcClientJfxController = fxmlLoader.getController();
 		esupSgcClientJfxController.initializeFromFileLocalStorage(primaryStage);
+
+		primaryStage.show();
 
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override

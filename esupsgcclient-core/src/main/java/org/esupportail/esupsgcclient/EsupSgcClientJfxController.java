@@ -381,6 +381,11 @@ public class EsupSgcClientJfxController implements Initializable {
 		// initialisation (dé)sélection menu autostart fonction du filelocalstorage
 		autostart.setSelected("true".equals(fileLocalStorage.getItem("autostart")));
 
+		// initialisation position fenêtre fonction du filelocalstorage
+		if(!StringUtils.isEmpty(fileLocalStorage.getItem("stageX")) && !StringUtils.isEmpty(fileLocalStorage.getItem("stageY"))) {
+			stage.setX(Double.parseDouble(fileLocalStorage.getItem("stageX")));
+			stage.setY(Double.parseDouble(fileLocalStorage.getItem("stageY")));
+		}
 		// application en plein écran par défaut
 		if(!StringUtils.isEmpty(fileLocalStorage.getItem("sizeWidth")) && !StringUtils.isEmpty(fileLocalStorage.getItem("sizeHeight"))) {
 			stage.setWidth(Double.parseDouble(fileLocalStorage.getItem("sizeWidth")));
@@ -388,6 +393,9 @@ public class EsupSgcClientJfxController implements Initializable {
 		} else {
 			stage.setMaximized(true);
 		}
+		// now add eventlistener stage x, y -> sauvegarde dans le filelocalstorage
+		stage.xProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("stageX", newValue.toString()));
+		stage.yProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("stageY", newValue.toString()));
 		// now add eventlistener stage dimension -> sauvegarde dans le filelocalstorage
 		stage.widthProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("sizeWidth", newValue.toString()));
 		stage.heightProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("sizeHeight", newValue.toString()));

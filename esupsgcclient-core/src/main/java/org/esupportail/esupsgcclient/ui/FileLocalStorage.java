@@ -58,7 +58,6 @@ public class FileLocalStorage {
 	}
 
 	public String getItem(String key) {
-		log.debug("get key : " + key);
 		String value = "";
 		try {
 			FileInputStream fis = new FileInputStream(file);
@@ -67,6 +66,7 @@ public class FileLocalStorage {
 			ois.close();
 			fis.close();
 			value = item.get(key);
+			log.debug("get key : " + key + " value : " + value);
 		} catch (EOFException e) {
 			log.warn("error on read localstorage");
 		} catch (Exception e) {
