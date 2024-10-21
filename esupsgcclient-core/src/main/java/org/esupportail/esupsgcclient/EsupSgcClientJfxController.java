@@ -73,18 +73,6 @@ public class EsupSgcClientJfxController implements Initializable {
 	Pane actionsPane;
 
 	@FXML
-	CheckMenuItem buttonDisplayStatut;
-
-	@FXML
-	CheckMenuItem buttonDisplayEsupNfcTag;
-
-	@FXML
-	CheckMenuItem buttonDisplayLogs;
-
-	@FXML
-	CheckMenuItem buttonDisplayControl;
-
-	@FXML
 	Menu camerasMenu;
 
 	@FXML
@@ -188,25 +176,13 @@ public class EsupSgcClientJfxController implements Initializable {
 		statutPane.managedProperty().bind(statutPane.visibleProperty());
 		controlPane.managedProperty().bind(controlPane.visibleProperty());
 
-		// statutPane.getParent().managedProperty().bind(statutPane.managedProperty().or(controlPane.managedProperty()));
-
-		// affichage panes fonction de la (dé)sélection menus affichage
-		esupNfcClientStackPane.visibleProperty().bind(buttonDisplayEsupNfcTag.selectedProperty());
-		statutPane.visibleProperty().bind(buttonDisplayStatut.selectedProperty());
-		logTextarea.visibleProperty().bind(buttonDisplayLogs.selectedProperty());
-		controlPane.visibleProperty().bind(buttonDisplayControl.selectedProperty());
-
 		// changement de la visibilité -> redimensionnement effectif de l'application
 		esupNfcClientStackPane.visibleProperty().addListener(observable -> stage.sizeToScene());
 		statutPane.visibleProperty().addListener(observable -> stage.sizeToScene());
 		logTextarea.visibleProperty().addListener(observable -> stage.sizeToScene());
 		controlPane.visibleProperty().addListener(observable -> stage.sizeToScene());
 
-		// (dé)sélection menu affichage -> sauvegarde dans le filelocalstorage
-		buttonDisplayEsupNfcTag.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayEsupNfcTag", newValue.toString()));
-		buttonDisplayStatut.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayStatut", newValue.toString()));
-		buttonDisplayLogs.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayLogs", newValue.toString()));
-		buttonDisplayControl.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("displayControl", newValue.toString()));
+		// (dé)sélection menu autostart -> sauvegarde dans le filelocalstorage
 		autostart.selectedProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("autostart", newValue.toString()));
 
 		webcamImageView.managedProperty().bind(webcamImageView.visibleProperty());
@@ -401,18 +377,13 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		stage.setTitle("Esup-SGC-Client " + appVersion.getVersion());
 
-		// initialisation (dé)sélection menu affichage fonction du filelocalstorage
-		buttonDisplayEsupNfcTag.setSelected(!"false".equals(fileLocalStorage.getItem("displayEsupNfcTag")));
-		buttonDisplayStatut.setSelected(!"false".equals(fileLocalStorage.getItem("displayStatut")));
-		buttonDisplayLogs.setSelected(!"false".equals(fileLocalStorage.getItem("displayLogs")));
-		buttonDisplayControl.setSelected(!"false".equals(fileLocalStorage.getItem("displayControl")));
+		// initialisation (dé)sélection menu autostart fonction du filelocalstorage
 		autostart.setSelected("true".equals(fileLocalStorage.getItem("autostart")));
 
 		// hack splitpane  - specify it in fxml doesn't work
 		mainPane.setDividerPositions(0.25);
 		mainPane2.setDividerPositions(0.7);
 		mainPane3.setDividerPositions(0.7);
-
 
 		// initialisation tâche combobox après 2 secondes - temps d'initialisation auth/nfc/imprimante ...
 		log.info("Tâche au démarrage : " + fileLocalStorage.getItem("esupsgcTask"));

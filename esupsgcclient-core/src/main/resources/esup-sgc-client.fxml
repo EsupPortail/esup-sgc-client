@@ -34,14 +34,6 @@
                   <MenuItem fx:id="exit" mnemonicParsing="false" text="Quitter" />
                </items>
             </Menu>
-          <Menu mnemonicParsing="false" text="Affichage">
-            <items>
-              <CheckMenuItem fx:id="buttonDisplayEsupNfcTag" mnemonicParsing="false" text="EsupNfcTag" />
-	      <CheckMenuItem fx:id="buttonDisplayStatut" mnemonicParsing="false" selected="true" text="Statut" />
-	      <CheckMenuItem fx:id="buttonDisplayLogs" mnemonicParsing="false" selected="true" text="Logs" />
-	      <CheckMenuItem fx:id="buttonDisplayControl" mnemonicParsing="false" selected="true" text="Contrôle" />
-            </items>
-          </Menu>
             <Menu fx:id="camerasMenu" mnemonicParsing="false" text="Caméra" />
         </menus>
       </MenuBar>
