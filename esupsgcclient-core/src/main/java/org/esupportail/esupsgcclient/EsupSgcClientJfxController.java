@@ -350,6 +350,7 @@ public class EsupSgcClientJfxController implements Initializable {
 				webcamTaskService.setWebcamWidth(((Pane)webcamImageView.getParent()).getWidth());
 			}
 		});
+
 	}
 
 	// For macOS, this part must be in the main Thread / Static Method
@@ -380,10 +381,27 @@ public class EsupSgcClientJfxController implements Initializable {
 		// initialisation (dé)sélection menu autostart fonction du filelocalstorage
 		autostart.setSelected("true".equals(fileLocalStorage.getItem("autostart")));
 
-		// hack splitpane  - specify it in fxml doesn't work
-		mainPane.setDividerPositions(0.25);
-		mainPane2.setDividerPositions(0.7);
-		mainPane3.setDividerPositions(0.7);
+		//initialisation splitpane fonction du filelocalstorage
+		double mainPaneDivider = 0.25;
+		double mainPane2Divider = 0.7;
+		double mainPane3Divider = 0.7;
+		if(!fileLocalStorage.getItem("mainPaneDivider").isEmpty()) {
+			mainPaneDivider = Double.parseDouble(fileLocalStorage.getItem("mainPaneDivider"));
+		}
+		if(!fileLocalStorage.getItem("mainPane2Divider").isEmpty()) {
+			mainPane2Divider = Double.parseDouble(fileLocalStorage.getItem("mainPane2Divider"));
+		}
+		if(!fileLocalStorage.getItem("mainPane3Divider").isEmpty()) {
+			mainPane3Divider = Double.parseDouble(fileLocalStorage.getItem("mainPane3Divider"));
+		}
+		mainPane.setDividerPositions(mainPaneDivider);
+		mainPane2.setDividerPositions(mainPane2Divider);
+		mainPane3.setDividerPositions(mainPane3Divider);
+
+		// now add eventlistener splitpane dimension -> sauvegarde dans le filelocalstorage
+		mainPane.getDividers().get(0).positionProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("mainPaneDivider", newValue.toString()));
+		mainPane2.getDividers().get(0).positionProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("mainPane2Divider", newValue.toString()));
+		mainPane3.getDividers().get(0).positionProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("mainPane3Divider", newValue.toString()));
 
 		// initialisation tâche combobox après 2 secondes - temps d'initialisation auth/nfc/imprimante ...
 		log.info("Tâche au démarrage : " + fileLocalStorage.getItem("esupsgcTask"));
