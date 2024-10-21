@@ -40,9 +40,6 @@ public class EsupSgcClientApplication extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
-		// application en plein écran
-		primaryStage.setMaximized(true);
-
 		EsupSgcClientJfxController esupSgcClientJfxController = fxmlLoader.getController();
 		esupSgcClientJfxController.initializeFromFileLocalStorage(primaryStage);
 

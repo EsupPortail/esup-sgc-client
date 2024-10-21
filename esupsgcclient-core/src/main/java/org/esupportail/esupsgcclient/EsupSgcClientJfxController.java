@@ -381,17 +381,28 @@ public class EsupSgcClientJfxController implements Initializable {
 		// initialisation (dé)sélection menu autostart fonction du filelocalstorage
 		autostart.setSelected("true".equals(fileLocalStorage.getItem("autostart")));
 
+		// application en plein écran par défaut
+		if(!StringUtils.isEmpty(fileLocalStorage.getItem("sizeWidth")) && !StringUtils.isEmpty(fileLocalStorage.getItem("sizeHeight"))) {
+			stage.setWidth(Double.parseDouble(fileLocalStorage.getItem("sizeWidth")));
+			stage.setHeight(Double.parseDouble(fileLocalStorage.getItem("sizeHeight")));
+		} else {
+			stage.setMaximized(true);
+		}
+		// now add eventlistener stage dimension -> sauvegarde dans le filelocalstorage
+		stage.widthProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("sizeWidth", newValue.toString()));
+		stage.heightProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("sizeHeight", newValue.toString()));
+
 		//initialisation splitpane fonction du filelocalstorage
 		double mainPaneDivider = 0.25;
 		double mainPane2Divider = 0.7;
 		double mainPane3Divider = 0.7;
-		if(!fileLocalStorage.getItem("mainPaneDivider").isEmpty()) {
+		if(!StringUtils.isEmpty(fileLocalStorage.getItem("mainPaneDivider"))) {
 			mainPaneDivider = Double.parseDouble(fileLocalStorage.getItem("mainPaneDivider"));
 		}
-		if(!fileLocalStorage.getItem("mainPane2Divider").isEmpty()) {
+		if(!StringUtils.isEmpty(fileLocalStorage.getItem("mainPane2Divider"))) {
 			mainPane2Divider = Double.parseDouble(fileLocalStorage.getItem("mainPane2Divider"));
 		}
-		if(!fileLocalStorage.getItem("mainPane3Divider").isEmpty()) {
+		if(!StringUtils.isEmpty(fileLocalStorage.getItem("mainPane3Divider"))) {
 			mainPane3Divider = Double.parseDouble(fileLocalStorage.getItem("mainPane3Divider"));
 		}
 		mainPane.setDividerPositions(mainPaneDivider);
