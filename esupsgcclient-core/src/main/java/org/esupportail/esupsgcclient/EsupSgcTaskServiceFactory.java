@@ -1,7 +1,5 @@
 package org.esupportail.esupsgcclient;
 
-import javax.annotation.Resource;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
@@ -10,7 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
@@ -22,6 +20,7 @@ import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class EsupSgcTaskServiceFactory {
 
     final static Logger log = Logger.getLogger(EsupSgcTaskServiceFactory.class);
 
-    FlowPane actionsPane;
+    Pane actionsPane;
 
     ImageView webcamImageView;
 
@@ -81,7 +80,7 @@ public class EsupSgcTaskServiceFactory {
 
     public void init(ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView,
                      TextArea logTextarea, ProgressBar progressBar, Label textPrincipal,
-                     FlowPane actionsPane, CheckMenuItem autostart) {
+                     Pane actionsPane, CheckMenuItem autostart) {
         this.actionsPane = actionsPane;
         this.webcamImageView = webcamImageView;
         this.bmpColorImageView = bmpColorImageView;

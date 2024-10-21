@@ -44,7 +44,6 @@ public class EsupNfcClientStackPane extends StackPane {
 
     @PostConstruct
     public void init() throws HeadlessException {
-            webView.setPrefWidth(500);
             webView.getEngine().setJavaScriptEnabled(true);
             if (fileLocalStorage.getItem("numeroId") != null) {
                 appSession.setNumeroId(fileLocalStorage.getItem("numeroId"));
@@ -73,7 +72,6 @@ public class EsupNfcClientStackPane extends StackPane {
                             try {
                                 FileUtils.copyURLToFile(new URL(newValue), new File("esupnfctagdesktop.jar"));
                                 webView.getEngine().loadContent("<html>Téléchargment terminé dans le dossier de lancement du jar</html>", "text/html");
-                                webView.setPrefWidth(500);
                             } catch (IOException e) {
                                 log.error("jar download error", e);
                             }

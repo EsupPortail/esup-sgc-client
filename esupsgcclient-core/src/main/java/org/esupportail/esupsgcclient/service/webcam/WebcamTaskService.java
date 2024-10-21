@@ -3,6 +3,8 @@ package org.esupportail.esupsgcclient.service.webcam;
 import com.github.sarxos.webcam.Webcam;
 import javax.annotation.Resource;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
@@ -23,6 +25,9 @@ public class WebcamTaskService extends Service<Void> {
 
     final static Logger log = Logger.getLogger(WebcamTaskService.class);
 
+    final static int CAMERA_NATIVE_WIDTH = 640;
+    final static int CAMERA_NATIVE_HEIGHT = 480;
+
     String webcamName;
 
     ImageView webcamImageView;
@@ -42,11 +47,10 @@ public class WebcamTaskService extends Service<Void> {
             protected Void call() throws Exception {
                 final AtomicReference<WritableImage> ref = new AtomicReference<>();
                 Webcam webcam = Webcam.getWebcamByName(webcamName);
-                webcam.setViewSize(new Dimension(640, 480));
+                webcam.setViewSize(new Dimension(CAMERA_NATIVE_WIDTH, CAMERA_NATIVE_HEIGHT));
                 webcam.open();
                 ObjectProperty<Image> imageProperty = webcamImageView.imageProperty();
                 webcamImageView.setRotate(180);
-
                 appSession.setWebcamReady(true);
                 while (true) {
                     try {
@@ -80,4 +84,10 @@ public class WebcamTaskService extends Service<Void> {
         return webcamUiTask;
     }
 
+    public void setWebcamWidth(double width) {
+        webcamImageView.setFitWidth(width);
+        Webcam webcam = Webcam.getWebcamByName(webcamName);
+        int newHeight = (int) (width * CAMERA_NATIVE_HEIGHT / CAMERA_NATIVE_WIDTH);
+        webcam.setViewSize(new Dimension((int) width, newHeight));
+    }
 }

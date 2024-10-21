@@ -11,18 +11,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -77,7 +70,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	MenuBar menuBar;
 
 	@FXML
-	FlowPane actionsPane;
+	Pane actionsPane;
 
 	@FXML
 	CheckMenuItem buttonDisplayStatut;
@@ -119,10 +112,16 @@ public class EsupSgcClientJfxController implements Initializable {
 	public TextArea logTextarea;
 
 	@FXML
-	public Pane nfcTagPane;
+	public SplitPane mainPane;
 
 	@FXML
-	FlowPane statutPane;
+	public SplitPane mainPane2;
+
+	@FXML
+	public SplitPane mainPane3;
+
+	@FXML
+	Pane statutPane;
 
 	@FXML
 	public Pane controlPane;
@@ -181,22 +180,24 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView, logTextarea, progressBar, textPrincipal, actionsPane, autostart);
 
+		mainPane.getItems().add(0, esupNfcClientStackPane);
+
 		// redimensionnement possible en fonction de la visible
-		nfcTagPane.managedProperty().bind(nfcTagPane.visibleProperty());
+		esupNfcClientStackPane.managedProperty().bind(esupNfcClientStackPane.visibleProperty());
 		logTextarea.managedProperty().bind(logTextarea.visibleProperty());
 		statutPane.managedProperty().bind(statutPane.visibleProperty());
 		controlPane.managedProperty().bind(controlPane.visibleProperty());
 
-		statutPane.getParent().managedProperty().bind(statutPane.managedProperty().or(controlPane.managedProperty()));
+		// statutPane.getParent().managedProperty().bind(statutPane.managedProperty().or(controlPane.managedProperty()));
 
 		// affichage panes fonction de la (dé)sélection menus affichage
-		nfcTagPane.visibleProperty().bind(buttonDisplayEsupNfcTag.selectedProperty());
+		esupNfcClientStackPane.visibleProperty().bind(buttonDisplayEsupNfcTag.selectedProperty());
 		statutPane.visibleProperty().bind(buttonDisplayStatut.selectedProperty());
 		logTextarea.visibleProperty().bind(buttonDisplayLogs.selectedProperty());
 		controlPane.visibleProperty().bind(buttonDisplayControl.selectedProperty());
 
 		// changement de la visibilité -> redimensionnement effectif de l'application
-		nfcTagPane.visibleProperty().addListener(observable -> stage.sizeToScene());
+		esupNfcClientStackPane.visibleProperty().addListener(observable -> stage.sizeToScene());
 		statutPane.visibleProperty().addListener(observable -> stage.sizeToScene());
 		logTextarea.visibleProperty().addListener(observable -> stage.sizeToScene());
 		controlPane.visibleProperty().addListener(observable -> stage.sizeToScene());
@@ -212,11 +213,9 @@ public class EsupSgcClientJfxController implements Initializable {
 		bmpBlackImageView.managedProperty().bind(bmpBlackImageView.visibleProperty());
 		bmpColorImageView.managedProperty().bind(bmpColorImageView.visibleProperty());
 
-		webcamImageView.setFitWidth(380.0);
-		bmpBlackImageView.setFitWidth(250.0);
-		bmpColorImageView.setFitWidth(250.0);
-
-		nfcTagPane.getChildren().add(esupNfcClientStackPane);
+		// responsive : largeur des images == largeur du pane parent
+		bmpBlackImageView.fitWidthProperty().bind(((Pane)bmpBlackImageView.getParent()).prefWidthProperty());
+		bmpColorImageView.fitWidthProperty().bind(((Pane)bmpColorImageView.getParent()).prefWidthProperty());
 
 		stopButton.disableProperty().bind(appSession.taskIsRunningProperty().not());
 
@@ -368,6 +367,13 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		initWebcam(logTextarea);
+
+		((Pane)webcamImageView.getParent()).widthProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+				webcamTaskService.setWebcamWidth(((Pane)webcamImageView.getParent()).getWidth());
+			}
+		});
 	}
 
 	// For macOS, this part must be in the main Thread / Static Method
@@ -401,6 +407,12 @@ public class EsupSgcClientJfxController implements Initializable {
 		buttonDisplayLogs.setSelected(!"false".equals(fileLocalStorage.getItem("displayLogs")));
 		buttonDisplayControl.setSelected(!"false".equals(fileLocalStorage.getItem("displayControl")));
 		autostart.setSelected("true".equals(fileLocalStorage.getItem("autostart")));
+
+		// hack splitpane  - specify it in fxml doesn't work
+		mainPane.setDividerPositions(0.25);
+		mainPane2.setDividerPositions(0.7);
+		mainPane3.setDividerPositions(0.7);
+
 
 		// initialisation tâche combobox après 2 secondes - temps d'initialisation auth/nfc/imprimante ...
 		log.info("Tâche au démarrage : " + fileLocalStorage.getItem("esupsgcTask"));

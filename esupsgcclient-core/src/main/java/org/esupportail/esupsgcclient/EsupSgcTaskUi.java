@@ -8,7 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class EsupSgcTaskUi {
     final static Logger log = Logger.getLogger(EsupSgcTaskUi.class);
     EsupSgcTaskService service;
-    FlowPane actionsPane;
+    Pane actionsPane;
     ProgressBar progressBar;
     TextArea logTextarea;
     Label textPrincipal;
@@ -30,7 +30,7 @@ public class EsupSgcTaskUi {
     ImageView bmpBlackImageView;
     ImageView bmpBackImageView;
 
-    public EsupSgcTaskUi(EsupSgcTaskService service, FlowPane actionsPane, ProgressBar progressBar, TextArea logTextarea, Label textPrincipal,
+    public EsupSgcTaskUi(EsupSgcTaskService service, Pane actionsPane, ProgressBar progressBar, TextArea logTextarea, Label textPrincipal,
                          Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
         this.service = service;
         this.actionsPane = actionsPane;

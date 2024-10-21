@@ -40,12 +40,8 @@ public class EsupSgcClientApplication extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
-		// positionnement application au 'centre' du bureau
-		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-		double x = bounds.getMinX() + (bounds.getWidth() - scene.getWidth()) * 0.2;
-		double y = bounds.getMinY() + (bounds.getHeight() - scene.getHeight()) * 0.5;
-		primaryStage.setX(x);
-		primaryStage.setY(y);
+		// application en plein écran
+		primaryStage.setMaximized(true);
 
 		EsupSgcClientJfxController esupSgcClientJfxController = fxmlLoader.getController();
 		esupSgcClientJfxController.initializeFromFileLocalStorage(primaryStage);
