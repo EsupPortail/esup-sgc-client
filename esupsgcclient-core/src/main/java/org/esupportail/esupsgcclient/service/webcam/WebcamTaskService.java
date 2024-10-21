@@ -86,8 +86,5 @@ public class WebcamTaskService extends Service<Void> {
 
     public void setWebcamWidth(double width) {
         webcamImageView.setFitWidth(width);
-        Webcam webcam = Webcam.getWebcamByName(webcamName);
-        int newHeight = (int) (width * CAMERA_NATIVE_HEIGHT / CAMERA_NATIVE_WIDTH);
-        webcam.setViewSize(new Dimension((int) width, newHeight));
     }
 }
