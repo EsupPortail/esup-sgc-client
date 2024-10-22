@@ -15,11 +15,10 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.ScrollPane?>
 <VBox stylesheets="@/org/kordamp/bootstrapfx/bootstrapfx.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.esupportail.esupsgcclient.EsupSgcClientJfxController">
    <children>
@@ -115,17 +114,21 @@
                                     <Insets top="5.0" />
                                  </VBox.margin>
                               </HBox>
-                              <VBox alignment="TOP_CENTER" minWidth="150" minHeight="50">
-                                 <children>
-                                    <ImageView fx:id="webcamImageView" pickOnBounds="true" preserveRatio="true"/>
-                                    <ImageView fx:id="bmpBlackImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
-                                    <ImageView fx:id="bmpColorImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
-                                    <ImageView fx:id="bmpBackImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
-                                 </children>
-                                 <FlowPane.margin>
-                                    <Insets top="5.0" />
-                                 </FlowPane.margin>
-                              </VBox>
+                              <ScrollPane fitToWidth="true">
+                              <content>
+                                 <VBox alignment="TOP_CENTER" minWidth="150" minHeight="50">
+                                    <children>
+                                       <ImageView fx:id="webcamImageView" pickOnBounds="true" preserveRatio="true"/>
+                                       <ImageView fx:id="bmpBlackImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
+                                       <ImageView fx:id="bmpColorImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
+                                       <ImageView fx:id="bmpBackImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
+                                    </children>
+                                    <FlowPane.margin>
+                                       <Insets top="5.0" />
+                                    </FlowPane.margin>
+                                 </VBox>
+                                 </content>
+                              </ScrollPane>
                            </children>
                            <FlowPane.margin>
                               <Insets top="10.0" />
