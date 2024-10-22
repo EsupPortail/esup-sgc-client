@@ -386,19 +386,26 @@ public class EsupSgcClientJfxController implements Initializable {
 			stage.setX(Double.parseDouble(fileLocalStorage.getItem("stageX")));
 			stage.setY(Double.parseDouble(fileLocalStorage.getItem("stageY")));
 		}
-		// application en plein écran par défaut
+		// application en plein écran par défaut - on préserve la taille de la fenêtre si elle n'est pas maximisée
 		if(!StringUtils.isEmpty(fileLocalStorage.getItem("sizeWidth")) && !StringUtils.isEmpty(fileLocalStorage.getItem("sizeHeight"))) {
 			stage.setWidth(Double.parseDouble(fileLocalStorage.getItem("sizeWidth")));
 			stage.setHeight(Double.parseDouble(fileLocalStorage.getItem("sizeHeight")));
-		} else {
-			stage.setMaximized(true);
 		}
+		stage.setMaximized(true);
 		// now add eventlistener stage x, y -> sauvegarde dans le filelocalstorage
 		stage.xProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("stageX", newValue.toString()));
 		stage.yProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("stageY", newValue.toString()));
 		// now add eventlistener stage dimension -> sauvegarde dans le filelocalstorage
-		stage.widthProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("sizeWidth", newValue.toString()));
-		stage.heightProperty().addListener((observableValue, oldValue, newValue) -> fileLocalStorage.setItem("sizeHeight", newValue.toString()));
+		stage.widthProperty().addListener((observableValue, oldValue, newValue) -> {
+			if(!stage.isMaximized()) {
+				fileLocalStorage.setItem("sizeWidth", newValue.toString());
+			}
+		});
+		stage.heightProperty().addListener((observableValue, oldValue, newValue) -> {
+			if(!stage.isMaximized()) {
+				fileLocalStorage.setItem("sizeHeight", newValue.toString());
+			}
+		});
 
 		//initialisation splitpane fonction du filelocalstorage
 		double mainPaneDivider = 0.25;
