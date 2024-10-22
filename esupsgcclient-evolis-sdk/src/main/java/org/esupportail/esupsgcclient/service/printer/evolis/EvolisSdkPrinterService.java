@@ -1,18 +1,6 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
-import com.evolis.sdk.CardFace;
-import com.evolis.sdk.CardPos;
-import com.evolis.sdk.CleaningInfo;
-import com.evolis.sdk.Connection;
-import com.evolis.sdk.Device;
-import com.evolis.sdk.Evolis;
-import com.evolis.sdk.InputTray;
-import com.evolis.sdk.OutputTray;
-import com.evolis.sdk.PrintSession;
-import com.evolis.sdk.ReturnCode;
-import com.evolis.sdk.RibbonInfo;
-import com.evolis.sdk.Service;
-import com.evolis.sdk.State;
+import com.evolis.sdk.*;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -235,6 +223,15 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 				if(ribbonInfo != null) {
 					String progressDesc = String.format ("Ribbon Info - %s : reste %s / %s faces\n", ribbonInfo.getDescription(), ribbonInfo.getRemaining(), ribbonInfo.getCapacity());
 					logTextarea.appendText(progressDesc);
+				}
+				PrinterInfo printerInfo = getEvolisConnection().getInfo();
+				if(printerInfo != null) {
+					String printerInfoString = String.format("%s / %s - sn %s - firmware %s\n",
+							printerInfo.getMarkName(),
+							printerInfo.getModelName(),
+							printerInfo.getSerialNumber(),
+							printerInfo.getFwVersion());
+					logTextarea.appendText(printerInfoString);
 				}
 			}
 		}
