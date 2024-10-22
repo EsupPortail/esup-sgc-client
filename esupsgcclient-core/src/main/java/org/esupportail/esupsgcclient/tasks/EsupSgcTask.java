@@ -130,7 +130,7 @@ public abstract class EsupSgcTask extends Task<String> {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ImageIO.write(input_image, "PNG", out);
             Utils.jfxRunLaterIfNeeded(() -> {
-                bmpImageView.setImage(new Image(new ByteArrayInputStream(out.toByteArray()), 200, 200, true, true));
+                bmpImageView.setImage(new Image(new ByteArrayInputStream(out.toByteArray()), input_image.getWidth(), input_image.getHeight(), true, true));
             });
         } catch (Exception e) {
             log.warn("pb refreshing bmpImageView with bmpAsBase64", e);
