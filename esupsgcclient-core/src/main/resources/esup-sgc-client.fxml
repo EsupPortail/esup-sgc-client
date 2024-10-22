@@ -114,19 +114,19 @@
                                     <Insets top="5.0" />
                                  </VBox.margin>
                               </HBox>
-                              <ScrollPane fitToWidth="true">
-                              <content>
-                                 <VBox alignment="TOP_CENTER" minWidth="150" minHeight="50">
-                                    <children>
-                                       <ImageView fx:id="webcamImageView" pickOnBounds="true" preserveRatio="true"/>
-                                       <ImageView fx:id="bmpBlackImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
-                                       <ImageView fx:id="bmpColorImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
-                                       <ImageView fx:id="bmpBackImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
-                                    </children>
-                                    <VBox.margin>
-                                       <Insets top="5.0" />
-                                    </VBox.margin>
-                                 </VBox>
+                              <ScrollPane fitToWidth="true" vbarPolicy="ALWAYS">
+                                 <content>
+                                    <VBox alignment="TOP_CENTER" minWidth="150" minHeight="50">
+                                       <children>
+                                          <ImageView fx:id="webcamImageView" pickOnBounds="true" preserveRatio="true"/>
+                                          <ImageView fx:id="bmpBlackImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
+                                          <ImageView fx:id="bmpColorImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
+                                          <ImageView fx:id="bmpBackImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </VBox>
                                  </content>
                               </ScrollPane>
                            </children>
