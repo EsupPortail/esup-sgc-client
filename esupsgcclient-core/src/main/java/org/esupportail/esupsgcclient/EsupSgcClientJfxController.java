@@ -189,10 +189,6 @@ public class EsupSgcClientJfxController implements Initializable {
 		bmpBlackImageView.managedProperty().bind(bmpBlackImageView.visibleProperty());
 		bmpColorImageView.managedProperty().bind(bmpColorImageView.visibleProperty());
 
-		// responsive : largeur des images == largeur du pane parent
-		bmpBlackImageView.fitWidthProperty().bind(((Pane)bmpBlackImageView.getParent()).prefWidthProperty());
-		bmpColorImageView.fitWidthProperty().bind(((Pane)bmpColorImageView.getParent()).prefWidthProperty());
-
 		stopButton.disableProperty().bind(appSession.taskIsRunningProperty().not());
 
 		comboBox.disableProperty().bind(appSession.taskIsRunningProperty());
@@ -344,10 +340,15 @@ public class EsupSgcClientJfxController implements Initializable {
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
 		initWebcam(logTextarea);
 
+		// responsive : largeur des images == largeur du pane parent
 		((Pane)webcamImageView.getParent()).widthProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-				webcamTaskService.setWebcamWidth(((Pane)webcamImageView.getParent()).getWidth());
+				double width = ((Pane)webcamImageView.getParent()).getWidth();
+				webcamImageView.setFitWidth(width);
+				bmpBlackImageView.setFitWidth(width);
+				bmpColorImageView.setFitWidth(width);
+				bmpBackImageView.setFitWidth(width);
 			}
 		});
 

@@ -84,7 +84,4 @@ public class WebcamTaskService extends Service<Void> {
         return webcamUiTask;
     }
 
-    public void setWebcamWidth(double width) {
-        webcamImageView.setFitWidth(width);
-    }
 }

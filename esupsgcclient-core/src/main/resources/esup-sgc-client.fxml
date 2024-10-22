@@ -123,9 +123,9 @@
                                        <ImageView fx:id="bmpColorImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
                                        <ImageView fx:id="bmpBackImageView" disable="true" pickOnBounds="true" preserveRatio="true"/>
                                     </children>
-                                    <FlowPane.margin>
+                                    <VBox.margin>
                                        <Insets top="5.0" />
-                                    </FlowPane.margin>
+                                    </VBox.margin>
                                  </VBox>
                                  </content>
                               </ScrollPane>
