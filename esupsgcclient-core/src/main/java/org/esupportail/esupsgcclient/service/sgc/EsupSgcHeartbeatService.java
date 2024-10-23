@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
+import org.esupportail.esupsgcclient.AppVersion;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,9 @@ public class EsupSgcHeartbeatService extends Service<Void> {
 
     @Resource
     EsupSgcRestClientService esupSgcRestClientService;
+
+    @Resource
+    AppVersion appVersion;
 
     EsupSgcPrinterService esupSgcPrinterService;
 
@@ -32,7 +36,7 @@ public class EsupSgcHeartbeatService extends Service<Void> {
                 String encodePrintHeartbeat = "OK";
                 while (!this.isCancelled() && encodePrintHeartbeat!=null) {
                     try {
-                        String maintenanceInfo = esupSgcPrinterService.getMaintenanceInfo();
+                        String maintenanceInfo = String.format("Esup-SGC-Client %s - compilé lé %s\n%s", appVersion.getVersion(), appVersion.getBuildDate(), esupSgcPrinterService.getMaintenanceInfo());
                         log.info("encodePrintHeartbeat - printer maintenanceInfo : " + maintenanceInfo);
                         encodePrintHeartbeat = esupSgcRestClientService.postEncodePrintHeartbeat(maintenanceInfo);
                     } catch (ResourceAccessException e) {
