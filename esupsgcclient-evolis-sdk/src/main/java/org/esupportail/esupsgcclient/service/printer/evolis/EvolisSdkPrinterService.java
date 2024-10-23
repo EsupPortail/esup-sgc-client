@@ -54,8 +54,6 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	TextArea logTextarea;
 
-	CheckMenuItem simulateMenuItem;
-
 	CheckMenuItem encodePrintOrder;
 
 	@Override
@@ -103,15 +101,13 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		stopEpcSupervision.setText("Arrêter la supervision EPC de l'imprimante");
 		MenuItem restartEpcSupervision = new MenuItem();
 		restartEpcSupervision.setText("Redémarrer la supervision EPC de l'imprimante");
-		simulateMenuItem = new CheckMenuItem();
-		simulateMenuItem.setText("Simuler l'impression");
 		encodePrintOrder = new CheckMenuItem();
 		encodePrintOrder.setText("Encoder puis imprimer (expérimental)");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
 		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject,
 				evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, clearPrintStatusMenu,
-				stopEpcSupervision, restartEpcSupervision, simulateMenuItem, encodePrintOrder);
+				stopEpcSupervision, restartEpcSupervision, encodePrintOrder);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -321,10 +317,6 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		} else {
 			Service.start();
 		}
-	}
-
-	public boolean isSimulate() {
-		return simulateMenuItem.isSelected();
 	}
 
 	public boolean isEncodePrintOrder() {
