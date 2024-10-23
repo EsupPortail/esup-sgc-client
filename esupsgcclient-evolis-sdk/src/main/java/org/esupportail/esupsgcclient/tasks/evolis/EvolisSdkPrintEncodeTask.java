@@ -90,50 +90,15 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
                 evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
             }
             evolisPrinterService.startSequence();
-            if(!evolisPrinterService.printFrontColorBmp(bmpColorAsBase64)) {
-                throw new RuntimeException("Impossible d'imprimer le bmp couleur");
-            }
-            setUiStepSuccess(UiStep.printer_color);
-            if(!evolisPrinterService.printFrontBlackBmp(bmpBlackAsBase64)) {
-                throw new RuntimeException("Impossible d'imprimer le bmp noir");
-            }
-            setUiStepSuccess(UiStep.printer_black);
-            if(StringUtils.isNotEmpty(bmpBackAsBase64)) {
-                if(!evolisPrinterService.printBackBmp(bmpBackAsBase64)) {
-                    throw new RuntimeException("Impossible d'imprimer le bmp verso");
-                }
-                setUiStepSuccess(UiStep.printer_back);
-            }
-            if(!evolisPrinterService.isSimulate()) {
-                evolisPrinterService.print();
+            if(evolisPrinterService.isEncodePrintOrder()) {
+                updateTitle("Encodage avant impression ...");
+                encodeStep(qrcode);
+                printStep(bmpColorAsBase64, bmpBlackAsBase64, bmpBackAsBase64);
             } else {
-                evolisPrinterService.insertCardPrinter();
-                updateTitle("Simulation édition (impression) ... sleep de 2 sec.");
-                Utils.sleep(2000);
+                updateTitle("Impression avant encodage ...");
+                printStep(bmpColorAsBase64, bmpBlackAsBase64, bmpBackAsBase64);
+                encodeStep(qrcode);
             }
-            setUiStepSuccess(UiStep.printer_print);
-            while(!evolisPrinterService.insertCardToContactLessStation(this)) {
-                updateTitle("Impossible d'insérer la carte dans la station NFC - en attente ...");
-                Utils.sleep(500);
-            }
-            evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
-            while(!evolisPrinterStatus.contains("ENCODING_RUNNING")) {
-                updateTitle(String.format("en attente d'une carte ...", evolisPrinterStatus));
-                Utils.sleep(500);
-                evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
-            }
-            setUiStepSuccess(UiStep.printer_nfc);
-            encodingService.pcscConnection(this);
-            encodingService.waitForCardPresent(5000);
-            String csn = encodingService.readCsn();
-            updateTitle4thisTask(csn);
-            if(!evolisPrinterService.isSimulate()) {
-                encodingService.encode(this, qrcode);
-            } else {
-                updateTitle("Simulation édition (encodage) ... sleep de 2 sec.");
-                Utils.sleep(2000);
-            }
-            setUiStepSuccess(UiStep.encode);
             evolisPrinterService.eject();
             String msgTimer = String.format("Carte éditée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
             updateTitle(msgTimer);
@@ -146,5 +111,56 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
         }
 		return null;
 	}
+
+    private void encodeStep(String qrcode) throws Exception {
+        String evolisPrinterStatus;
+        while(!evolisPrinterService.insertCardToContactLessStation(this)) {
+            updateTitle("Impossible d'insérer la carte dans la station NFC - en attente ...");
+            Utils.sleep(500);
+        }
+        evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
+        while(!evolisPrinterStatus.contains("ENCODING_RUNNING")) {
+            updateTitle(String.format("en attente d'une carte ...", evolisPrinterStatus));
+            Utils.sleep(500);
+            evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
+        }
+        setUiStepSuccess(UiStep.printer_nfc);
+        encodingService.pcscConnection(this);
+        encodingService.waitForCardPresent(5000);
+        String csn = encodingService.readCsn();
+        updateTitle4thisTask(csn);
+        if(!evolisPrinterService.isSimulate()) {
+            encodingService.encode(this, qrcode);
+        } else {
+            updateTitle("Simulation édition (encodage) ... sleep de 2 sec.");
+            Utils.sleep(2000);
+        }
+        setUiStepSuccess(UiStep.encode);
+    }
+
+    private void printStep(String bmpColorAsBase64, String bmpBlackAsBase64, String bmpBackAsBase64) {
+        if(!evolisPrinterService.printFrontColorBmp(bmpColorAsBase64)) {
+            throw new RuntimeException("Impossible d'imprimer le bmp couleur");
+        }
+        setUiStepSuccess(UiStep.printer_color);
+        if(!evolisPrinterService.printFrontBlackBmp(bmpBlackAsBase64)) {
+            throw new RuntimeException("Impossible d'imprimer le bmp noir");
+        }
+        setUiStepSuccess(UiStep.printer_black);
+        if(StringUtils.isNotEmpty(bmpBackAsBase64)) {
+            if(!evolisPrinterService.printBackBmp(bmpBackAsBase64)) {
+                throw new RuntimeException("Impossible d'imprimer le bmp verso");
+            }
+            setUiStepSuccess(UiStep.printer_back);
+        }
+        if(!evolisPrinterService.isSimulate()) {
+            evolisPrinterService.print();
+        } else {
+            evolisPrinterService.insertCardPrinter();
+            updateTitle("Simulation édition (impression) ... sleep de 2 sec.");
+            Utils.sleep(2000);
+        }
+        setUiStepSuccess(UiStep.printer_print);
+    }
 
 }
