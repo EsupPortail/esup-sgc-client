@@ -15,6 +15,7 @@ import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
+import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,9 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	@Resource
 	AppSession appSession;
+
+	@Resource
+	FileLocalStorage fileLocalStorage;
 
 	Connection evolisConnection;
 
@@ -103,6 +107,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		restartEpcSupervision.setText("Redémarrer la supervision EPC de l'imprimante");
 		encodePrintOrder = new CheckMenuItem();
 		encodePrintOrder.setText("Encoder puis imprimer (expérimental)");
+		encodePrintOrder.setSelected("true".equals(fileLocalStorage.getItem("encodePrintOrder")));
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
 		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject,
@@ -150,6 +155,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			).show();
 		});
 		pcscDesfireTest.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()).or(appSession.printerReadyProperty().not()));
+
+		encodePrintOrder.setOnAction(actionEvent -> {
+			fileLocalStorage.setItem("encodePrintOrder", encodePrintOrder.isSelected() ? "true" : "false");
+		});
 
 		clearPrintStatusMenu.setOnAction(actionEvent -> {
 			new Thread(() -> {
