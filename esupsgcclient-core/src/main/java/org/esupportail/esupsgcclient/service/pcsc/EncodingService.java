@@ -276,7 +276,7 @@ public class EncodingService {
 				}
 			} else {
 				esupSgcTask.updateTitle4thisTask("\n");
-				throw new EncodingException("NFC APDU gived by nfctag is null ?!");
+				throw new EncodingException(String.format("NFC APDU gived by esup-nfc-tag-server is null after command '%s' ?!", result));
 			}
 		}
 
