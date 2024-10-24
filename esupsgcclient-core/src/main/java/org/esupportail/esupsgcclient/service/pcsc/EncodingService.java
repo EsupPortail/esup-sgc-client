@@ -263,14 +263,14 @@ public class EncodingService {
 		while (true) {
 			apduStacks.add("RAPDU : " + result);
 			log.trace("RAPDU : " + result);
-			NfcResultBean nfcResultBean = esupNfcTagRestClientService.getApdu(csn, result);
-			apduStacks.add("SAPDU : " + nfcResultBean.getFullApdu());
-			log.trace("SAPDU : " + nfcResultBean.getFullApdu());
-			k++;
-			// hack to log progress on textaera
-			logTextAreaService.appendTextNoNewLine(k%2==0 ? "." : "_");
-			esupSgcTask.updateProgressStep();
-			if (nfcResultBean.getFullApdu() != null) {
+			try {
+				NfcResultBean nfcResultBean = esupNfcTagRestClientService.getApdu(csn, result);
+				apduStacks.add("SAPDU : " + nfcResultBean.getFullApdu());
+				log.trace("SAPDU : " + nfcResultBean.getFullApdu());
+				k++;
+				// hack to log progress on textarea
+				logTextAreaService.appendTextNoNewLine(k % 2 == 0 ? "." : "_");
+				esupSgcTask.updateProgressStep();
 				if (!"END".equals(nfcResultBean.getFullApdu())) {
 					try {
 						result = pcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
@@ -283,9 +283,11 @@ public class EncodingService {
 					encodeCnousIfNeeded(csn);
 					return nfcResultBean;
 				}
-			} else {
+			} catch(EncodingException e) {
 				logTextAreaService.appendTextNoNewLine("\n");
-				throw new EncodingException(String.format("NFC APDU gived by esup-nfc-tag-server is null ?!\n### APDUs Stack ###\n%s", StringUtils.join(apduStacks, "\n")));
+				String eroorMessage = String.format("%s\n### APDUs Stack ###\n%s", StringUtils.join(apduStacks, "\n"));
+				logTextAreaService.appendText(eroorMessage);
+				throw new EncodingException(eroorMessage, e);
 			}
 		}
 
