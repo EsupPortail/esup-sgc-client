@@ -151,6 +151,9 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Resource
 	AppVersion appVersion;
 
+    @Resource
+    AppConfig appConfig;
+
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -165,6 +168,8 @@ public class EsupSgcClientJfxController implements Initializable {
 		});
 
 		logTextarea.appendText("Esup-SGC-Client " + appVersion.getVersion() + " - compilé le " + appVersion.getBuildDate() + "\n");
+		logTextarea.appendText("ESUP-SGC : " + appConfig.getEsupSgcUrl() + "\n");
+		logTextarea.appendText("Esup-NFC-Tag-Server : " + appConfig.getEsupNfcTagServerUrl() + "\n");
 
 		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView, logTextarea, progressBar, textPrincipal, actionsPane, autostart);
 
