@@ -231,12 +231,12 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			} else {
 				RibbonInfo ribbonInfo = getEvolisConnection().getRibbonInfo();
 				if(ribbonInfo != null) {
-					String progressDesc = String.format ("Ribbon Info - %s : reste %s / %s faces\n", ribbonInfo.getDescription(), ribbonInfo.getRemaining(), ribbonInfo.getCapacity());
+					String progressDesc = String.format ("Ribbon Info - %s : reste %s / %s faces", ribbonInfo.getDescription(), ribbonInfo.getRemaining(), ribbonInfo.getCapacity());
 					logTextAreaService.appendText(progressDesc);
 				}
 				PrinterInfo printerInfo = getEvolisConnection().getInfo();
 				if(printerInfo != null) {
-					String printerInfoString = String.format("%s / %s - sn %s - firmware %s\n",
+					String printerInfoString = String.format("%s / %s - sn %s - firmware %s",
 							printerInfo.getMarkName(),
 							printerInfo.getModelName(),
 							printerInfo.getSerialNumber(),
