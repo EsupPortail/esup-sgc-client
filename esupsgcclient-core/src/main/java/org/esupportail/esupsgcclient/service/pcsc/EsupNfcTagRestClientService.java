@@ -2,6 +2,8 @@ package org.esupportail.esupsgcclient.service.pcsc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
@@ -30,9 +32,13 @@ public class EsupNfcTagRestClientService {
     public  NfcResultBean getApdu(String csn, String result) throws Exception {
 			String url = String.format("%s/desfire-ws/?result=%s&numeroId=%s&cardId=%s", appConfig.getEsupNfcTagServerUrl(), result, appSession.getNumeroId(), csn);
 			try {
-				return restTemplate.getForObject(url, NfcResultBean.class);
+				NfcResultBean nfcResultBean = restTemplate.getForObject(url, NfcResultBean.class);
+				if(nfcResultBean.getFullApdu() == null) {
+					throw new EncodingException(String.format("NFC APDU gived by esup-nfc-tag-server is null ?!\n### URL ###\n%s", url));
+				}
+				return nfcResultBean;
 			} catch(HttpClientErrorException clientEx) {
-				throw new EncodingException("Exception during calling esupnfcTagServer", clientEx);
+				throw new EncodingException("Exception during calling esupnfcTagServer : " + url, clientEx);
 			}
     }
 

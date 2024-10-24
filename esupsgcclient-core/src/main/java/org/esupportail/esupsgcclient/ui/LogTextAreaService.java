@@ -28,4 +28,7 @@ public class LogTextAreaService {
         log.info(text);
     }
 
+    public void appendTextNoNewLine(String s) {
+         Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(s));
+    }
 }

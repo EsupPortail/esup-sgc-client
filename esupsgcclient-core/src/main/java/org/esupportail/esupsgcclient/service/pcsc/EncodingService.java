@@ -11,6 +11,7 @@ import org.esupportail.esupsgcclient.service.SgcCheckException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteException;
 import org.esupportail.esupsgcclient.service.cnous.CnousFournisseurCarteRunExe;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
+import org.esupportail.esupsgcclient.ui.LogTextAreaService;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
@@ -28,7 +29,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.smartcardio.CardException;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -55,6 +58,9 @@ public class EncodingService {
 
 	@Resource
 	PcscUsbService pcscUsbService;
+
+	@Resource
+	LogTextAreaService logTextAreaService;
 
 	@PostConstruct
 	void init() throws CnousFournisseurCarteException {
@@ -253,30 +259,33 @@ public class EncodingService {
 		esupSgcTask.updateTitle4thisTask("NFC : Start");
 		int k = 0;
 		String result = "";
+		List<String> apduStacks = new ArrayList<>();
 		while (true) {
+			apduStacks.add("RAPDU : " + result);
 			log.trace("RAPDU : " + result);
 			NfcResultBean nfcResultBean = esupNfcTagRestClientService.getApdu(csn, result);
+			apduStacks.add("SAPDU : " + nfcResultBean.getFullApdu());
 			log.trace("SAPDU : " + nfcResultBean.getFullApdu());
 			k++;
 			// hack to log progress on textaera
-			esupSgcTask.updateTitle4thisTask(k%2==0 ? "." : "_");
+			logTextAreaService.appendTextNoNewLine(k%2==0 ? "." : "_");
 			esupSgcTask.updateProgressStep();
 			if (nfcResultBean.getFullApdu() != null) {
 				if (!"END".equals(nfcResultBean.getFullApdu())) {
 					try {
 						result = pcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
 					} catch (CardException e) {
-						esupSgcTask.updateTitle4thisTask("\n");
-						throw new PcscException("pcsc send apdu error", e);
+						logTextAreaService.appendTextNoNewLine("\n");
+						throw new PcscException(String.format("pcsc send apdu error, \nAPDUs Stack:\n%s", StringUtils.join(apduStacks, "\n")), e);
 					}
 				} else {
-					esupSgcTask.updateTitle4thisTask("\n");
+					logTextAreaService.appendTextNoNewLine("\n");
 					encodeCnousIfNeeded(csn);
 					return nfcResultBean;
 				}
 			} else {
-				esupSgcTask.updateTitle4thisTask("\n");
-				throw new EncodingException(String.format("NFC APDU gived by esup-nfc-tag-server is null after command '%s' ?!", result));
+				logTextAreaService.appendTextNoNewLine("\n");
+				throw new EncodingException(String.format("NFC APDU gived by esup-nfc-tag-server is null ?!\n### APDUs Stack ###\n%s", StringUtils.join(apduStacks, "\n")));
 			}
 		}
 
