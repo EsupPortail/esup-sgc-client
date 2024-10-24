@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
@@ -87,39 +88,55 @@ public class EsupNfcClientStackPane extends StackPane {
         getChildren().add(webviewPane);
     }
 
-    public void readLocalStorage() {
+    public synchronized void readLocalStorage() {
         new Thread(() -> {
-            AtomicBoolean windowsVarsNotReady = new AtomicBoolean(true);
-        while (windowsVarsNotReady.get()) {
-            Utils.jfxRunLaterIfNeeded(() -> {
-                JSObject window = (JSObject) webView.getEngine().executeScript("window");
-                if (window.getMember("numeroId") != null && !"".equals(window.getMember("numeroId")) && !"undefined".equals(window.getMember("numeroId"))) {
-                    appSession.setNumeroId(window.getMember("numeroId").toString());
-                    fileLocalStorage.setItem("numeroId", appSession.getNumeroId());
-                } else {
-                    windowsVarsNotReady.set(false);
+            Date startDate = new Date();
+            AtomicBoolean windowsVarsReady = new AtomicBoolean(false);
+            int loop = 0;
+                while (!windowsVarsReady.get()) {
+                    loop++;
+                    int finalLoop = loop;
+                    Utils.jfxRunLaterIfNeeded(() -> {
+                        synchronized (windowsVarsReady) {
+                            if (windowsVarsReady.get()) {
+                                return;
+                            }
+                            windowsVarsReady.set(true);
+                            JSObject window = (JSObject) webView.getEngine().executeScript("window");
+                            if (window.getMember("numeroId") != null && !"".equals(window.getMember("numeroId")) && !"undefined".equals(window.getMember("numeroId"))) {
+                                appSession.setNumeroId(window.getMember("numeroId").toString());
+                                fileLocalStorage.setItem("numeroId", appSession.getNumeroId());
+                            } else {
+                                windowsVarsReady.set(false);
+                            }
+                            if (window.getMember("sgcAuthToken") != null && !"".equals(window.getMember("sgcAuthToken")) && !"undefined".equals(window.getMember("sgcAuthToken"))) {
+                                appSession.setSgcAuthToken(window.getMember("sgcAuthToken").toString());
+                                fileLocalStorage.setItem("sgcAuthToken", appSession.getSgcAuthToken());
+                            } else {
+                                windowsVarsReady.set(false);
+                            }
+                            if (window.getMember("eppnInit") != null && !"".equals(window.getMember("eppnInit")) && !"undefined".equals(window.getMember("eppnInit"))) {
+                                appSession.setEppnInit(window.getMember("eppnInit").toString());
+                                fileLocalStorage.setItem("eppnInit", appSession.getEppnInit());
+                            } else {
+                                windowsVarsReady.set(false);
+                            }
+                            if (window.getMember("authType") != null && !"".equals(window.getMember("authType")) && !"undefined".equals(window.getMember("authType"))) {
+                                appSession.setAuthType(window.getMember("authType").toString());
+                                fileLocalStorage.setItem("authType", appSession.getAuthType());
+                            } else {
+                                windowsVarsReady.set(false);
+                            }
+                            if (!windowsVarsReady.get() && finalLoop == 20) {
+                                logTextAreaService.appendTextOnlyOne("esup-sgc-client n'arrive pas à récupérer les variables d'authentification et de salle de badgeage depuis la page web d'esup-nfc-tag-server...");
+                            }
+                            if (windowsVarsReady.get()) {
+                                logTextAreaService.appendTextOnlyOne("Variables d'authentification et de salle de badgeage depuis la page web d'esup-nfc-tag-server OK");
+                            }
+                        }
+                    });
+                    Utils.sleep(500);
                 }
-                if (window.getMember("sgcAuthToken") != null && !"".equals(window.getMember("sgcAuthToken")) && !"undefined".equals(window.getMember("sgcAuthToken"))) {
-                    appSession.setSgcAuthToken(window.getMember("sgcAuthToken").toString());
-                    fileLocalStorage.setItem("sgcAuthToken", appSession.getSgcAuthToken());
-                } else {
-                    windowsVarsNotReady.set(false);
-                }
-                if (window.getMember("eppnInit") != null && !"".equals(window.getMember("eppnInit")) && !"undefined".equals(window.getMember("eppnInit"))) {
-                    appSession.setEppnInit(window.getMember("eppnInit").toString());
-                    fileLocalStorage.setItem("eppnInit", appSession.getEppnInit());
-                } else {
-                    windowsVarsNotReady.set(false);
-                }
-                if (window.getMember("authType") != null && !"".equals(window.getMember("authType")) && !"undefined".equals(window.getMember("authType"))) {
-                    appSession.setAuthType(window.getMember("authType").toString());
-                    fileLocalStorage.setItem("authType", appSession.getAuthType());
-                } else {
-                    windowsVarsNotReady.set(false);
-                }
-            });
-            Utils.sleep(500);
-        }
         }).start();
     }
 

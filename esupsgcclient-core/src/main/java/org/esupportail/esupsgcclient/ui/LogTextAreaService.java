@@ -18,6 +18,8 @@ public class LogTextAreaService {
 
     DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
 
+    String lastMessage = "";
+
     public void initLogTextArea(TextArea logTextarea) {
         this.logTextarea = logTextarea;
     }
@@ -30,5 +32,12 @@ public class LogTextAreaService {
 
     public void appendTextNoNewLine(String s) {
          Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(s));
+    }
+
+    public void appendTextOnlyOne(String s) {
+        if(!lastMessage.equals(s)) {
+            lastMessage = s;
+            appendText(s);
+        }
     }
 }
