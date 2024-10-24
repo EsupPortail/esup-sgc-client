@@ -1,6 +1,5 @@
 package org.esupportail.esupsgcclient.ui;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import javafx.beans.value.ChangeListener;
@@ -22,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class EsupNfcClientStackPane extends StackPane {
@@ -42,15 +42,18 @@ public class EsupNfcClientStackPane extends StackPane {
     @Resource
     AppConfig appConfig;
 
-    @PostConstruct
+    @Resource
+    LogTextAreaService logTextAreaService;
+
     public void init() throws HeadlessException {
             webView.getEngine().setJavaScriptEnabled(true);
             if (fileLocalStorage.getItem("numeroId") != null) {
                 appSession.setNumeroId(fileLocalStorage.getItem("numeroId"));
             }
             String url = appConfig.getEsupNfcTagServerUrl() + "/nfc-index?numeroId=" + appSession.getNumeroId() + "&jarVersion=" + getJarVersion() + "&imei=esupSgcClient&macAddress=" + Utils.getMacAddress();
-            log.info("webView load : " + url);
+            logTextAreaService.appendText("webView load : " + url);
             webView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+                logTextAreaService.appendText("webView state : " + newValue);
 				if (newValue == State.SUCCEEDED) {
 					JSObject window = (JSObject) webView.getEngine().executeScript("window");
 					window.setMember("Android", javaScriptConsoleBridge);
@@ -85,25 +88,42 @@ public class EsupNfcClientStackPane extends StackPane {
     }
 
     public void readLocalStorage() {
-        Utils.jfxRunLaterIfNeeded(() -> {
-            JSObject window = (JSObject) webView.getEngine().executeScript("window");
-            appSession.setNumeroId(window.getMember("numeroId").toString());
-            appSession.setSgcAuthToken(window.getMember("sgcAuthToken").toString());
-            appSession.setEppnInit(window.getMember("eppnInit").toString());
-            appSession.setAuthType(window.getMember("authType").toString());
-            if (appSession.getNumeroId() != null && !appSession.getNumeroId().equals("") && !"undefined".equals(appSession.getNumeroId())) {
-                fileLocalStorage.setItem("numeroId", appSession.getNumeroId());
-            }
-            if (appSession.getSgcAuthToken() != null && !appSession.getSgcAuthToken().equals("") && !"undefined".equals(appSession.getSgcAuthToken())) {
-                fileLocalStorage.setItem("sgcAuthToken", appSession.getSgcAuthToken());
-            }
-            if (appSession.getEppnInit() != null && !appSession.getEppnInit().equals("") && !"undefined".equals(appSession.getEppnInit())) {
-                fileLocalStorage.setItem("eppnInit", appSession.getEppnInit());
-            }
-            if (appSession.getAuthType() != null && !appSession.getAuthType().equals("") && !"undefined".equals(appSession.getAuthType())) {
-                fileLocalStorage.setItem("authType", appSession.getAuthType());
-            }
-        });
+        new Thread(() -> {
+            AtomicBoolean windowsVarsNotReady = new AtomicBoolean(true);
+        while (windowsVarsNotReady.get()) {
+            Utils.jfxRunLaterIfNeeded(() -> {
+                JSObject window = (JSObject) webView.getEngine().executeScript("window");
+                if (window.getMember("numeroId") != null && !"".equals(window.getMember("numeroId")) && !"undefined".equals(window.getMember("numeroId"))) {
+                    appSession.setNumeroId(window.getMember("numeroId").toString());
+                    fileLocalStorage.setItem("numeroId", appSession.getNumeroId());
+                } else {
+                    windowsVarsNotReady.set(false);
+                }
+                if (window.getMember("sgcAuthToken") != null && !"".equals(window.getMember("sgcAuthToken")) && !"undefined".equals(window.getMember("sgcAuthToken"))) {
+                    appSession.setSgcAuthToken(window.getMember("sgcAuthToken").toString());
+                    fileLocalStorage.setItem("sgcAuthToken", appSession.getSgcAuthToken());
+                } else {
+                    windowsVarsNotReady.set(false);
+                }
+                if (window.getMember("eppnInit") != null && !"".equals(window.getMember("eppnInit")) && !"undefined".equals(window.getMember("eppnInit"))) {
+                    appSession.setEppnInit(window.getMember("eppnInit").toString());
+                    fileLocalStorage.setItem("eppnInit", appSession.getEppnInit());
+                } else {
+                    windowsVarsNotReady.set(false);
+                }
+                if (window.getMember("authType") != null && !"".equals(window.getMember("authType")) && !"undefined".equals(window.getMember("authType"))) {
+                    appSession.setAuthType(window.getMember("authType").toString());
+                    fileLocalStorage.setItem("authType", appSession.getAuthType());
+                } else {
+                    windowsVarsNotReady.set(false);
+                }
+            });
+            Utils.sleep(500);
+        }
+        }).start();
+    }
+
+    private void readLocalStorageLoop() {
     }
 
     private String getJarVersion() {

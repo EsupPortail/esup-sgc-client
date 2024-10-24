@@ -166,6 +166,7 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView, progressBar, textPrincipal, actionsPane, autostart);
 
+		esupNfcClientStackPane.init();
 		mainPane.getItems().add(0, esupNfcClientStackPane);
 
 		// redimensionnement possible en fonction de la visible

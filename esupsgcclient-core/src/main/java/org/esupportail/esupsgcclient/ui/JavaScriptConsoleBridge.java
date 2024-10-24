@@ -11,6 +11,9 @@ public class JavaScriptConsoleBridge {
 
     @Resource
     FileLocalStorage fileLocalStorage;
+
+    @Resource
+    LogTextAreaService logTextAreaService;
 	
 	private final static Logger log = Logger.getLogger(JavaScriptConsoleBridge.class);
 
@@ -21,18 +24,18 @@ public class JavaScriptConsoleBridge {
     }
 	
 	public void consoleerror(String text) {
-        log.info("Console Javascript : " + text);
+        logTextAreaService.appendText("Console Javascript : " + text);
     }
 	
     public void info(String text) {
-        log.info("Info Javascript : " + text);
+        logTextAreaService.appendText("Info Javascript : " + text);
     }
 
     public void windowerror(String text) {
-        log.error("Window Javascript : " + text);
+        logTextAreaService.appendText("Window Javascript : " + text);
     }
     
     public void warn(String text) {
-        log.warn("Warn Javascript : " + text);
+        logTextAreaService.appendText("Warn Javascript : " + text);
     }
 }

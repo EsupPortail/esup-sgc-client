@@ -28,6 +28,9 @@ public class FileLocalStorage {
 	@javax.annotation.Resource
 	AppSession appSession;
 
+	@javax.annotation.Resource
+	LogTextAreaService logTextAreaService;
+
 	@PostConstruct
 	void initLocalStorageFile() {
 		String localStorageName = "esupSgcLocalStorage";

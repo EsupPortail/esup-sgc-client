@@ -276,7 +276,7 @@ public class EncodingService {
 						result = pcscUsbService.sendAPDU(nfcResultBean.getFullApdu());
 					} catch (CardException e) {
 						logTextAreaService.appendTextNoNewLine("\n");
-						throw new PcscException(String.format("pcsc send apdu error, \nAPDUs Stack:\n%s", StringUtils.join(apduStacks, "\n")), e);
+						throw new PcscException(String.format("pcsc send apdu error, \n%s\nAPDUs Stack:\n%s", e.getMessage(), StringUtils.join(apduStacks, "\n")), e);
 					}
 				} else {
 					logTextAreaService.appendTextNoNewLine("\n");
