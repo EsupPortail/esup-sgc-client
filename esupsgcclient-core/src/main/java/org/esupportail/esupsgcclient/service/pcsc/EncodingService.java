@@ -285,7 +285,7 @@ public class EncodingService {
 				}
 			} catch(EncodingException e) {
 				logTextAreaService.appendTextNoNewLine("\n");
-				String eroorMessage = String.format("%s\n### APDUs Stack ###\n%s", StringUtils.join(apduStacks, "\n"));
+				String eroorMessage = String.format("%s\n### APDUs Stack ###\n%s", e.getMessage(), StringUtils.join(apduStacks, "\n"));
 				logTextAreaService.appendText(eroorMessage);
 				throw new EncodingException(eroorMessage, e);
 			}
