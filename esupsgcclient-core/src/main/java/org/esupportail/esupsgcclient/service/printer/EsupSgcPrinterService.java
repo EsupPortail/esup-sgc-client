@@ -9,6 +9,6 @@ public abstract class EsupSgcPrinterService {
 
     public abstract String getMaintenanceInfo() throws Exception;
 
-    public abstract void setupJfxUi(Stage stage, Tooltip tooltip, TextArea logTextarea, MenuBar menuBar);
+    public abstract void setupJfxUi(Stage stage, Tooltip tooltip, MenuBar menuBar);
 
 }

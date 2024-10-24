@@ -16,6 +16,7 @@ import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
+import org.esupportail.esupsgcclient.ui.LogTextAreaService;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +53,12 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	@Resource
 	FileLocalStorage fileLocalStorage;
 
+	@Resource
+	LogTextAreaService logTextAreaService;
+
 	Connection evolisConnection;
 
 	PrintSession evolisProntSession;
-
-	TextArea logTextarea;
 
 	CheckMenuItem encodePrintOrder;
 
@@ -76,14 +78,13 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	}
 
 	@Override
-	public synchronized void setupJfxUi(Stage stage, Tooltip tooltip, TextArea logTextarea, MenuBar menuBar) {
+	public synchronized void setupJfxUi(Stage stage, Tooltip tooltip, MenuBar menuBar) {
 
-		this.logTextarea = logTextarea;
 		init();
 
 		tooltip.textProperty().bind(evolisSdkHeartbeatTaskService.titleProperty());
 		evolisSdkHeartbeatTaskService.start();
-		evolisSdkHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(newValue + "\n")));
+		evolisSdkHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> logTextAreaService.appendText(newValue));
 
 		MenuItem evolisRelease = new MenuItem();
 		evolisRelease.setText("Release Evolis");
@@ -117,25 +118,25 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 		evolisRelease.setOnAction(actionEvent -> {
 			new Thread(() -> {
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis release ... \n"));
+				logTextAreaService.appendText("Evolis release ...");
 				getEvolisConnection().release();
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis release OK\n"));
+				logTextAreaService.appendText("Evolis release OK");
 			}).start();
 		});
 
 		evolisReset.setOnAction(actionEvent -> {
 			new Thread(() -> {
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis reset ... \n"));
+				logTextAreaService.appendText("Evolis reset ...");
 				getEvolisConnection().reset();
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis reset OK\n"));
+				logTextAreaService.appendText("Evolis reset OK");
 			}).start();
 		});
 
 		evolisReject.setOnAction(actionEvent -> {
 			new Thread(() -> {
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis reject ... \n"));
+				logTextAreaService.appendText("Evolis reject ...");
 				getEvolisConnection().rejectCard();
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis reject OK \n"));
+				logTextAreaService.appendText("Evolis reject OK");
 			}).start();
 		});
 
@@ -168,25 +169,25 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 		stopEvolis.setOnAction(actionEvent -> {
 			new Thread(() -> {
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis stop ... \n"));
+				logTextAreaService.appendText("Evolis stop ...");
 				getEvolisConnection().sendCommand("Psdc;Force");
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Evolis stopped OK \n"));
+				logTextAreaService.appendText("Evolis stopped OK");
 			}).start();
 		});
 
 		stopEpcSupervision.setOnAction(actionEvent -> {
 			new Thread(() -> {
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Arrêt de la supervision ... \n"));
+				logTextAreaService.appendText("Arrêt de la supervision ...");
 				stopEpcSupervision();
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("supervision arrêtée : \n"));
+				logTextAreaService.appendText("supervision arrêtée :");
 			}).start();
 		});
 
 		restartEpcSupervision.setOnAction(actionEvent -> {
 			new Thread(() -> {
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Redémarrage de la supervision ... \n"));
+				logTextAreaService.appendText("Redémarrage de la supervision ...");
 				stopEpcSupervision();
-				Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("supervision démarrée : \n"));
+				logTextAreaService.appendText("supervision démarrée :");
 			}).start();
 		});
 
@@ -198,9 +199,9 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			Optional<String> result = td.showAndWait();
 			result.ifPresent(command -> {
 				new Thread(() -> {
-					Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Call : " + command + " ... \n"));
+					logTextAreaService.appendText("Call : " + command + " ...");
 					String ret = getEvolisConnection().sendCommand(command);
-					Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Return : " + ret + "\n"));
+					logTextAreaService.appendText("Return : " + ret);
 				}).start();
 			});
 		});
@@ -218,20 +219,20 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			if (devicesArray != null) {
 				List<Device> devices = Arrays.asList(devicesArray);
 				if (devices.isEmpty()) {
-					logTextarea.appendText("No evolis printer found\n");
+					logTextAreaService.appendText("No evolis printer found");
 				} else {
 					Device device = devices.get(0);
-					logTextarea.appendText("Evolis printer found : " + device.getName() + "\n");
+					logTextAreaService.appendText("Evolis printer found : " + device.getName());
 					evolisConnection = new Connection(device);
 				}
 			}
 			if (evolisConnection == null) {
-				logTextarea.appendText("No evolis printer found\n");
+				logTextAreaService.appendText("No evolis printer found");
 			} else {
 				RibbonInfo ribbonInfo = getEvolisConnection().getRibbonInfo();
 				if(ribbonInfo != null) {
 					String progressDesc = String.format ("Ribbon Info - %s : reste %s / %s faces\n", ribbonInfo.getDescription(), ribbonInfo.getRemaining(), ribbonInfo.getCapacity());
-					logTextarea.appendText(progressDesc);
+					logTextAreaService.appendText(progressDesc);
 				}
 				PrinterInfo printerInfo = getEvolisConnection().getInfo();
 				if(printerInfo != null) {
@@ -240,7 +241,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 							printerInfo.getModelName(),
 							printerInfo.getSerialNumber(),
 							printerInfo.getFwVersion());
-					logTextarea.appendText(printerInfoString);
+					logTextAreaService.appendText(printerInfoString);
 				}
 			}
 		}
@@ -266,7 +267,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			getEvolisConnection().setInputTray(InputTray.FEEDER);
 			getEvolisConnection().setOutputTray(OutputTray.STANDARD);
 			getEvolisConnection().setErrorTray(OutputTray.ERROR);
-			logTextarea.appendText("PrintSession OK\n");
+			logTextAreaService.appendText("PrintSession OK");
 		}
 		return evolisProntSession;
 	}
@@ -292,7 +293,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	public synchronized void print() {
 		ReturnCode returnCode = getPrintSession().print();
-		logTextarea.appendText("Print return code : " + returnCode.name() + "\n");
+		logTextAreaService.appendText("Print return code : " + returnCode.name());
 	}
 
 	public synchronized boolean insertCardToContactLessStation(EsupSgcTask esupSgcTask) {
@@ -333,7 +334,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	}
 
 	public synchronized void clearPrintStatus() {
-		Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText("Clear Printer status ... \n"));
+		logTextAreaService.appendText("Clear Printer status ...");
 		getEvolisConnection().sendCommand("Scs;");
 	}
 }

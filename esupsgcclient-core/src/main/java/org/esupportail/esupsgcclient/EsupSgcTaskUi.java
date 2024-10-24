@@ -12,6 +12,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
+import org.esupportail.esupsgcclient.ui.LogTextAreaService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 
@@ -22,7 +23,7 @@ public class EsupSgcTaskUi {
     EsupSgcTaskService service;
     Pane actionsPane;
     ProgressBar progressBar;
-    TextArea logTextarea;
+    LogTextAreaService logTextAreaService;
     Label textPrincipal;
     Map<UiStep, TextFlow> uiSteps;
     ImageView webcamImageView;
@@ -30,12 +31,12 @@ public class EsupSgcTaskUi {
     ImageView bmpBlackImageView;
     ImageView bmpBackImageView;
 
-    public EsupSgcTaskUi(EsupSgcTaskService service, Pane actionsPane, ProgressBar progressBar, TextArea logTextarea, Label textPrincipal,
+    public EsupSgcTaskUi(EsupSgcTaskService service, Pane actionsPane, ProgressBar progressBar, LogTextAreaService logTextAreaService, Label textPrincipal,
                          Map<UiStep, TextFlow> uiSteps, ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView) {
         this.service = service;
         this.actionsPane = actionsPane;
         this.progressBar = progressBar;
-        this.logTextarea = logTextarea;
+        this.logTextAreaService = logTextAreaService;
         this.textPrincipal = textPrincipal;
         this.uiSteps = uiSteps;
         this.webcamImageView = webcamImageView;
@@ -57,7 +58,7 @@ public class EsupSgcTaskUi {
                 Utils.jfxRunLaterIfNeeded(() -> {
                     progressBar.setStyle("-fx-accent:red");
                     if (service.getException() != null && service.getException().getMessage() != null) {
-                        logTextarea.appendText(service.getException().getMessage() + "\n");
+                        logTextAreaService.appendText(service.getException().getMessage());
                     }
                     textPrincipal.textProperty().unbind();
                     textPrincipal.setText("...");
@@ -70,7 +71,7 @@ public class EsupSgcTaskUi {
             public void handle(WorkerStateEvent t) {
                 log.info("Cancel called");
                 Utils.jfxRunLaterIfNeeded(() -> {
-                    logTextarea.appendText("Service stoppé\n");
+                    logTextAreaService.appendText("Service stoppé");
                     progressBar.setStyle("-fx-accent:red");
                     textPrincipal.textProperty().unbind();
                     textPrincipal.setText("...");
@@ -78,14 +79,12 @@ public class EsupSgcTaskUi {
             }
         });
         service.titleProperty().addListener((observable, oldValue, newValue) -> {
-            Utils.jfxRunLaterIfNeeded(() -> {
-                if (newValue.length() > 1) {
-                    logTextarea.appendText(newValue + "\n");
-                } else if (newValue.length() == 1) {
-                    // case of simple '.' or '_' from encoding task
-                    logTextarea.appendText(newValue);
-                }
-            });
+            if (newValue.length() > 1) {
+                logTextAreaService.appendText(newValue);
+            } else if (newValue.length() == 1) {
+                // case of simple '.' or '_' from encoding task
+                logTextAreaService.appendText(newValue);
+            }
         });
     }
 

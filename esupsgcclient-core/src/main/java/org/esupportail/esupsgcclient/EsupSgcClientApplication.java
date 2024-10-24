@@ -50,7 +50,7 @@ public class EsupSgcClientApplication extends Application {
 				esupSgcClientJfxController.exit();
 			}
 		});
-		esupSgcClientJfxController.logTextarea.appendText(String.format("Application intialized in %.2f seconds\n", (System.currentTimeMillis()-start)/1000.0));
+		esupSgcClientJfxController.logTextAreaService.appendText(String.format("Application initialized in %.2f seconds", (System.currentTimeMillis()-start)/1000.0));
 	}
 
 }

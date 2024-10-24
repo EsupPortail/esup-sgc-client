@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcHeartbeatService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskSupervisionService;
+import org.esupportail.esupsgcclient.ui.LogTextAreaService;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -46,8 +47,6 @@ public class EsupSgcTaskServiceFactory {
 
     ImageView bmpBackImageView;
 
-    TextArea logTextarea;
-
     ProgressBar progressBar;
 
     Label textPrincipal;
@@ -72,6 +71,9 @@ public class EsupSgcTaskServiceFactory {
     @Resource
     AppSession appSession;
 
+    @Resource
+    LogTextAreaService logTextAreaService;
+
     Map<UiStep, TextFlow> uiSteps = new HashMap<>();
 
     Map<String, EsupSgcTaskUi> esupSgcTaskUis = new HashMap<>();
@@ -79,14 +81,13 @@ public class EsupSgcTaskServiceFactory {
     Map<String, ChangeListener<? super Boolean>> startStopListeners = new HashMap<>();
 
     public void init(ImageView webcamImageView, ImageView bmpColorImageView, ImageView bmpBlackImageView, ImageView bmpBackImageView,
-                     TextArea logTextarea, ProgressBar progressBar, Label textPrincipal,
+                     ProgressBar progressBar, Label textPrincipal,
                      Pane actionsPane, CheckMenuItem autostart) {
         this.actionsPane = actionsPane;
         this.webcamImageView = webcamImageView;
         this.bmpColorImageView = bmpColorImageView;
         this.bmpBlackImageView = bmpBlackImageView;
         this.bmpBackImageView = bmpBackImageView;
-        this.logTextarea = logTextarea;
         this.progressBar = progressBar;
         this.textPrincipal = textPrincipal;
         this.autostart = autostart;
@@ -109,19 +110,19 @@ public class EsupSgcTaskServiceFactory {
             // 1 thread for all EsupSgcTasks to be sure to avoid multiple runs in parallels
             esupSgcTaskService.setExecutor(sgcTaskExecutor);
             // create esupSgcTaskUis
-            esupSgcTaskUis.put(esupSgcTaskService.getLabel(), new EsupSgcTaskUi(esupSgcTaskService, actionsPane, progressBar, logTextarea, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView));
+            esupSgcTaskUis.put(esupSgcTaskService.getLabel(), new EsupSgcTaskUi(esupSgcTaskService, actionsPane, progressBar, logTextAreaService, textPrincipal, uiSteps, webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView));
             // add startStopListeners setup by @EsupSfcClientJfxController
             startStopListeners.put(esupSgcTaskService.getLabel(), (ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
                 if(newValue) {
                     if(autostart.isSelected()) {
-                        logTextarea.appendText(String.format("Autostart est activé, le service '%s' va démarrer dans 5 secondes.\n", esupSgcTaskService.getLabel()));
+                        logTextAreaService.appendText(String.format("Autostart est activé, le service '%s' va démarrer dans 5 secondes.", esupSgcTaskService.getLabel()));
                         Utils.sleep(5000);
                         runService(esupSgcTaskService.getLabel());
                     } else {
-                        logTextarea.appendText(String.format("Le service '%s' est prêt à démarrer.\n", esupSgcTaskService.getLabel()));
+                        logTextAreaService.appendText(String.format("Le service '%s' est prêt à démarrer.", esupSgcTaskService.getLabel()));
                     }
                 } else {
-                    logTextarea.appendText(String.format("Le service '%s' va s'arrêter.\n", esupSgcTaskService.getLabel()));
+                    logTextAreaService.appendText(String.format("Le service '%s' va s'arrêter.", esupSgcTaskService.getLabel()));
                     cancelService(esupSgcTaskService.getLabel());
                 }
             });

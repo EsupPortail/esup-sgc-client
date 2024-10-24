@@ -23,10 +23,7 @@ import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
-import org.esupportail.esupsgcclient.ui.EsupNfcClientStackPane;
-import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
-import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
-import org.esupportail.esupsgcclient.ui.FileLocalStorage;
+import org.esupportail.esupsgcclient.ui.*;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -146,6 +143,7 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	@Resource
 	EsupSgcDesfireFullTestPcscDialog esupSgcDesfireFullTestPcscDialog;
+
 	Stage stage;
 
 	@Resource
@@ -154,24 +152,19 @@ public class EsupSgcClientJfxController implements Initializable {
     @Resource
     AppConfig appConfig;
 
+	@Resource
+	LogTextAreaService logTextAreaService;
+
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
-		logTextarea.textProperty().addListener((observable, oldValue, newValue) -> {
-			String value = newValue;
-			if (newValue != null && oldValue != null) {
-				value = newValue.replace(oldValue, "");
-				if (value.contains("\n")) {
-					log.info(value.replace("\n", ""));
-				}
-			}
-		});
+		logTextAreaService.initLogTextArea(logTextarea);
 
-		logTextarea.appendText("Esup-SGC-Client " + appVersion.getVersion() + " - compilé le " + appVersion.getBuildDate() + "\n");
-		logTextarea.appendText("ESUP-SGC : " + appConfig.getEsupSgcUrl() + "\n");
-		logTextarea.appendText("Esup-NFC-Tag-Server : " + appConfig.getEsupNfcTagServerUrl() + "\n");
+		logTextAreaService.appendText("Esup-SGC-Client " + appVersion.getVersion() + " - compilé le " + appVersion.getBuildDate());
+		logTextAreaService.appendText("ESUP-SGC : " + appConfig.getEsupSgcUrl());
+		logTextAreaService.appendText("Esup-NFC-Tag-Server : " + appConfig.getEsupNfcTagServerUrl());
 
-		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView, logTextarea, progressBar, textPrincipal, actionsPane, autostart);
+		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView, progressBar, textPrincipal, actionsPane, autostart);
 
 		mainPane.getItems().add(0, esupNfcClientStackPane);
 
@@ -212,14 +205,14 @@ public class EsupSgcClientJfxController implements Initializable {
 					startButton.disableProperty().bind(appSession.taskIsRunningProperty().or(esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).not()));
 					fileLocalStorage.setItem("esupsgcTask", newServiceName);
 					if (!esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get()) {
-						logTextarea.appendText(String.format("Impossible de démarrer le service '%s' :\n", newServiceName));
-						logTextarea.appendText(esupSgcTaskServiceFactory.readyToRunPropertyDisplayProblem(newServiceName));
+						logTextAreaService.appendText(String.format("Impossible de démarrer le service '%s' :", newServiceName));
+						logTextAreaService.appendText(esupSgcTaskServiceFactory.readyToRunPropertyDisplayProblem(newServiceName));
 					} else {
-						logTextarea.appendText(String.format("Le service '%s' est prêt à démarrer.\n", newServiceName));
+						logTextAreaService.appendText(String.format("Le service '%s' est prêt à démarrer.", newServiceName));
 					}
 					esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).addListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
 					if (esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).get() && autostart.isSelected()) {
-						logTextarea.appendText(String.format("Autostart est activé, le service '%s' va démarrer.\n", newServiceName));
+						logTextAreaService.appendText(String.format("Autostart est activé, le service '%s' va démarrer.", newServiceName));
 						esupSgcTaskServiceFactory.runService(newServiceName);
 					}
 				} else {
@@ -251,11 +244,11 @@ public class EsupSgcClientJfxController implements Initializable {
 					if (newValue) {
 						checkNfc.getStyleClass().clear();
 						checkNfc.getStyleClass().add("btn-success");
-						logTextarea.appendText("PC/SC OK\n");
+						logTextAreaService.appendText("PC/SC OK");
 					} else {
 						checkNfc.getStyleClass().clear();
 						checkNfc.getStyleClass().add("btn-danger");
-						logTextarea.appendText("PC/SC KO\n");
+						logTextAreaService.appendText("PC/SC KO");
 					}
 				});
 			}
@@ -269,12 +262,12 @@ public class EsupSgcClientJfxController implements Initializable {
 						checkAuth.getStyleClass().clear();
 						checkAuth.getStyleClass().add("btn-success");
 						checkAuth.getTooltip().setText(appSession.eppnInit);
-						logTextarea.appendText("Authentification OK : " + appSession.eppnInit + "\n");
+						logTextAreaService.appendText("Authentification OK : " + appSession.eppnInit);
 					} else {
 						checkAuth.getStyleClass().clear();
 						checkAuth.getStyleClass().add("btn-danger");
 						checkAuth.getTooltip().setText("...");
-						logTextarea.appendText("Authentification K0 for " + appSession.eppnInit + " - we refresh iframe on esup-nfc-tag\n");
+						logTextAreaService.appendText("Authentification K0 for " + appSession.eppnInit + " - we refresh iframe on esup-nfc-tag");
 						esupNfcClientStackPane.init();
 					}
 				});
@@ -288,11 +281,11 @@ public class EsupSgcClientJfxController implements Initializable {
 					if (newValue) {
 						checkPrinter.getStyleClass().clear();
 						checkPrinter.getStyleClass().add("btn-success");
-						logTextarea.appendText("imprimante OK\n");
+						logTextAreaService.appendText("imprimante OK");
 					} else {
 						checkPrinter.getStyleClass().clear();
 						checkPrinter.getStyleClass().add("btn-danger");
-						logTextarea.appendText("imprimante KO\n");
+						logTextAreaService.appendText("imprimante KO");
 					}
 				});
 			}
@@ -305,11 +298,11 @@ public class EsupSgcClientJfxController implements Initializable {
 					if (newValue) {
 						checkCamera.getStyleClass().clear();
 						checkCamera.getStyleClass().add("btn-success");
-						logTextarea.appendText("Caméra OK.\n");
+						logTextAreaService.appendText("Caméra OK.");
 					} else {
 						checkCamera.getStyleClass().clear();
 						checkCamera.getStyleClass().add("btn-danger");
-						logTextarea.appendText("Caméra déconnectée ?!\n");
+						logTextAreaService.appendText("Caméra déconnectée ?!");
 					}
 				});
 			}
@@ -327,23 +320,23 @@ public class EsupSgcClientJfxController implements Initializable {
 			public void handle(ActionEvent e) {
 				esupSgcTaskServiceFactory.runService(comboBox.getSelectionModel().getSelectedItem());
 				Utils.jfxRunLaterIfNeeded(() -> {
-					logTextarea.appendText(String.format("Service '%s' démarré.\n", comboBox.getSelectionModel().getSelectedItem()));
+					logTextAreaService.appendText(String.format("Service '%s' démarré.", comboBox.getSelectionModel().getSelectedItem()));
 				});
 			}
 		});
 
 		if (esupSgcPrinterService != null) {
-			esupSgcPrinterService.setupJfxUi(stage, checkPrinter.getTooltip(), logTextarea, menuBar);
+			esupSgcPrinterService.setupJfxUi(stage, checkPrinter.getTooltip(), menuBar);
 		} else {
 			checkPrinter.setDisable(true);
 		}
 
 		checkNfc.getTooltip().textProperty().bind(nfcHeartbeatTaskService.titleProperty());
 		nfcHeartbeatTaskService.start();
-		nfcHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Utils.jfxRunLaterIfNeeded(() -> logTextarea.appendText(newValue + "\n")));
+		nfcHeartbeatTaskService.titleProperty().addListener((observable, oldValue, newValue) -> Utils.jfxRunLaterIfNeeded(() -> logTextAreaService.appendText(newValue)));
 
 		Webcam.addDiscoveryListener(new EsupWebcamDiscoveryListener(this));
-		initWebcam(logTextarea);
+		initWebcam(logTextAreaService);
 
 		// responsive : largeur des images == largeur du pane parent
 		((Pane)webcamImageView.getParent()).widthProperty().addListener(new ChangeListener<Number>() {
@@ -361,7 +354,7 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	// For macOS, this part must be in the main Thread / Static Method
 	// With this webcams are discovered and listener works at startup
-	static void initWebcam(TextArea logTextarea) {
+	static void initWebcam(LogTextAreaService logTextAreaService) {
 		try {
 			Webcam.getWebcams();
 		} catch (Exception e) {
@@ -373,7 +366,7 @@ public class EsupSgcClientJfxController implements Initializable {
 				log.warn("Webcam discovery success with NativeDriver !", e);
 			} catch (Exception ee) {
 				log.error("Webcam discovery failed", e);
-				logTextarea.appendText("Webcam discovery failed\n");
+				logTextAreaService.appendText("Webcam discovery failed");
 			}
 		}
 	}
@@ -504,7 +497,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	}
 
 	public void exit() {
-		logTextarea.appendText("Arrêt demandé\n");
+		logTextAreaService.appendText("Arrêt demandé");
 		esupSgcTaskServiceFactory.cancelService(comboBox.getSelectionModel().getSelectedItem());
 		webcamTaskService.cancel();
 		nfcHeartbeatTaskService.cancel();
