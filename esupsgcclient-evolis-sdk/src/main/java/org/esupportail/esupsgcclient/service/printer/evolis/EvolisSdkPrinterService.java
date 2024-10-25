@@ -65,9 +65,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	@Override
 	public synchronized String getMaintenanceInfo() {
 		CleaningInfo cleaningInfo = getEvolisConnection().getCleaningInfo();
-		String cleaningInfoString = String.format("Total Card Count : %s, CardCountBeforeWarrantyLost : %s, isPrintHeadUnderWarranty : %s, CardCountBeforeWarning : %s",
+		String printerInfoString = String.format("%s\n%s\nTotal Card Count : %s, CardCountBeforeWarrantyLost : %s, isPrintHeadUnderWarranty : %s, CardCountBeforeWarning : %s\n",
+				getInfo(), getRibbonInfoString(),
 				cleaningInfo.getTotalCardCount(), cleaningInfo.getCardCountBeforeWarrantyLost(), cleaningInfo.isPrintHeadUnderWarranty(), cleaningInfo.getCardCountBeforeWarning());
-		return cleaningInfoString;
+		return printerInfoString;
 	}
 
 	protected Connection getEvolisConnection() {
@@ -229,24 +230,43 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			if (evolisConnection == null) {
 				logTextAreaService.appendText("No evolis printer found");
 			} else {
-				RibbonInfo ribbonInfo = getEvolisConnection().getRibbonInfo();
-				if(ribbonInfo != null) {
-					String progressDesc = String.format ("Ribbon Info - %s : reste %s / %s faces", ribbonInfo.getDescription(), ribbonInfo.getRemaining(), ribbonInfo.getCapacity());
-					logTextAreaService.appendText(progressDesc);
+				String progressDescRibbonInfo = getRibbonInfoString();
+				if(!progressDescRibbonInfo.isEmpty()) {
+					logTextAreaService.appendText(progressDescRibbonInfo);
 				}
-				PrinterInfo printerInfo = getEvolisConnection().getInfo();
-				if(printerInfo != null) {
-					String printerInfoString = String.format("%s / %s - sn %s - firmware %s",
-							printerInfo.getMarkName(),
-							printerInfo.getModelName(),
-							printerInfo.getSerialNumber(),
-							printerInfo.getFwVersion());
+				String printerInfoString = getInfo();
+				if(!printerInfoString.isEmpty()) {
 					logTextAreaService.appendText(printerInfoString);
 				}
 			}
 		}
 	}
 
+	public synchronized String getInfo() {
+		String printerInfoString = "";
+		PrinterInfo printerInfo = getEvolisConnection().getInfo();
+		if(printerInfo != null) {
+			printerInfoString = String.format("%s / %s - sn %s - firmware %s",
+					printerInfo.getMarkName(),
+					printerInfo.getModelName(),
+					printerInfo.getSerialNumber(),
+					printerInfo.getFwVersion());
+		}
+		return printerInfoString;
+	}
+
+	public synchronized RibbonInfo getRibbonInfo() {
+		return getEvolisConnection().getRibbonInfo();
+	}
+
+	public String getRibbonInfoString() {
+		String progressDesc = "";
+		RibbonInfo ribbonInfo = getRibbonInfo();
+		if(ribbonInfo != null) {
+			progressDesc = String.format("Ribbon Info - %s : reste %s / %s faces", ribbonInfo.getDescription(), ribbonInfo.getRemaining(), ribbonInfo.getCapacity());
+		}
+		return progressDesc;
+	}
 
 	public synchronized String getPrinterStatus() {
 		State state = getEvolisConnection().getState();
