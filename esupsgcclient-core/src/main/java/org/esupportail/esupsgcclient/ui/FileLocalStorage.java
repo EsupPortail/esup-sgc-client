@@ -79,7 +79,7 @@ public class FileLocalStorage {
 	}
 
 	public void setItem(String key, String value) {
-		log.info("init write : " + key);
+		log.trace("init write : " + key);
 
 		Map<String, String> item = new HashMap<String, String>();
 		try {
@@ -99,7 +99,7 @@ public class FileLocalStorage {
 			oos.flush();
 			oos.close();
 			fos.close();
-			log.info(key + "=" + value + " write to localstorage");
+			log.debug(key + "=" + value + " write to localstorage");
 			if(key.equals("numeroId")) {
 				appSession.setNumeroId(value);
 			} else if(key.equals("sgcAuthToken")) {
