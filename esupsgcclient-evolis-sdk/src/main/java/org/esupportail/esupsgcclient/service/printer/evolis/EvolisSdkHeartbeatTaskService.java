@@ -38,14 +38,13 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                         String printerStatus = evolisPrinterService.getPrinterStatus();
                         RibbonInfo ribbonInfo = evolisPrinterService.getRibbonInfo();
                         if(printerStatus.contains("PRINTER_READY")) {
-                            if(!appSession.isPrinterReady()) {
+                            if(ribbonInfo.getRemaining()<1) {
+                                appSession.setPrinterReady(false);
+                                logTextAreaService.appendText("Plus de ruban, merci de le changer");
+                            } else if(!appSession.isPrinterReady()) {
                                 evolisPrinterService.init();
                                 appSession.setPrinterReady(true);
                             }
-                        }
-                        if(ribbonInfo.getRemaining()<1) {
-                            appSession.setPrinterReady(false);
-                            logTextAreaService.appendText("Plus de ruban, merci de le changer");
                         }
                         if(printerStatus!=null && !printerStatus.equals(lastPrinterStatus)) {
                             lastPrinterStatus = printerStatus;
