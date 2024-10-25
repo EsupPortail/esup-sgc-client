@@ -89,6 +89,9 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             while(!evolisPrinterStatus.contains("PRINTER_READY")) {
                 updateTitle(String.format("Status de l'imprimante evolis non prête (%s) - en attente ...", evolisPrinterStatus));
                 Utils.sleep(2000);
+                if(isCancelled()) {
+                    throw new RuntimeException("Task is cancelled");
+                }
                 evolisPrinterStatus = evolisPrinterService.getPrinterStatusWthHackFixNoRibbon();
             }
             RibbonInfo ribbonInfo = evolisPrinterService.getRibbonInfo();
