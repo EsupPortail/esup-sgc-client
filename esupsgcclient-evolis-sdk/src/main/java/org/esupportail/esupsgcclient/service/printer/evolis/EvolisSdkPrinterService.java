@@ -270,13 +270,22 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	public synchronized String getPrinterStatus() {
 		State state = getEvolisConnection().getState();
-		String printerStatus = String.format("%s : %s", state.getMajorState(), state.getMinorState());
+        return String.format("%s : %s", state.getMajorState(), state.getMinorState());
+	}
+
+
+	public String getPrinterStatusWthHackFixNoRibbon() {
+		String printerStatus = getPrinterStatus();
 		if(printerStatus.contains("WARNING : DEF_RIBBON_ENDED")) {
 			// Hack - WARNING : DEF_RIBBON_ENDED can be occurred on Evolis Primacy2
 			// even if the ribbon is not ended -> we clear the status to avoid blocking the printer
-			clearPrintStatus();
-			state = getEvolisConnection().getState();
-			printerStatus = String.format("%s : %s", state.getMajorState(), state.getMinorState());
+			RibbonInfo ribbonInfo = getRibbonInfo();
+			if(ribbonInfo.getRemaining()>0) {
+				logTextAreaService.appendText("Hack - clear printer status : " + printerStatus + " - ribbon remaining : " + ribbonInfo.getRemaining() + " but status is WARNING : DEF_RIBBON_ENDED");
+				clearPrintStatus();
+				printerStatus = getPrinterStatus();
+				logTextAreaService.appendText("Hack - new printer status : " + printerStatus);
+			}
 		}
 		return printerStatus;
 	}
@@ -357,5 +366,6 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		logTextAreaService.appendText("Clear Printer status ...");
 		getEvolisConnection().sendCommand("Scs;");
 	}
+
 }
 
