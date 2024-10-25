@@ -107,6 +107,7 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
                 encodeSteps(qrcode);
             }
             evolisPrinterService.eject();
+            cardInserted = false;
             String msgTimer = String.format("Carte éditée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
             updateTitle(msgTimer);
             String ribbonInfoString = evolisPrinterService.getRibbonInfoString();
