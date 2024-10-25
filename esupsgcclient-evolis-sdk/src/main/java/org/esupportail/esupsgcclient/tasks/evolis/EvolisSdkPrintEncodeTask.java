@@ -2,6 +2,7 @@ package org.esupportail.esupsgcclient.tasks.evolis;
 
 import javax.annotation.Resource;
 
+import com.evolis.sdk.RibbonInfo;
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -61,6 +62,7 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
 
     @Override
     protected String call() throws Exception {
+        boolean cardInserted = false;
         try {
             setUiStepRunning();
             setUiStepSuccess(null);
@@ -86,9 +88,14 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             String evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
             while(!evolisPrinterStatus.contains("PRINTER_READY")) {
                 updateTitle(String.format("Status de l'imprimante evolis non prête (%s) - en attente ...", evolisPrinterStatus));
-                Utils.sleep(5000);
+                Utils.sleep(2000);
                 evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
             }
+            RibbonInfo ribbonInfo = evolisPrinterService.getRibbonInfo();
+            if(ribbonInfo.getRemaining()<1) {
+                throw new RuntimeException("Plus de ruban, merci de le changer");
+            }
+            cardInserted = true;
             evolisPrinterService.startSequence();
             if(evolisPrinterService.isEncodePrintOrder()) {
                 updateTitle("Encodage avant impression ...");
@@ -102,11 +109,13 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             evolisPrinterService.eject();
             String msgTimer = String.format("Carte éditée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
             updateTitle(msgTimer);
-            String ribbonInfo = evolisPrinterService.getRibbonInfoString();
-            updateTitle(ribbonInfo);
+            String ribbonInfoString = evolisPrinterService.getRibbonInfoString();
+            updateTitle(ribbonInfoString);
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
-            evolisPrinterService.reject();
+            if(cardInserted) {
+                evolisPrinterService.reject();
+            }
             throw new RuntimeException("Exception on  EvolisTask : " + e.getMessage(), e);
         } finally {
             resetBmpUi();

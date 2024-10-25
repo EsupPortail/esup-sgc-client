@@ -40,7 +40,7 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                         if(printerStatus.contains("PRINTER_READY")) {
                             if(ribbonInfo.getRemaining()<1) {
                                 appSession.setPrinterReady(false);
-                                logTextAreaService.appendText("Plus de ruban, merci de le changer");
+                                printerStatus = "Plus de ruban, merci de le changer";
                             } else if(!appSession.isPrinterReady()) {
                                 evolisPrinterService.init();
                                 appSession.setPrinterReady(true);
