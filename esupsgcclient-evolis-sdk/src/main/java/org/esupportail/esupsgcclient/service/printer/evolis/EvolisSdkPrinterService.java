@@ -29,10 +29,6 @@ import java.util.List;
 import java.util.Optional;
 
 
-/**
- * This Service provides commands for interaction with sgc from evolis printers
- * It computes JSON-RPC commands to send to Evolis Services Provider 2
- */
 @Component
 public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	
