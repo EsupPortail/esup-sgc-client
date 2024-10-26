@@ -288,18 +288,22 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	}
 
 	protected PrintSession getPrintSession() {
-		if(evolisProntSession == null || getPrinterStatus(false).contains("PRINTER_OFFLINE")) {
+		return getPrintSession(false);
+	}
+
+	protected PrintSession getPrintSession(boolean newSession) {
+		if(newSession || evolisProntSession == null || getPrinterStatus(false).contains("PRINTER_OFFLINE")) {
 			evolisProntSession = new PrintSession(evolisConnection);
 			getEvolisConnection().setInputTray(InputTray.FEEDER);
 			getEvolisConnection().setOutputTray(OutputTray.STANDARD);
 			getEvolisConnection().setErrorTray(OutputTray.ERROR);
-			logTextAreaService.appendText("PrintSession OK");
+			logTextAreaService.appendText("New PrintSession OK");
 		}
 		return evolisProntSession;
 	}
 
 	public synchronized void startSequence() {
-		getPrintSession().setAutoEject(false);
+		getPrintSession(true).setAutoEject(false);
 	}
 
 	public synchronized boolean printFrontColorBmp(String bmpColorAsBase64) {
