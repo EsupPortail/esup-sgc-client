@@ -299,16 +299,19 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	protected synchronized PrintSession getPrintSession(boolean newSession) {
 		if(newSession || evolisProntSession == null || getPrinterStatus(false).contains("PRINTER_OFFLINE")) {
 			evolisProntSession = new PrintSession(evolisConnection);
-			getEvolisConnection().setInputTray(InputTray.FEEDER);
-			getEvolisConnection().setOutputTray(OutputTray.STANDARD);
-			getEvolisConnection().setErrorTray(OutputTray.ERROR);
 			logTextAreaService.appendText("New PrintSession OK");
 		}
 		return evolisProntSession;
 	}
 
-	public synchronized void startSequence() {
+	public synchronized void newPrintSessionWithNoAutoEject() {
 		getPrintSession(true).setAutoEject(false);
+	}
+
+	public synchronized void setupTrayConnection() {
+		getEvolisConnection().setInputTray(InputTray.FEEDER);
+		getEvolisConnection().setOutputTray(OutputTray.STANDARD);
+		getEvolisConnection().setErrorTray(OutputTray.ERROR);
 	}
 
 	public synchronized boolean printFrontColorBmp(String bmpColorAsBase64) {

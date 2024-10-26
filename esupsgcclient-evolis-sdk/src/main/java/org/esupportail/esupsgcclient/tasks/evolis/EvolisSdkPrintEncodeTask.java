@@ -99,7 +99,7 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
                 throw new RuntimeException("Plus de ruban, merci de le changer");
             }
             cardInserted = true;
-            evolisPrinterService.startSequence();
+            evolisPrinterService.setupTrayConnection();
             if(evolisPrinterService.isEncodePrintOrder()) {
                 updateTitle("Encodage avant impression ...");
                 encodeSteps(qrcode);
@@ -152,6 +152,7 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
     }
 
     private void printSteps(String bmpColorAsBase64, String bmpBlackAsBase64, String bmpBackAsBase64) {
+        evolisPrinterService.newPrintSessionWithNoAutoEject();
         if(!evolisPrinterService.printFrontColorBmp(bmpColorAsBase64)) {
             throw new RuntimeException("Impossible d'imprimer le bmp couleur");
         }
