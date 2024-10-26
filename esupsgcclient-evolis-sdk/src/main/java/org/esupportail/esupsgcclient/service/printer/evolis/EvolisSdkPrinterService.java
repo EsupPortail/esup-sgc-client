@@ -215,12 +215,12 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	public synchronized void init() {
 		if(evolisConnection == null || !getEvolisConnection().isOpen()) {
-			log.info("Evolis init connection ...");
+			log.debug("Evolis init connection ...");
 			Device[] devicesArray = Evolis.getDevices();
 			if (devicesArray != null) {
 				List<Device> devices = Arrays.asList(devicesArray);
 				if (devices.isEmpty()) {
-					logTextAreaService.appendText("No evolis printer found");
+					logTextAreaService.appendTextOnlyOne("No evolis printer found");
 				} else {
 					Device device = devices.get(0);
 					logTextAreaService.appendText("Evolis printer found : " + device.getName());
@@ -228,7 +228,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 				}
 			}
 			if (evolisConnection == null) {
-				logTextAreaService.appendText("No evolis printer found");
+				logTextAreaService.appendTextOnlyOne("No evolis printer found");
 			} else {
 				String progressDescRibbonInfo = getRibbonInfoString();
 				if(!progressDescRibbonInfo.isEmpty()) {
