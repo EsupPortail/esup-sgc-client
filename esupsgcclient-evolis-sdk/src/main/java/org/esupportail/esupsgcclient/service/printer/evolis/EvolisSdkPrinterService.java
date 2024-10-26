@@ -109,7 +109,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		encodePrintOrder.setText("Encoder puis imprimer (expérimental)");
 		encodePrintOrder.setSelected("true".equals(fileLocalStorage.getItem("encodePrintOrder")));
 		initConnectionAtEachPrint = new CheckMenuItem();
-		initConnectionAtEachPrint.setText("RéInitialiser la connexion à chaque impression");
+		initConnectionAtEachPrint.setText("RéInitialiser la connexion à chaque impression (expérimental)");
 		initConnectionAtEachPrint.setSelected("true".equals(fileLocalStorage.getItem("initConnectionAtEachPrint")));
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
