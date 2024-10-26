@@ -58,6 +58,8 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	CheckMenuItem encodePrintOrder;
 
+	CheckMenuItem initConnectionAtEachPrint;
+
 	@Override
 	public synchronized String getMaintenanceInfo() {
 		CleaningInfo cleaningInfo = getEvolisConnection().getCleaningInfo();
@@ -106,11 +108,14 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		encodePrintOrder = new CheckMenuItem();
 		encodePrintOrder.setText("Encoder puis imprimer (expérimental)");
 		encodePrintOrder.setSelected("true".equals(fileLocalStorage.getItem("encodePrintOrder")));
+		initConnectionAtEachPrint = new CheckMenuItem();
+		initConnectionAtEachPrint.setText("RéInitialiser la connexion à chaque impression");
+		initConnectionAtEachPrint.setSelected("true".equals(fileLocalStorage.getItem("initConnectionAtEachPrint")));
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
 		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject,
 				evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, clearPrintStatusMenu,
-				stopEpcSupervision, restartEpcSupervision, encodePrintOrder);
+				stopEpcSupervision, restartEpcSupervision, encodePrintOrder, initConnectionAtEachPrint);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -156,6 +161,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 		encodePrintOrder.setOnAction(actionEvent -> {
 			fileLocalStorage.setItem("encodePrintOrder", encodePrintOrder.isSelected() ? "true" : "false");
+		});
+
+		initConnectionAtEachPrint.setOnAction(actionEvent -> {
+			fileLocalStorage.setItem("initConnectionAtEachPrint", initConnectionAtEachPrint.isSelected() ? "true" : "false");
 		});
 
 		clearPrintStatusMenu.setOnAction(actionEvent -> {
@@ -287,7 +296,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		return getPrintSession(false);
 	}
 
-	protected PrintSession getPrintSession(boolean newSession) {
+	protected synchronized PrintSession getPrintSession(boolean newSession) {
 		if(newSession || evolisProntSession == null || getPrinterStatus(false).contains("PRINTER_OFFLINE")) {
 			evolisProntSession = new PrintSession(evolisConnection);
 			getEvolisConnection().setInputTray(InputTray.FEEDER);
@@ -359,10 +368,19 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		return encodePrintOrder.isSelected();
 	}
 
+	public boolean isInitConnectionAtEachPrint() {
+		return initConnectionAtEachPrint.isSelected();
+	}
+
 	public synchronized void clearPrintStatus() {
 		logTextAreaService.appendText("Clear Printer status ...");
 		getEvolisConnection().sendCommand("Scs;");
 	}
 
+	public synchronized void closeConnection() {
+		if(evolisConnection != null && evolisConnection.isOpen()) {
+			evolisConnection.close();
+		}
+	}
 }
 
