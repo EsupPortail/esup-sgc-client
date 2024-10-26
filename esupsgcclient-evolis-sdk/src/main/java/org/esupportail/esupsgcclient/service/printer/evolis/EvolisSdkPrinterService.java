@@ -380,6 +380,8 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	public synchronized void closeConnection() {
 		if(evolisConnection != null && evolisConnection.isOpen()) {
 			evolisConnection.close();
+			logTextAreaService.appendText("Evolis connection closed");
+			init();
 		}
 	}
 }
