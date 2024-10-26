@@ -35,7 +35,7 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
             protected Void call() throws Exception {
                 while(true) {
                     try {
-                        String printerStatus = evolisPrinterService.getPrinterStatus();
+                        String printerStatus = evolisPrinterService.getPrinterStatus(false);
                         RibbonInfo ribbonInfo = evolisPrinterService.getRibbonInfo();
                         if(printerStatus.contains("PRINTER_READY")) {
                             if(ribbonInfo.getRemaining()<1) {

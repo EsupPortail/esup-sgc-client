@@ -268,22 +268,19 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		return progressDesc;
 	}
 
-	public synchronized String getPrinterStatus() {
+	public synchronized String getPrinterStatus(boolean waitCard) {
 		State state = getEvolisConnection().getState();
-        return String.format("%s : %s", state.getMajorState(), state.getMinorState());
-	}
-
-
-	public String getPrinterStatusWthHackFixNoRibbon() {
-		String printerStatus = getPrinterStatus();
-		if(printerStatus.contains("WARNING : DEF_RIBBON_ENDED")) {
+		String printerStatus = String.format("%s : %s", state.getMajorState(), state.getMinorState());
+		if(printerStatus.contains("WARNING : DEF_RIBBON_ENDED") && (waitCard || !isEncodePrintOrder())) {
 			// Hack - WARNING : DEF_RIBBON_ENDED can be occurred on Evolis Primacy2
 			// even if the ribbon is not ended -> we clear the status to avoid blocking the printer
+			// qd on encode puis imprime, le clear print status est problématique : si on fait un clearstatus après encodage, la carte est rejetée et une autre carte est ensuite imprimée
 			RibbonInfo ribbonInfo = getRibbonInfo();
 			if(ribbonInfo.getRemaining()>0) {
 				logTextAreaService.appendText("Hack - clear printer status : " + printerStatus + " - ribbon remaining : " + ribbonInfo.getRemaining() + " but status is WARNING : DEF_RIBBON_ENDED");
 				clearPrintStatus();
-				printerStatus = getPrinterStatus();
+				state = getEvolisConnection().getState();
+				printerStatus = String.format("%s : %s", state.getMajorState(), state.getMinorState());
 				logTextAreaService.appendText("Hack - new printer status : " + printerStatus);
 			}
 		}
@@ -291,7 +288,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	}
 
 	protected PrintSession getPrintSession() {
-		if(evolisProntSession == null || getPrinterStatus().contains("PRINTER_OFFLINE")) {
+		if(evolisProntSession == null || getPrinterStatus(false).contains("PRINTER_OFFLINE")) {
 			evolisProntSession = new PrintSession(evolisConnection);
 			getEvolisConnection().setInputTray(InputTray.FEEDER);
 			getEvolisConnection().setOutputTray(OutputTray.STANDARD);
