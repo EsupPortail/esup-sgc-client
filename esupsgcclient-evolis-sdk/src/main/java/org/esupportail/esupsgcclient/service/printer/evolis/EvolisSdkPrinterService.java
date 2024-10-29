@@ -278,7 +278,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		return progressDesc;
 	}
 
-	public synchronized String getPrinterStatus(boolean waitCard) {
+	public String getPrinterStatus(boolean waitCard) {
 		State state = getEvolisConnection().getState();
 		String printerStatus = String.format("%s : %s", state.getMajorState(), state.getMinorState());
 		if(printerStatus.contains("WARNING : DEF_RIBBON_ENDED") && (waitCard || !isEncodePrintOrder())) {
