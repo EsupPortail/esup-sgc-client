@@ -60,6 +60,8 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	CheckMenuItem initConnectionAtEachPrint;
 
+	CheckMenuItem newPrintSessionAtEachPrint;
+
 	@Override
 	public synchronized String getMaintenanceInfo() {
 		CleaningInfo cleaningInfo = getEvolisConnection().getCleaningInfo();
@@ -111,11 +113,14 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		initConnectionAtEachPrint = new CheckMenuItem();
 		initConnectionAtEachPrint.setText("RéInitialiser la connexion à chaque impression (expérimental)");
 		initConnectionAtEachPrint.setSelected("true".equals(fileLocalStorage.getItem("initConnectionAtEachPrint")));
+		newPrintSessionAtEachPrint = new CheckMenuItem();
+		newPrintSessionAtEachPrint.setText("Nouvelle session d'impression à chaque impression (expérimental)");
+		newPrintSessionAtEachPrint.setSelected("true".equals(fileLocalStorage.getItem("newPrintSessionAtEachPrint")));
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
 		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject,
 				evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, clearPrintStatusMenu,
-				stopEpcSupervision, restartEpcSupervision, encodePrintOrder, initConnectionAtEachPrint);
+				stopEpcSupervision, restartEpcSupervision, encodePrintOrder, initConnectionAtEachPrint, newPrintSessionAtEachPrint);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -305,7 +310,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	}
 
 	public synchronized void newPrintSessionWithNoAutoEject() {
-		getPrintSession(true).setAutoEject(false);
+		getPrintSession(newPrintSessionAtEachPrint.isSelected()).setAutoEject(false);
 	}
 
 	public synchronized void setupTrayConnection() {
