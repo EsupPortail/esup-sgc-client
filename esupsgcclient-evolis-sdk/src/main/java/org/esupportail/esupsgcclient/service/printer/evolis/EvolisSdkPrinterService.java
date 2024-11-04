@@ -172,6 +172,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			fileLocalStorage.setItem("initConnectionAtEachPrint", initConnectionAtEachPrint.isSelected() ? "true" : "false");
 		});
 
+		newPrintSessionAtEachPrint.setOnAction(actionEvent -> {
+			fileLocalStorage.setItem("newPrintSessionAtEachPrint", newPrintSessionAtEachPrint.isSelected() ? "true" : "false");
+		});
+
 		clearPrintStatusMenu.setOnAction(actionEvent -> {
 			new Thread(() -> {
 				clearPrintStatus();
