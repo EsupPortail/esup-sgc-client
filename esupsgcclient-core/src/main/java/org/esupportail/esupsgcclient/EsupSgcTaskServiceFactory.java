@@ -11,7 +11,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcHeartbeatService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskSupervisionService;
@@ -35,7 +36,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Component
 public class EsupSgcTaskServiceFactory {
 
-    final static Logger log = Logger.getLogger(EsupSgcTaskServiceFactory.class);
+    final static Logger log = LoggerFactory.getLogger(EsupSgcTaskServiceFactory.class);
 
     Pane actionsPane;
 

@@ -1,7 +1,8 @@
 package org.esupportail.esupsgcclient.ui;
 
 import javafx.scene.control.TextArea;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.EsupSgcClientJfxController;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ import java.text.SimpleDateFormat;
 @Component
 public class LogTextAreaService {
 
-    final static Logger log = Logger.getLogger(LogTextAreaService.class);
+    final static Logger log = LoggerFactory.getLogger(LogTextAreaService.class);
 
     TextArea logTextarea;
 

@@ -10,7 +10,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.ui.LogTextAreaService;
 import org.esupportail.esupsgcclient.ui.UiStep;
@@ -19,7 +20,7 @@ import org.esupportail.esupsgcclient.utils.Utils;
 import java.util.Map;
 
 public class EsupSgcTaskUi {
-    final static Logger log = Logger.getLogger(EsupSgcTaskUi.class);
+    final static Logger log = LoggerFactory.getLogger(EsupSgcTaskUi.class);
     EsupSgcTaskService service;
     Pane actionsPane;
     ProgressBar progressBar;

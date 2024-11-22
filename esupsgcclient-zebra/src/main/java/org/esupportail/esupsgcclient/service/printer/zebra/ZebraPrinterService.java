@@ -41,7 +41,8 @@ import javafx.scene.layout.TilePane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.hack.zebra.ForceLoadDll;
 import org.esupportail.esupsgcclient.hack.zebra.UsbConnection;
@@ -66,7 +67,7 @@ import java.util.Optional;
 @Component
 public class ZebraPrinterService extends EsupSgcPrinterService {
 	
-	private final static Logger log = Logger.getLogger(ZebraPrinterService.class);
+	private final static Logger log = LoggerFactory.getLogger(ZebraPrinterService.class);
 	
 	private static Integer CARD_FEED_TIMEOUT = 30000;
 

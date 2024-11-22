@@ -2,8 +2,6 @@ package org.esupportail.esupsgcclient;
 
 import com.github.eduramiba.webcamcapture.drivers.NativeDriver;
 import com.github.sarxos.webcam.Webcam;
-import javax.annotation.Resource;
-
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -13,28 +11,28 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.service.webcam.EsupWebcamDiscoveryListener;
 import org.esupportail.esupsgcclient.service.webcam.WebcamTaskService;
 import org.esupportail.esupsgcclient.ui.*;
 import org.esupportail.esupsgcclient.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 @Component
 public class EsupSgcClientJfxController implements Initializable {
 
-	final static Logger log = Logger.getLogger(EsupSgcClientJfxController.class);
+	final static Logger log = LoggerFactory.getLogger(EsupSgcClientJfxController.class);
 
 	@Resource
 	AppSession appSession;

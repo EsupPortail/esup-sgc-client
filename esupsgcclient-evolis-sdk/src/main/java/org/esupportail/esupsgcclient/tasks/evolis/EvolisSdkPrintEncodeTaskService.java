@@ -4,7 +4,8 @@ import javax.annotation.Resource;
 import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.AppSession.READY_CONDITION;
 import org.esupportail.esupsgcclient.service.printer.evolis.EvolisSdkPrinterService;
@@ -20,7 +21,7 @@ import java.util.Map;
 @Service
 public class EvolisSdkPrintEncodeTaskService extends EsupSgcTaskService {
 
-	private final static Logger log = Logger.getLogger(EvolisSdkPrintEncodeTaskService.class);
+	private final static Logger log = LoggerFactory.getLogger(EvolisSdkPrintEncodeTaskService.class);
 
 	static final String IMPRESSION_ET_ENCODAGE_VIA_EVOLIS = "Impression et encodage via imprimante Evolis";
 

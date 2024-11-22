@@ -5,7 +5,8 @@ import javax.annotation.Resource;
 import com.evolis.sdk.RibbonInfo;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.ui.LogTextAreaService;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EvolisSdkHeartbeatTaskService extends Service<Void> {
 
-    final static Logger log = Logger.getLogger(EvolisSdkHeartbeatTaskService.class);
+    final static Logger log = LoggerFactory.getLogger(EvolisSdkHeartbeatTaskService.class);
 
     @Resource
     EvolisSdkPrinterService evolisPrinterService;

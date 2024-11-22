@@ -11,7 +11,8 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Component
 public class WebcamTaskService extends Service<Void> {
 
-    final static Logger log = Logger.getLogger(WebcamTaskService.class);
+    final static Logger log = LoggerFactory.getLogger(WebcamTaskService.class);
 
     final static int CAMERA_NATIVE_WIDTH = 640;
     final static int CAMERA_NATIVE_HEIGHT = 480;

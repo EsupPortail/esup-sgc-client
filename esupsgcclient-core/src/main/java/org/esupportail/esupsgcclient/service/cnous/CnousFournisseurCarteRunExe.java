@@ -1,6 +1,7 @@
 package org.esupportail.esupsgcclient.service.cnous;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,7 +10,7 @@ import java.io.InputStreamReader;
 
 public class CnousFournisseurCarteRunExe {
 
-	private final static Logger log = Logger.getLogger(CnousFournisseurCarteRunExe.class);
+	private final static Logger log = LoggerFactory.getLogger(CnousFournisseurCarteRunExe.class);
 	
 	private String pathToExe;
 	

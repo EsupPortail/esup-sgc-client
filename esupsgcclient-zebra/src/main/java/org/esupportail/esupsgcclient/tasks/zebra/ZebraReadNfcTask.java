@@ -4,7 +4,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.pcsc.NfcResultBean;
 import org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService;
@@ -23,7 +24,7 @@ import java.util.Map;
 @Scope("prototype")
 public class ZebraReadNfcTask extends EsupSgcTask {
 
-    private final static Logger log = Logger.getLogger(ZebraReadNfcTask.class);
+    private final static Logger log = LoggerFactory.getLogger(ZebraReadNfcTask.class);
 
     final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{
             UiStep.printer_nfc,

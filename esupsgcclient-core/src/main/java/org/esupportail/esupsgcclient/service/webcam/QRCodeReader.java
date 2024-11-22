@@ -11,7 +11,8 @@ import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import javafx.embed.swing.SwingFXUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.tasks.simple.QrCodeTask;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -30,7 +31,7 @@ import java.util.concurrent.FutureTask;
 @Service 
 public class QRCodeReader {
 
-	private final static Logger log = Logger.getLogger(QRCodeReader.class);
+	private final static Logger log = LoggerFactory.getLogger(QRCodeReader.class);
 
 	MultiFormatReader qrReader;
 

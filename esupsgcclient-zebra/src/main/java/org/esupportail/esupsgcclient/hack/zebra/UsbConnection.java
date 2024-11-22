@@ -1,7 +1,8 @@
 package org.esupportail.esupsgcclient.hack.zebra;
 
 import com.zebra.sdk.comm.ConnectionException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
 Without this hack on HALF ZXP3 command, we get this error on our ZXP3 printer :
@@ -52,7 +53,7 @@ Without this hack on HALF ZXP3 command, we get this error on our ZXP3 printer :
  */
 public class UsbConnection extends com.zebra.sdk.comm.UsbConnection {
 
-    private final static Logger log = Logger.getLogger(UsbConnection.class);
+    private final static Logger log = LoggerFactory.getLogger(UsbConnection.class);
 
     public UsbConnection(String var1) throws ConnectionException {
         super(var1);

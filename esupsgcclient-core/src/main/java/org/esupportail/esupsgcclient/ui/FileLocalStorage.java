@@ -1,7 +1,8 @@
 package org.esupportail.esupsgcclient.ui;
 
 import javax.annotation.PostConstruct;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppSession;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -21,7 +22,7 @@ import java.util.Properties;
 @Component
 public class FileLocalStorage {
 
-	private final static Logger log = Logger.getLogger(FileLocalStorage.class);
+	private final static Logger log = LoggerFactory.getLogger(FileLocalStorage.class);
 
 	private File file;
 

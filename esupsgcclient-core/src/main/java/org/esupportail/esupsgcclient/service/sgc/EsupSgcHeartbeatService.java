@@ -3,7 +3,8 @@ package org.esupportail.esupsgcclient.service.sgc;
 import javax.annotation.Resource;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppVersion;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -14,7 +15,7 @@ import org.springframework.web.client.ResourceAccessException;
 @Component
 public class EsupSgcHeartbeatService extends Service<Void> {
 
-    final static Logger log = Logger.getLogger(EsupSgcHeartbeatService.class);
+    final static Logger log = LoggerFactory.getLogger(EsupSgcHeartbeatService.class);
 
     @Resource
     EsupSgcRestClientService esupSgcRestClientService;

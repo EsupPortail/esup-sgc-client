@@ -4,7 +4,8 @@ import javax.annotation.Resource;
 import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.AppSession.READY_CONDITION;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Service
 public class ZebraReadNfcTaskService extends EsupSgcTaskService {
 
-	private final static Logger log = Logger.getLogger(ZebraReadNfcTaskService.class);
+	private final static Logger log = LoggerFactory.getLogger(ZebraReadNfcTaskService.class);
 
 	static final String BADGEAGE_EN_SERIE_VIA_ZEBRA = "Badgeage en série via Imprimante Zebra";
 

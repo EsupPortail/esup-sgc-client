@@ -9,7 +9,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.utils.Utils;
@@ -27,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Component
 public class EsupNfcClientStackPane extends StackPane {
 
-    private final static Logger log = Logger.getLogger(EsupNfcClientStackPane.class);
+    private final static Logger log = LoggerFactory.getLogger(EsupNfcClientStackPane.class);
 
     WebView webView = new WebView();
 

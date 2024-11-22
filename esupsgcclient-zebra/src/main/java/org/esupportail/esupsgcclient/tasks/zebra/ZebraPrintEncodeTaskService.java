@@ -3,7 +3,8 @@ package org.esupportail.esupsgcclient.tasks.zebra;
 import javafx.concurrent.Task;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.AppSession.READY_CONDITION;
 import org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService;
@@ -20,7 +21,7 @@ import java.util.Map;
 @Service
 public class ZebraPrintEncodeTaskService extends EsupSgcTaskService {
 
-	private final static Logger log = Logger.getLogger(ZebraPrintEncodeTaskService.class);
+	private final static Logger log = LoggerFactory.getLogger(ZebraPrintEncodeTaskService.class);
 
 	static final String IMPRESSION_ET_ENCODAGE__VIA_ZEBRA = "Impression et encodage via Imprimante Zebra";
 

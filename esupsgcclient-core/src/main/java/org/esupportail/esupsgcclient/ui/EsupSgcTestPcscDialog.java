@@ -11,7 +11,8 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.service.pcsc.PcscUsbService;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,7 @@ import javax.smartcardio.CardException;
 @Component
 public class EsupSgcTestPcscDialog {
 
-    private final static Logger log = Logger.getLogger(EsupSgcTestPcscDialog.class);
+    private final static Logger log = LoggerFactory.getLogger(EsupSgcTestPcscDialog.class);
 
     @Resource
     PcscUsbService pcscUsbService;

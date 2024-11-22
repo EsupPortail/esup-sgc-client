@@ -2,7 +2,8 @@ package org.esupportail.esupsgcclient.service.pcsc;
 
 import jnasmartcardio.Smartcardio;
 import jnasmartcardio.Smartcardio.JnaPCSCException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ import java.util.List;
 @Service
 public class PcscUsbService {
 
-	private final Logger log = Logger.getLogger(PcscUsbService.class);
+	private final Logger log = LoggerFactory.getLogger(PcscUsbService.class);
 
 	private Card card;
 	private CardTerminal cardTerminal;

@@ -5,7 +5,9 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.ui.UiStep;
 
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 
 public abstract class EsupSgcTaskService extends javafx.concurrent.Service<String> {
 
-    private final static Logger log = Logger.getLogger(EsupSgcTaskService.class);
+    private final static Logger log = LoggerFactory.getLogger(EsupSgcTaskService.class);
 
     protected Map<UiStep, TextFlow> uiSteps;
     protected ImageView webcamImageView;
@@ -60,7 +62,7 @@ public abstract class EsupSgcTaskService extends javafx.concurrent.Service<Strin
                 .filter(a-> Arrays.asList(readyToRunConditions()).contains(a.getKey()) && !a.getValue().get())
                 .collect(Collectors.toMap(e->e.getKey(),e->e.getValue()));
         List<String> pbs = readyToRunConditionsFailedMap.keySet().stream().map(k -> " * " + k + " : KO").collect(Collectors.toList());
-        log.warn(pbs);
+        log.warn(StringUtils.join(pbs, ","));
         return String.join("\n", pbs) + "\n";
     }
 

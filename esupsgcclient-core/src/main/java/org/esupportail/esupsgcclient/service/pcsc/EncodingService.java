@@ -4,7 +4,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.SgcCheckException;
@@ -36,7 +37,7 @@ import java.util.Map;
 
 @Component
 public class EncodingService {
-	private final static Logger log = Logger.getLogger(EncodingService.class);
+	private final static Logger log = LoggerFactory.getLogger(EncodingService.class);
 
 	public enum BmpType {color, overlay, black, back}
 	private String pathToExe = "c:\\cnousApi\\";
@@ -132,14 +133,14 @@ public class EncodingService {
 				throw new SgcCheckException("Card for " + qrcode + " not found, please check its state in SGC web application.");
 
 			} else {
-				log.error(e);
+				log.error("Exception on checkBeforeEncoding", e);
 				throw new SgcCheckException("SGC select error : " + e.getResponseBodyAsString());
 			}
 		} catch (HttpServerErrorException e) {
-			log.error(e);
+			log.error("Exception on checkBeforeEncoding", e);
 			throw new SgcCheckException("SGC select error : Web Server Error " + e.getResponseBodyAsString());
 		} catch (Exception e) {
-			log.error(e);
+			log.error("Exception on checkBeforeEncoding", e);
 			throw new SgcCheckException("SGC select error", e);
 		}
 	}
@@ -178,7 +179,7 @@ public class EncodingService {
 				return false;
 			}
 		} catch (RestClientException e) {
-			log.error(e);
+			log.error("Exception on cnousEncoding", e);
 			throw new CnousFournisseurCarteException("cnous error : can't get cnousId : " + e.getMessage());
 		}
 	}
@@ -304,7 +305,7 @@ public class EncodingService {
 					log.warn("Cnous csv send :  Failed");
 				}
 			} else {
-				log.warn("cnous csv send : Failed for csn " + csn, null);
+				log.warn("cnous csv send : Failed for csn " + csn);
 			}
 		} else {
 			log.info("Cnous Encoding :  Skipped");

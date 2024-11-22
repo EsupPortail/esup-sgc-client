@@ -10,7 +10,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -22,7 +23,7 @@ import java.net.URL;
 @ComponentScan
 public class EsupSgcClientApplication extends Application {
 
-	private final static Logger log = Logger.getLogger(EsupSgcClientApplication.class);
+	private final static Logger log = LoggerFactory.getLogger(EsupSgcClientApplication.class);
 
 	public void start(final Stage primaryStage) throws IOException {
 

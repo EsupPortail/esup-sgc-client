@@ -1,6 +1,7 @@
 package org.esupportail.esupsgcclient.ui;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -15,7 +16,7 @@ public class JavaScriptConsoleBridge {
     @Resource
     LogTextAreaService logTextAreaService;
 	
-	private final static Logger log = Logger.getLogger(JavaScriptConsoleBridge.class);
+	private final static Logger log = LoggerFactory.getLogger(JavaScriptConsoleBridge.class);
 
 	public void disconnect() {
 		log.info("Javascript exit !");

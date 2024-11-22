@@ -2,7 +2,8 @@ package org.esupportail.esupsgcclient.hack.zebra;
 
 import com.zebra.sdk.comm.internal.NativeUsbAdapter;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService;
 
 import java.io.File;
@@ -16,7 +17,7 @@ import java.util.Date;
  */
 public class ForceLoadDll {
 
-    private final static Logger log = Logger.getLogger(ForceLoadDll.class);
+    private final static Logger log = LoggerFactory.getLogger(ForceLoadDll.class);
 
     public static void loadDll() {
         if(System.getProperty("os.name").toLowerCase().contains("windows")) {

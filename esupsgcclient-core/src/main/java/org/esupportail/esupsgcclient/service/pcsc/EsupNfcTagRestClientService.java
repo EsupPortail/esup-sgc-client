@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppConfig;
 import org.esupportail.esupsgcclient.AppSession;
 import org.springframework.http.HttpEntity;
@@ -18,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class EsupNfcTagRestClientService {
 
-	private final static Logger log = Logger.getLogger(EsupNfcTagRestClientService.class);
+	private final static Logger log = LoggerFactory.getLogger(EsupNfcTagRestClientService.class);
 
 	@Resource
 	RestTemplate restTemplate;

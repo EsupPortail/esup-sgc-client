@@ -1,7 +1,8 @@
 package org.esupportail.esupsgcclient.utils;
 
 import javafx.application.Platform;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -10,7 +11,7 @@ import java.util.Enumeration;
 @SuppressWarnings("restriction")
 public class Utils {
 
-	private final static Logger log = Logger.getLogger(Utils.class);
+	private final static Logger log = LoggerFactory.getLogger(Utils.class);
 
     public static void sleep(long time) {
 		try {

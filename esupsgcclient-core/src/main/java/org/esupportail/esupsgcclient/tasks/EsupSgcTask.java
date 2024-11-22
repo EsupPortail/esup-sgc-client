@@ -5,7 +5,8 @@ import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 
@@ -19,7 +20,7 @@ import java.util.Map;
 
 public abstract class EsupSgcTask extends Task<String> {
 
-    private final static Logger log = Logger.getLogger(EsupSgcTask.class);
+    private final static Logger log = LoggerFactory.getLogger(EsupSgcTask.class);
 
     private final static int PROGRESS_STEP_LENGTH = 200;
 

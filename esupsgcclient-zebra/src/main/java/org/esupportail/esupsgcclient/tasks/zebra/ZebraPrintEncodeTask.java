@@ -5,7 +5,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.service.pcsc.EncodingService;
 import org.esupportail.esupsgcclient.service.printer.zebra.ZebraPrinterService;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcRestClientService;
@@ -24,7 +25,7 @@ import java.util.Map;
 @Scope("prototype")
 public class ZebraPrintEncodeTask extends EsupSgcTask {
 
-    private final static Logger log = Logger.getLogger(ZebraPrintEncodeTask.class);
+    private final static Logger log = LoggerFactory.getLogger(ZebraPrintEncodeTask.class);
 
     final static List<UiStep> UI_STEPS_LIST =  Arrays.asList(new UiStep[]{
             UiStep.long_poll,
