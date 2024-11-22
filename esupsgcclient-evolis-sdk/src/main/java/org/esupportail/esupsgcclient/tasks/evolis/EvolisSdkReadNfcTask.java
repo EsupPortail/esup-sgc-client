@@ -56,11 +56,11 @@ public class EvolisSdkReadNfcTask extends EsupSgcTask {
                 updateTitle("Impossible d'insérer la carte dans la station NFC - en attente ...");
                 Utils.sleep(500);
             }
-            String evolisPrinterStatus = evolisPrinterService.getPrinterStatus(true);
+            String evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
             while(!evolisPrinterStatus.contains("ENCODING_RUNNING")) {
                 updateTitle(String.format("en attente d'une carte ...", evolisPrinterStatus));
                 Utils.sleep(100);
-                evolisPrinterStatus = evolisPrinterService.getPrinterStatus(true);
+                evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
             }
             setUiStepSuccess(UiStep.printer_nfc);
             encodingService.pcscConnection(this);

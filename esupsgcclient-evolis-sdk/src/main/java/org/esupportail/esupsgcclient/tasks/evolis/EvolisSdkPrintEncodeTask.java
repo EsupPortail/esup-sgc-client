@@ -85,14 +85,14 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
                 setUiStepSuccess(UiStep.bmp_back);
             }
             evolisPrinterService.releaseIfNeeded();
-            String evolisPrinterStatus = evolisPrinterService.getPrinterStatus(true);
+            String evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
             while(!evolisPrinterStatus.contains("PRINTER_READY")) {
                 updateTitle(String.format("Status de l'imprimante evolis non prête (%s) - en attente ...", evolisPrinterStatus));
                 Utils.sleep(2000);
                 if(isCancelled()) {
                     throw new RuntimeException("Task is cancelled");
                 }
-                evolisPrinterStatus = evolisPrinterService.getPrinterStatus(true);
+                evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
             }
             RibbonInfo ribbonInfo = evolisPrinterService.getRibbonInfo();
             if(ribbonInfo.getRemaining()<1) {
@@ -100,15 +100,9 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             }
             cardInserted = true;
             evolisPrinterService.setupTrayConnection();
-            if(evolisPrinterService.isEncodePrintOrder()) {
-                updateTitle("Encodage avant impression ...");
-                encodeSteps(qrcode);
-                printSteps(bmpColorAsBase64, bmpBlackAsBase64, bmpBackAsBase64);
-            } else {
-                updateTitle("Impression avant encodage ...");
-                printSteps(bmpColorAsBase64, bmpBlackAsBase64, bmpBackAsBase64);
-                encodeSteps(qrcode);
-            }
+            updateTitle("Impression avant encodage ...");
+            printSteps(bmpColorAsBase64, bmpBlackAsBase64, bmpBackAsBase64);
+            encodeSteps(qrcode);
             evolisPrinterService.eject();
             cardInserted = false;
             String msgTimer = String.format("Carte éditée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
@@ -123,9 +117,6 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             throw new RuntimeException("Exception on  EvolisTask : " + e.getMessage(), e);
         } finally {
             resetBmpUi();
-            if(evolisPrinterService.isInitConnectionAtEachPrint()) {
-                evolisPrinterService.closeConnection();
-            }
         }
 		return null;
 	}
@@ -136,11 +127,11 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             updateTitle("Impossible d'insérer la carte dans la station NFC - en attente ...");
             Utils.sleep(500);
         }
-        evolisPrinterStatus = evolisPrinterService.getPrinterStatus(false);
+        evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
         while(!evolisPrinterStatus.contains("ENCODING_RUNNING")) {
             updateTitle(String.format("en attente d'une carte ...", evolisPrinterStatus));
             Utils.sleep(500);
-            evolisPrinterStatus = evolisPrinterService.getPrinterStatus(false);
+            evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
         }
         setUiStepSuccess(UiStep.printer_nfc);
         encodingService.pcscConnection(this);
