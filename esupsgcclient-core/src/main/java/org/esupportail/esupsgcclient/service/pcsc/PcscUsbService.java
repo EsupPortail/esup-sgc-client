@@ -24,9 +24,6 @@ public class PcscUsbService {
 
 	private final Logger log = Logger.getLogger(PcscUsbService.class);
 
-	@Value("${nfcReinitAtEachConnection:false}")
-	boolean nfcReinitAtEachConnection = false;
-
 	private Card card;
 	private CardTerminal cardTerminal;
 	private TerminalFactory context;
@@ -55,9 +52,6 @@ public class PcscUsbService {
 	}
 
 	public String connection() throws CardException, PcscException {
-		if(nfcReinitAtEachConnection) {
-			init();
-		}
 		for (CardTerminal terminal : terminals.list()) {
 			if(terminal.isCardPresent()){
 				log.info("Try with terminal " + terminal.getName());
@@ -67,10 +61,12 @@ public class PcscUsbService {
 					return cardTerminal.getName();
 				} catch(JnaPCSCException e) {
 					// if card nfc is ko for example
-					if(e.getMessage().contains("SCARD_E_NO_SMARTCARD") || e.getMessage().contains("SCARD_W_UNPOWERED_CARD")) {
-						log.info("wait ... " + e.getMessage());
+					if(e.getMessage().contains("SCARD_E_NO_SMARTCARD") || e.getMessage().contains("SCARD_W_UNPOWERED_CARD") || e.getMessage().contains("SCARD_W_UNRESPONSIVE_CARD")) {
+						log.warn("wait ... " + e.getMessage());
 						log.info("wait ... " + terminal.getName());
-						Utils.sleep(200);
+						Utils.sleep(500);
+						init();
+						return connection();
 					} else {
 						throw new RuntimeException("pcsc connection error - " + e.getMessage(), e);
 					}
