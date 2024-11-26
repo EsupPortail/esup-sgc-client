@@ -368,7 +368,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 			zebraCardPrinter.cancel(jobId);
 			log.info("Job ID " + jobId + " was cancelled.%n");
 		} catch (ConnectionException | ZebraCardException e) {
-			log.error(e);
+			log.error("Exception on ZebraPrinterService.cancelJob", e);
 		}
 	}
 	
@@ -393,7 +393,7 @@ public class ZebraPrinterService extends EsupSgcPrinterService {
 					status = String.format("%s %s", printerStatusInfo.status, printerStatusInfo.alarmInfo.description);
 					log.trace(status);
 				} catch (Exception e) {
-					log.error(e);
+					log.error("Exception on ZebraPrinterService.getStatus", e);
 				}
 			}
 		}
