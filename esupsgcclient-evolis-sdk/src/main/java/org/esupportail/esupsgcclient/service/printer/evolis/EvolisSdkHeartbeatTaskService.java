@@ -12,6 +12,8 @@ import org.esupportail.esupsgcclient.ui.LogTextAreaService;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 
 @Component
 public class EvolisSdkHeartbeatTaskService extends Service<Void> {
@@ -34,11 +36,19 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
         return new Task<Void>() {
             @Override
             protected Void call() throws Exception {
+                RibbonInfo ribbonInfo = null;
+                Date lastRibbonInfoDate = new Date();
                 while(true) {
                     try {
                         String printerStatus = evolisPrinterService.getPrinterStatus();
-                        RibbonInfo ribbonInfo = evolisPrinterService.getRibbonInfo();
                         if(printerStatus.contains("PRINTER_READY")) {
+                            // check ribbon only if printer is ready and only each hour to avoid too much requests
+                            // -> to avoid overuse of nfc chip of the ribbon
+                            // -> to avoid to burn out the nfc chip of the ribbon
+                            if(ribbonInfo == null || (lastRibbonInfoDate.getTime() + 1000*3600) < new Date().getTime()) {
+                                ribbonInfo = evolisPrinterService.getRibbonInfo();
+                                lastRibbonInfoDate = new Date();
+                            }
                             if(ribbonInfo.getRemaining()<1) {
                                 appSession.setPrinterReady(false);
                                 printerStatus = "Plus de ruban, merci de le changer";
