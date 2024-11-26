@@ -23,10 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Component
@@ -56,12 +53,21 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	PrintSession evolisProntSession;
 
+	String ribbonInfoString4MaintenanceInfo = "";
+
+	Date lastRibbonInfoDate = new Date();
+
 
 	@Override
 	public synchronized String getMaintenanceInfo() {
 		CleaningInfo cleaningInfo = getEvolisConnection().getCleaningInfo();
+		// check ribbon only if printer is ready and only each hour to avoid too much requests
+		if(ribbonInfoString4MaintenanceInfo.isEmpty() || (lastRibbonInfoDate.getTime() + 1000*3600) < new Date().getTime()) {
+			ribbonInfoString4MaintenanceInfo = getRibbonInfoString();
+			lastRibbonInfoDate = new Date();
+		}
 		String printerInfoString = String.format("%s\n%s\nTotal Card Count : %s, CardCountBeforeWarrantyLost : %s, isPrintHeadUnderWarranty : %s, CardCountBeforeWarning : %s\n",
-				getInfo(), getRibbonInfoString(),
+				getInfo(), ribbonInfoString4MaintenanceInfo,
 				cleaningInfo.getTotalCardCount(), cleaningInfo.getCardCountBeforeWarrantyLost(), cleaningInfo.isPrintHeadUnderWarranty(), cleaningInfo.getCardCountBeforeWarning());
 		return printerInfoString;
 	}
