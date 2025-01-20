@@ -10,8 +10,6 @@
   </parent>
   <artifactId>esupsgcclient-evolis-sdk</artifactId>
   <properties>
-    <evolis.sdk.lib>/opt/evolis-sdk-java-wrapper/evolis-sdk-java-8.4.0.jar</evolis.sdk.lib>
-    <evolis.sdk.version>8.4.0</evolis.sdk.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
   </properties>
@@ -20,36 +18,18 @@
       <groupId>org.esupportail.esupsgcclient</groupId>
       <artifactId>esupsgcclient-core</artifactId>
       <version>${revision}</version>
+      <exclusions>
+        <exclusion>
+          <!-- keep JNA version from evolis-sdk pom.xml -->
+          <groupId>net.java.dev.jna</groupId>
+          <artifactId>jna-platform</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.evolis.sdk</groupId>
-      <artifactId>evolis-sdk-java</artifactId>
-      <version>${evolis.sdk.version}</version>
+      <artifactId>evolis-sdk</artifactId>
+      <version>9.0.0-5707</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <version>2.5.2</version>
-        <executions>
-          <execution>
-            <id>install-evolis-sdk</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <configuration>
-              <file>${evolis.sdk.lib}</file>
-              <groupId>com.evolis.sdk</groupId>
-              <artifactId>evolis-sdk-java</artifactId>
-              <version>${evolis.sdk.version}</version>
-              <packaging>jar</packaging>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
