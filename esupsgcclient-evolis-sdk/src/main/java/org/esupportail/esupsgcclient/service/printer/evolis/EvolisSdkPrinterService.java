@@ -301,25 +301,22 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	public synchronized boolean printFrontColorBmp(String bmpColorAsBase64) {
 		byte[] bytes = Base64.getDecoder().decode(bmpColorAsBase64);
-		return getPrintSession().setImage(CardFace.FRONT, bytes, bytes.length);
+		return getPrintSession().setImage(CardFace.FRONT, bytes);
 	}
 
 	public synchronized boolean printFrontBlackBmp(String bmpBlackAsBase64) {
 		byte[] bytes = Base64.getDecoder().decode(bmpBlackAsBase64);
-		return getPrintSession().setBlack(CardFace.FRONT, bytes, bytes.length);
+		return getPrintSession().setBlack(CardFace.FRONT, bytes);
 	}
 
 	public synchronized boolean printBackBmp(String bmpBackAsBase64) {
 		byte[] bytes = Base64.getDecoder().decode(bmpBackAsBase64);
-		return getPrintSession().setBlack(CardFace.BACK, bytes, bytes.length);
+		return getPrintSession().setBlack(CardFace.BACK, bytes);
 	}
 
 	public synchronized void print() {
 		ReturnCode returnCode = getPrintSession().print();
 		logTextAreaService.appendText("Print return code : " + returnCode.name());
-		if(returnCode != ReturnCode.OK) {
-			throw new RuntimeException("Erreur d'impression. Print return code : " + returnCode.name());
-		}
 	}
 
 	public synchronized boolean insertCardToContactLessStation(EsupSgcTask esupSgcTask) {
