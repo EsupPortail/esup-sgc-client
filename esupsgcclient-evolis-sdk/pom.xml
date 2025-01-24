@@ -10,8 +10,8 @@
   </parent>
   <artifactId>esupsgcclient-evolis-sdk</artifactId>
   <properties>
-    <evolis.sdk.lib>/opt/evolis-sdk-java-wrapper/evolis-sdk-java-8.4.0.jar</evolis.sdk.lib>
-    <evolis.sdk.version>8.4.0</evolis.sdk.version>
+    <evolis.sdk.lib>/opt/evolis-sdk-java-wrapper/evolis-sdk-9.0.0-6413.jar</evolis.sdk.lib>
+    <evolis.sdk.version>9.0.0-6413</evolis.sdk.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
   </properties>
