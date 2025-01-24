@@ -317,6 +317,9 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	public synchronized void print() {
 		ReturnCode returnCode = getPrintSession().print();
 		logTextAreaService.appendText("Print return code : " + returnCode.name());
+		if(returnCode != ReturnCode.OK) {
+			throw new RuntimeException("Erreur d'impression. Print return code : " + returnCode.name());
+		}
 	}
 
 	public synchronized boolean insertCardToContactLessStation(EsupSgcTask esupSgcTask) {
