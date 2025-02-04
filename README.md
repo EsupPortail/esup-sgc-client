@@ -116,14 +116,7 @@ Ensuite, il vous suffit d'installer le driver de votre imprimante evolis.
 
 Les drivers sont disponibles aussi bien sous Windows, Linux et macOS. Aussi votre imprimante Evolis (Primacy 1, Primacy 2, ...) peut fonctionner aussi bien via un esup-sgc-client depuis linux, windows ou mac.
 
-Si vous souhaitez compiler vous même le client avec le support evolis via le SDK, vous devez spécifier le profil maven `evolis-sdk` et initialiser votre repository maven local avec le SDK evolis.
-Cf esupsgclient-evolis-sdk/pom.xml, celui-ci demande à avoir le jar dans /opt/evolis-sdk-java-wrapper/evolis-sdk-9.0.0-6413.jar.
-Ce jar sera installé dans votre maven local via cette commande :
-````
-mvn initialize -P evolis-sdk
-````
-
-Via ce mode, esup-sgc-client dialogue directement avec l'imprimante via le SDK 3.
+esup-sgc-client dialogue directement avec l'imprimante via le SDK 3.
 Ce SDK permet de retrouver simplement et automatiquement l'imprimante evolis connectée, le type de ruban n'est pas non plus à configurer, ...
 
 Théoriquement, esup-sgc-client doit supporter les autres imprimantes evolis que Primacy 1 et 2 via le SDK3 toujours.
