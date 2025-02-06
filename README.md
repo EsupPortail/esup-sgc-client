@@ -138,12 +138,11 @@ TWN4DevPack451\Tools\flash.exe USB TWN4DevPack451\Firmware\TWN4_xPx451_S1SC160_M
 ```
 
 En plus du driver Zebra et du firmware (du lecteur NFC, celui de la Zebra étant sans doute déjà jour) à mettre éventuellement à jour, il vous faut également télécharger le SDK Zebra depuis https://www.zebra.com/fr/fr/support-downloads/printer-software/developer-tools/card-sdk.html
-Celui-ci a pour nom "LINK-OS MULTIPLATFORM SDK FOR CARD PRINTERS", nous avons utilisé la version v2.14.5198 de ce SDK.
 
 Le répertoire dans lequel le SDK est ainsi installé (et sa version) doit être positionné dans esupsgcclient-zebra/pom.xml 
 ```
-    <zebra.link_os_sdk.lib>/opt/link_os_sdk/PC-Card/v2.14.5198/lib</zebra.link_os_sdk.lib>
-    <zebra.link_os_sdk.version>v2.14.5198</zebra.link_os_sdk.version>
+    <zebra.link_os_sdk.lib>/opt/LinkOS_SDK_PC-Card_Java_v3.01.86/lib</zebra.link_os_sdk.lib>
+    <zebra.link_os_sdk.version>v3.01.86</zebra.link_os_sdk.version>
 ```
 
 Une fois le SDK téléchargé et configuré dans ce fichier, vous devez taper la commande suivante pour le faire connaitre à maven : 
@@ -161,6 +160,8 @@ Si la ZC300 attend a priori 'other' pour spécifier le lecteur NFC USB intégré
 
 Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows, macOS et linux.
 
+#### zxp3 - difficultés rencontrées
+
 Concernant la ZXP3, le SDK java fourni par Zebra pose nativement un problème avec les demi-panneaux, un contournement est proposé dans esup-sgc-client pour que cela fonctionne, 
 pour ce faire il suffit de positionner printerZebraHackZxp3HalfBug à true dans esupsgcclient.properties (ou via une variable d'environnement).
 
@@ -176,49 +177,9 @@ cela est nécessaire si vous avez mis à jour le firmware du lecteur NFC fourni 
 ce que l'on vous déconseille de faire ; cela permet de le faire fonctionner sous linux le lecteur NFC mais de manière instable (de nos tests, des erreurs pc/sc peuvent survenir), de plus la mise à jour du firmware est **irréversible**
 car le firmware initial est celui de zebra qui est non disponible au téléchargement.
 
-#### support sous Windows
+Aussi la ZXP3, qui est un modèle en fin de vie et dont les consommables vont être de plus en plus difficiles à trouver, n'est pas recommandée pour l'impression avec esup-sgc-client.
+Elle peut par contre vous servir de robot de badgeage (pour noter les cartes comme détruites par exemple) ou encore comme robot d'encodage (après une impression en masse, cf la documentation esup-sgc à ce sujet).
 
-Avec une imprimante Zebra de branchée sous windows, 2 cas de figure se produisent, suivant la JVM utilisée :
-* crash (core dump) avec la plupart des JVM - ce problème est connu et référencé dans plusieyrs pages : [ici](https://developer.zebra.com/content/zsdkapi-crashing-jvm) et [là](https://developer.zebra.com/content/zebranativeusbadapter64dll-and-jdk-9) par exemple.
-* un fonctionnement correct : l'imprimante est bien reconnue et l'icône dans esup-sgc-client devient ainsi verte, on peut alors lancer un 'stress test pc/sc' depuis le menu zebra
-
-La difficulté de la mise en oeuvre sous windows réside donc à trouver une JVM (JDK ou JRE) supportant le SDK Zebra.
-
-Des tests effectués, on estime que les JRE suivantes fonctionnent bien : 
- * versions JRE 1.8 proposées par Oracle jusqu'à la 1.8.0_251 inclue ; pour utiliser en production ue JRE sans vous acquitter d'un droit de licence, prenez la version **8u202** (dernière en date avec une licence gratuite pour un usage en production) : vous pouvez trouver ces anciennes versions dans [la page de téléchargement présentant ces archives](https://www.oracle.com/fr/java/technologies/javase/javase8-archive-downloads.html).
- 
-Si les versions en 32 bits comme la zulu JRE/JFX 11 en 32 bits proposées sur [AZUL](https://www.azul.com/downloads/?version=java-11-lts&os=windows&architecture=x86-32-bit&package=jre-fx#zulu) 
-sont compatibles avec le SDK Zebra, elles ne le sont pas complètement avec les technologies JFX utilisées par esup-sgc-client, on peut alors obtenir sur certaines actions (formulaires html webview pour l'authentification depuis un WAYF shibboleth notamment) une erreur du type
-```
-7036 [JavaFX Application Thread] ERROR org.esupportail.esupsgcclient.ui.JavaScriptConsoleBridge.windowerror(JavaScriptConsoleBridge.java:32)  - Window Javascript : ReferenceError: Can't find variable: $
-```
-Ce qui peut rendre esup-sgc-client difficilement utilisable (notamment pour la partie authentification) ; si tel est le cas, on vous conseille donc d'utiliser la JRE 1.8.0_202 d'Oracle.
-
-Pour tester sous windows, le plus pratique est de lancer une commande DOS et d'utiliser java.exe (et non javaw.exe) en ligne de commandes, ce qui permet 
-d'avoir le retour (logs) directement dans la commande DOS.
-On lance donc dans sous dos (cmd) une commande type :
-```
-"C:\Program Files\EsupSgcClient\java\bin\java.exe"
--Dcom.sun.webkit.useHTTP2Loader=false -DprinterZebraEncoderType=other
--jar esup-sgc-client-zebra.jar
-```
-
-#### support sous Linux
-
-Sous linux, le dialogue PC/SC avec l'encodeur est réalisé grâce à pcscd avec les pilotes proposés dans libccid.
-Le dialogue avec l'imprimante nécessite que l'utilisateur ait les droits de lecture/écriture sur le fichier de périphérique (sous peine d'une erreur de type "USB error 3: Unable to open device: Access denied (insufficient permissions)").
-Exemple pour debian : un ls -l sur le /dev nous indique qu'il suffit pour ce faire de mettre l'utilisateur dans les groupes dialout et lp.
-```
-adduser vincent dialout
-adduser vincent lp
-```
-
-Notez que sous linux, contrairement à sous windows, nous n'avons pas rencontré de difficultés de compatibilité avec les JVM (JDK/JRE) que l'on a pu tester.
-De fait, et tant que Zebra n'aura pas réglé ses problèmes de compatibilités avec les JVM sous wondows, on recommande plutôt d'utiliser les Zebra depuis des postes linux.
-
-#### support sous macOS
-
-macOS est également bien supproté par esup-sgc-client et ZC300
 
 ### esup-nfc-tag et esup-sgc de démonstration
 
