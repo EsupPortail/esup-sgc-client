@@ -11,11 +11,11 @@
 	<url>http://maven.apache.org</url>
 	<properties>
 		<revision>4.3-SNAPSHOT</revision>
-		<spring.version>5.3.39</spring.version>
-		<jackson.version>2.18.1</jackson.version>
+		<spring.version>6.2.2</spring.version>
+		<jackson.version>2.18.2</jackson.version>
 		<slf4j.version>2.0.16</slf4j.version>
-		<java.version>1.8</java.version>
-		<openjfx.version>11</openjfx.version>
+		<java.version>17</java.version>
+		<openjfx.version>17</openjfx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
