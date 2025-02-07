@@ -27,7 +27,7 @@ qui peut lui-même être généré depuis un simple formulaire web en ligne via 
 esup-sgc-client est une application java/spring/javafx utilisant maven pour gérer la compilation 
 et les dépendances des librairies utilisées.
 
-Pour fonctionner, il requiert un openjdk 17 (ou supérieur) et openjfx.
+Pour fonctionner, il requiert un openjdk 21 (ou supérieur) et openjfx.
 
 Il peut fonctionner sur les systèmes d'exploitation Windows, Linux et macOS.
 
@@ -44,7 +44,7 @@ Cependant, depuis votre IDE, le débogage via des points d'arrêt (breakpoint) r
 Il vaut mieux alors lancer le projet en tant qu'application java. Vous devrez alors spécifier les options javafx/openjfx 
 en précissant les "VM Options" de ce type :
 ````
---module-path /usr/local/javafx-sdk-17/lib/ --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.media,javafx.graphics,javafx.swing,javafx.web
+--module-path /usr/local/javafx-sdk-21/lib/ --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.media,javafx.graphics,javafx.swing,javafx.web
 ````
 
 Suivant le certificat utilisé par vos serveurs esup-sgc/esup-nfc-tag, et la version de java utilisée, vous devrez également rajouter dans les options java
