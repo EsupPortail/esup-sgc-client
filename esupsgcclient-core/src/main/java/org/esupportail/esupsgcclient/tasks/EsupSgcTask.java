@@ -88,13 +88,13 @@ public abstract class EsupSgcTask extends Task<String> {
                 uiStepTextFlow.getStyleClass().clear();
                 uiStepTextFlow.getStyleClass().add("alert-warning");
             } else {
+                updateTitle(uiStep.toString());
                 TextFlow uiStepTextFlow = (TextFlow) uiSteps.get(uiStep);
                 uiStepTextFlow.getStyleClass().clear();
                 uiStepTextFlow.getStyleClass().add("alert-success");
                 updateProgress((getUiStepsList().indexOf(uiStep) + 1) * PROGRESS_STEP_LENGTH, getUiStepsList().size() * PROGRESS_STEP_LENGTH);
                 if (getUiStepsList().indexOf(uiStep) + 1 < getUiStepsList().size()) {
                     UiStep newtUiStep = (UiStep) getUiStepsList().get(getUiStepsList().indexOf(uiStep) + 1);
-                    updateTitle(newtUiStep.toString());
                     uiStepTextFlow = (TextFlow) uiSteps.get(newtUiStep);
                     uiStepTextFlow.getStyleClass().clear();
                     uiStepTextFlow.getStyleClass().add("alert-warning");
