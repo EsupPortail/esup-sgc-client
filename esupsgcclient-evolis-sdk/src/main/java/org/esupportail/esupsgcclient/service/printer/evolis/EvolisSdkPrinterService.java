@@ -108,11 +108,13 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		stopEpcSupervision.setText("Arrêter la supervision EPC de l'imprimante");
 		MenuItem restartEpcSupervision = new MenuItem();
 		restartEpcSupervision.setText("Redémarrer la supervision EPC de l'imprimante");
+        MenuItem closeConnection = new MenuItem();
+        closeConnection.setText("Fermer la connexion Evolis");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
 		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject,
 				evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, clearPrintStatusMenu,
-				stopEpcSupervision, restartEpcSupervision);
+				stopEpcSupervision, restartEpcSupervision, closeConnection);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -185,6 +187,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 				logTextAreaService.appendText("supervision démarrée :");
 			}).start();
 		});
+
+        closeConnection.setOnAction(actionEvent -> {
+            new Thread(this::closeConnection).start();
+        });
 
 		TilePane r = new TilePane();
 		TextInputDialog td = new TextInputDialog("Echo;ESUP-SGC d'ESUP-Portail");
