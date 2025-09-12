@@ -63,8 +63,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		CleaningInfo cleaningInfo = getEvolisConnection().getCleaningInfo();
 		// check ribbon only if printer is ready and only each hour to avoid too much requests
 		if(ribbonInfoString4MaintenanceInfo.isEmpty() || (lastRibbonInfoDate.getTime() + 1000*3600) < new Date().getTime()) {
-			ribbonInfoString4MaintenanceInfo = getRibbonInfoString(getRibbonInfo());
-			lastRibbonInfoDate = new Date();
+			getRibbonInfo();
 		}
 		String printerInfoString = String.format("%s\n%s\nTotal Card Count : %s, CardCountBeforeWarrantyLost : %s, isPrintHeadUnderWarranty : %s, CardCountBeforeWarning : %s\n",
 				getInfo(), ribbonInfoString4MaintenanceInfo,
@@ -256,7 +255,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	}
 
 	public synchronized RibbonInfo getRibbonInfo() {
-		return getEvolisConnection().getRibbonInfo();
+        RibbonInfo ribbonInfo = getEvolisConnection().getRibbonInfo();
+        ribbonInfoString4MaintenanceInfo = getRibbonInfoString(ribbonInfo);
+        lastRibbonInfoDate = new Date();
+        return ribbonInfo;
 	}
 
 	public String getRibbonInfoString(RibbonInfo ribbonInfo) {
