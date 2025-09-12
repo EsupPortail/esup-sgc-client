@@ -63,7 +63,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		CleaningInfo cleaningInfo = getEvolisConnection().getCleaningInfo();
 		// check ribbon only if printer is ready and only each hour to avoid too much requests
 		if(ribbonInfoString4MaintenanceInfo.isEmpty() || (lastRibbonInfoDate.getTime() + 1000*3600) < new Date().getTime()) {
-			ribbonInfoString4MaintenanceInfo = getRibbonInfoString();
+			ribbonInfoString4MaintenanceInfo = getRibbonInfoString(getRibbonInfo());
 			lastRibbonInfoDate = new Date();
 		}
 		String printerInfoString = String.format("%s\n%s\nTotal Card Count : %s, CardCountBeforeWarrantyLost : %s, isPrintHeadUnderWarranty : %s, CardCountBeforeWarning : %s\n",
@@ -230,7 +230,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			if (evolisConnection == null) {
 				logTextAreaService.appendTextOnlyOne("No evolis printer found");
 			} else {
-				String progressDescRibbonInfo = getRibbonInfoString();
+				String progressDescRibbonInfo = getRibbonInfoString(getRibbonInfo());
 				if(!progressDescRibbonInfo.isEmpty()) {
 					logTextAreaService.appendText(progressDescRibbonInfo);
 				}
@@ -259,9 +259,8 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		return getEvolisConnection().getRibbonInfo();
 	}
 
-	public String getRibbonInfoString() {
+	public String getRibbonInfoString(RibbonInfo ribbonInfo) {
 		String progressDesc = "";
-		RibbonInfo ribbonInfo = getRibbonInfo();
 		if(ribbonInfo != null) {
 			progressDesc = String.format("Ribbon Info - %s : reste %s / %s faces", ribbonInfo.getDescription(), ribbonInfo.getRemaining(), ribbonInfo.getCapacity());
 		}

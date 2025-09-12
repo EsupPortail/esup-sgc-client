@@ -103,13 +103,19 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             evolisPrinterService.setupTrayConnection();
             updateTitle("Impression avant encodage ...");
             printSteps(bmpColorAsBase64, bmpBlackAsBase64, bmpBackAsBase64);
+            // Hack : we check that the printing is effectively done before encoding - for that we check the number of remaining ribbons after printing
+            Utils.sleep(500);
+            RibbonInfo ribbonInfoAfterPrinting =  evolisPrinterService.getRibbonInfo();
+            if(ribbonInfoAfterPrinting.getRemaining()==ribbonInfo.getRemaining()) {
+                throw new RuntimeException("Suite à l'impression, le nombre de rubans restant n'a pas évolué - l'impression n'a pas eu lieu ?" + ribbonInfoAfterPrinting.getRemaining());
+            }
+            String ribbonInfoString = evolisPrinterService.getRibbonInfoString(ribbonInfoAfterPrinting);
+            updateTitle(ribbonInfoString);
             encodeSteps(qrcode);
             evolisPrinterService.eject();
             cardInserted = false;
             String msgTimer = String.format("Carte éditée en %.2f secondes\n", (System.currentTimeMillis()-start)/1000.0);
             updateTitle(msgTimer);
-            String ribbonInfoString = evolisPrinterService.getRibbonInfoString();
-            updateTitle(ribbonInfoString);
         } catch (Exception e) {
             setCurrentUiStepFailed(e);
             if(cardInserted) {
