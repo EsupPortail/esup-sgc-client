@@ -96,21 +96,22 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
                 evolisPrinterStatus = evolisPrinterService.getPrinterStatus();
             }
             RibbonInfo ribbonInfo = evolisPrinterService.getRibbonInfo();
+            String ribbonInfoString = evolisPrinterService.getRibbonInfoString(ribbonInfo);
+            updateTitle(ribbonInfoString);
             if(ribbonInfo.getRemaining()<1) {
                 throw new RuntimeException("Plus de ruban, merci de le changer");
             }
             cardInserted = true;
             evolisPrinterService.setupTrayConnection();
             updateTitle("Impression avant encodage ...");
+            long printStart = System.currentTimeMillis();
             printSteps(bmpColorAsBase64, bmpBlackAsBase64, bmpBackAsBase64);
-            // Hack : we check that the printing is effectively done before encoding - for that we check the number of remaining ribbons after printing
-            Utils.sleep(500);
-            RibbonInfo ribbonInfoAfterPrinting =  evolisPrinterService.getRibbonInfo();
-            if(ribbonInfoAfterPrinting.getRemaining()==ribbonInfo.getRemaining()) {
-                throw new RuntimeException("Suite à l'impression, le nombre de rubans restant n'a pas évolué - l'impression n'a pas eu lieu ?" + ribbonInfoAfterPrinting.getRemaining());
+            // Hack : if print is done too quickly, it's that it failed
+            long printDuration = System.currentTimeMillis()-printStart;
+            updateTitle("Impression terminée en " + printDuration + " ms");
+            if(printDuration < 4000) {
+                throw new RuntimeException("L'impression aurait duré moins de 5 secondes, celle-ci a probablement échoué, processus stoppé");
             }
-            String ribbonInfoString = evolisPrinterService.getRibbonInfoString(ribbonInfoAfterPrinting);
-            updateTitle(ribbonInfoString);
             encodeSteps(qrcode);
             evolisPrinterService.eject();
             cardInserted = false;
