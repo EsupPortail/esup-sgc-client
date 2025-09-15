@@ -1,13 +1,7 @@
 package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import com.evolis.sdk.*;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Stage;
 import org.esupportail.esupsgcclient.AppSession;
@@ -17,11 +11,11 @@ import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.ui.LogTextAreaService;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.util.*;
 
@@ -107,13 +101,11 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		stopEpcSupervision.setText("Arrêter la supervision EPC de l'imprimante");
 		MenuItem restartEpcSupervision = new MenuItem();
 		restartEpcSupervision.setText("Redémarrer la supervision EPC de l'imprimante");
-        MenuItem closeConnection = new MenuItem();
-        closeConnection.setText("Fermer la connexion Evolis");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
 		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject,
 				evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, clearPrintStatusMenu,
-				stopEpcSupervision, restartEpcSupervision, closeConnection);
+				stopEpcSupervision, restartEpcSupervision);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -186,10 +178,6 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 				logTextAreaService.appendText("supervision démarrée :");
 			}).start();
 		});
-
-        closeConnection.setOnAction(actionEvent -> {
-            new Thread(this::closeConnection).start();
-        });
 
 		TilePane r = new TilePane();
 		TextInputDialog td = new TextInputDialog("Echo;ESUP-SGC d'ESUP-Portail");
@@ -367,6 +355,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		getEvolisConnection().sendCommand("Scs;");
 	}
 
+    @PreDestroy
 	public synchronized void closeConnection() {
 		if(evolisConnection != null && evolisConnection.isOpen()) {
 			evolisConnection.close();
@@ -375,4 +364,3 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		}
 	}
 }
-
