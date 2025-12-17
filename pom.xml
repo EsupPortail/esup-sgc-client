@@ -11,8 +11,7 @@
 	<url>http://maven.apache.org</url>
 	<properties>
 		<revision>5.3-SNAPSHOT</revision>
-		<spring.version>6.2.7</spring.version>
-		<jackson.version>2.18.4</jackson.version>
+		<spring.version>6.2.15</spring.version>
 		<slf4j.version>2.0.17</slf4j.version>
 		<java.version>21</java.version>
 		<openjfx.version>21</openjfx.version>
