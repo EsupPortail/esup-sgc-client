@@ -196,7 +196,7 @@ public class EsupSgcClientJfxController implements Initializable {
 		comboBox.getSelectionModel().selectedItemProperty().addListener((options, oldServiceName, newServiceName) -> {
 			log.debug("comboBox SelectionModel Event : " + options.getValue() + " - " + oldServiceName + " - " + newServiceName);
 			Utils.jfxRunLaterIfNeeded(() -> {
-				if (!StringUtils.isEmpty(newServiceName)) {
+				if (!StringUtils.isEmpty(newServiceName) && esupSgcTaskServiceFactory.getServicesNames().contains(newServiceName)) {
 					if (autostart.isSelected() && !StringUtils.isEmpty(oldServiceName)) {
 						esupSgcTaskServiceFactory.readyToRunProperty(newServiceName).removeListener(esupSgcTaskServiceFactory.getStopStartListener(newServiceName));
 					}

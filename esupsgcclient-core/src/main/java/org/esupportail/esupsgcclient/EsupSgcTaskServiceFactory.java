@@ -147,6 +147,9 @@ public class EsupSgcTaskServiceFactory {
     }
 
     public BooleanBinding readyToRunProperty(String serviceName) {
+        if(!esupSgcTaskUis.containsKey(serviceName)) {
+            throw new IllegalArgumentException("Service name not found: " + serviceName);
+        }
         return esupSgcTaskUis.get(serviceName).readyToRunProperty();
     }
 
