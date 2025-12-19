@@ -10,7 +10,7 @@
 	<name>esupsgcclient</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<revision>5.3</revision>
+		<revision>5.4-SNAPSHOT</revision>
 		<spring.version>6.2.15</spring.version>
 		<slf4j.version>2.0.17</slf4j.version>
 		<java.version>21</java.version>
