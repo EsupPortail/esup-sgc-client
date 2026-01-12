@@ -1,21 +1,11 @@
 package org.esupportail.esupsgcclient.service.pcsc;
 
-import jnasmartcardio.Smartcardio;
-import jnasmartcardio.Smartcardio.JnaPCSCException;
+import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.esupportail.esupsgcclient.utils.Utils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.smartcardio.Card;
-import javax.smartcardio.CardException;
-import javax.smartcardio.CardTerminal;
-import javax.smartcardio.CardTerminals;
-import javax.smartcardio.CommandAPDU;
-import javax.smartcardio.ResponseAPDU;
-import javax.smartcardio.TerminalFactory;
-import java.security.Security;
+import javax.smartcardio.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,9 +21,8 @@ public class PcscUsbService {
 	private CardTerminals terminals;
 	
 	void init() throws PcscException {
-		Security.addProvider(new Smartcardio());
 		try {
-			context = TerminalFactory.getInstance("PC/SC", null, Smartcardio.PROVIDER_NAME);
+			context = TerminalFactory.getInstance("PC/SC", null);
 			terminals = context.terminals();
 		} catch (Exception e) {
 			throw new PcscException("Exception retrieving context", e);
@@ -60,7 +49,7 @@ public class PcscUsbService {
 					card = terminal.connect("*");
 					cardTerminal = terminal;
 					return cardTerminal.getName();
-				} catch(JnaPCSCException e) {
+				} catch(Exception e) {
 					// if card nfc is ko for example
 					if(e.getMessage().contains("SCARD_E_NO_SMARTCARD") || e.getMessage().contains("SCARD_W_UNPOWERED_CARD") || e.getMessage().contains("SCARD_W_UNRESPONSIVE_CARD")) {
 						log.warn("wait ... " + e.getMessage());
