@@ -117,11 +117,13 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		stopEpcSupervision.setText("Arrêter la supervision EPC de l'imprimante");
 		MenuItem restartEpcSupervision = new MenuItem();
 		restartEpcSupervision.setText("Redémarrer la supervision EPC de l'imprimante");
+		MenuItem cleanEvolis = new MenuItem();
+		cleanEvolis.setText("Lancer un cycle de nettoyage de la tête d'impression");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
 		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject,
 				evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, clearPrintStatusMenu,
-				stopEpcSupervision, restartEpcSupervision);
+				stopEpcSupervision, restartEpcSupervision, cleanEvolis);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -192,6 +194,14 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 				logTextAreaService.appendText("Redémarrage de la supervision ...");
 				stopEpcSupervision();
 				logTextAreaService.appendText("supervision démarrée :");
+			}).start();
+		});
+
+		cleanEvolis.setOnAction(actionEvent -> {
+			new Thread(() -> {
+				logTextAreaService.appendText("Lancement d'un cycle de nettoyage ...");
+				String ret = getEvolisConnection().sendCommand("Scp;");
+				logTextAreaService.appendText("Return : " + ret);
 			}).start();
 		});
 
