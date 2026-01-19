@@ -3,7 +3,10 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 import com.evolis.sdk.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.TilePane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 
 
@@ -119,11 +124,13 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		restartEpcSupervision.setText("Redémarrer la supervision EPC de l'imprimante");
 		MenuItem cleanEvolis = new MenuItem();
 		cleanEvolis.setText("Lancer un cycle de nettoyage de la tête d'impression");
+		MenuItem updateFirmware = new MenuItem();
+		updateFirmware.setText("Mise a jour du firmware de l'imprimante");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
 		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject,
 				evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, clearPrintStatusMenu,
-				stopEpcSupervision, restartEpcSupervision, cleanEvolis);
+				stopEpcSupervision, restartEpcSupervision, cleanEvolis, updateFirmware);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -203,6 +210,26 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 				String ret = getEvolisConnection().sendCommand("Scp;");
 				logTextAreaService.appendText("Return : " + ret);
 			}).start();
+		});
+
+		final FileChooser fileChooser = new FileChooser();
+		updateFirmware.setOnAction(actionEvent -> {
+			File file = fileChooser.showOpenDialog(stage);
+			if (file != null) {
+				new Thread(() -> {
+					try {
+						logTextAreaService.appendText(String.format("Envoi du fichier %s pour mise à jour du firmware de l'imprimante Evolis en cours ...", file.getAbsolutePath()));
+						InputStream is = IOUtils.toBufferedInputStream(FileUtils.openInputStream(file));
+						getEvolisConnection().firmwareUpdate(is.readAllBytes());
+						logTextAreaService.appendText("Mise à jour réussie !");
+						logTextAreaService.appendText("Merci de redémarrer l'application.");
+					} catch (Exception e) {
+						logTextAreaService.appendText(String.format("Mise à jour échouée ... : %s", e.getMessage()));
+						log.error("Exception lors de la mise à jour du firmware Evolis", e);
+					}
+				}).start();
+				logTextAreaService.appendText("Ne pas éteindre l'imprimante et l'application pendant la mise à jour du firmware !");
+			}
 		});
 
 		TilePane r = new TilePane();
