@@ -4,6 +4,7 @@ import com.evolis.sdk.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
 import org.esupportail.esupsgcclient.AppSession;
 import org.esupportail.esupsgcclient.service.printer.EsupSgcPrinterService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
@@ -13,6 +14,7 @@ import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.ui.LogTextAreaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -50,6 +52,20 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	String ribbonInfoString4MaintenanceInfo = "";
 
 	Date lastRibbonInfoDate = new Date();
+
+
+	public EvolisSdkPrinterService(@Value("${printerEvolisLoglevel:}") String printerEvolisLoglevel,
+								   @Value("${printerEvolisLogPath:}") String printerEvolisLogPath) {
+		if(!StringUtils.isEmpty(printerEvolisLoglevel)) {
+			LogLevel logLevel = LogLevel.valueOf(printerEvolisLoglevel);
+			Evolis.setLogLevel(logLevel);
+			log.info("Set Evolis log level to " + logLevel);
+		}
+		if(!StringUtils.isEmpty(printerEvolisLogPath)) {
+			Evolis.setLogPath(printerEvolisLogPath);
+			log.info("Set Evolis log path to " + printerEvolisLogPath);
+		}
+	}
 
 
 	@Override
