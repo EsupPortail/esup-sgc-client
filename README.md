@@ -119,6 +119,13 @@ Les drivers sont disponibles aussi bien sous Windows, Linux et macOS. Aussi votr
 esup-sgc-client dialogue directement avec l'imprimante via le SDK 3.
 Ce SDK permet de retrouver simplement et automatiquement l'imprimante evolis connectée, le type de ruban n'est pas non plus à configurer, ...
 
+Sous linux, la librairie interne du SDK requiert notamment libcups.so que l'on peut retrouver au travers du paquet libcups2-dev (Debian/Ubuntu) ou cups-devel (RHEL/CentOS).
+Si vous avez des difficultés à faire fonctionner le SDK3 sous votre OS, n'hésitez pas à activer les logs du SDK3 en positionnant les propriétés suivantes dans esupsgcclient.properties par exemple :
+```
+printerEvolisLoglevel = TRACE
+printerEvolisLogPath = /tmp/evolis_printer.log
+```
+
 Théoriquement, esup-sgc-client doit supporter les autres imprimantes evolis que Primacy 1 et 2 via le SDK3 toujours.
 
 ### zebra
