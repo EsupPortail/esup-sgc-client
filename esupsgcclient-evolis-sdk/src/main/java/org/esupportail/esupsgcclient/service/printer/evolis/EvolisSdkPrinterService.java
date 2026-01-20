@@ -126,11 +126,13 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		cleanEvolis.setText("Lancer un cycle de nettoyage de la tête d'impression");
 		MenuItem updateFirmware = new MenuItem();
 		updateFirmware.setText("Mise a jour du firmware de l'imprimante");
+		MenuItem restoreFactorySettings = new MenuItem();
+		restoreFactorySettings.setText("Restaurer les paramètres d'usine de l'imprimante");
 		Menu evolisMenu = new Menu();
 		evolisMenu.setText("Evolis-SDK");
 		evolisMenu.getItems().addAll(evolisRelease, evolisReset, evolisReject,
 				evolisCommand, testPcsc, pcscDesfireTest, stopEvolis, clearPrintStatusMenu,
-				stopEpcSupervision, restartEpcSupervision, cleanEvolis, updateFirmware);
+				stopEpcSupervision, restartEpcSupervision, cleanEvolis, updateFirmware, restoreFactorySettings);
 		menuBar.getMenus().add(evolisMenu);
 
 		evolisRelease.setOnAction(actionEvent -> {
@@ -230,6 +232,15 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 				}).start();
 				logTextAreaService.appendText("Ne pas éteindre l'imprimante et l'application pendant la mise à jour du firmware !");
 			}
+		});
+
+		restoreFactorySettings.setOnAction(actionEvent -> {
+			new Thread(() -> {
+				logTextAreaService.appendText("Restauration des paramètres d'usine de l'imprimante Evolis en cours ...");
+				String ret = getEvolisConnection().sendCommand("Rmp;all");
+				logTextAreaService.appendText("Return : " + ret);
+			}).start();
+			logTextAreaService.appendText("Ne pas éteindre l'imprimante pendant la restauration des paramètres d'usine !");
 		});
 
 		TilePane r = new TilePane();
