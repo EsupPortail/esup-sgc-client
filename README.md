@@ -120,6 +120,8 @@ esup-sgc-client dialogue directement avec l'imprimante via le SDK 3.
 Ce SDK permet de retrouver simplement et automatiquement l'imprimante evolis connectée, le type de ruban n'est pas non plus à configurer, ...
 
 Sous linux, la librairie interne du SDK requiert notamment libcups.so que l'on peut retrouver au travers du paquet libcups2-dev (Debian/Ubuntu) ou cups-devel (RHEL/CentOS).
+Il faut également s'assurer que l'utilisateur qui lance esup-sgc-client a les droits d'accès au port USB de l'imprimante ; généralement, l'ajout de l'utilisateur au groupe "lp" (Debian/Ubuntu) ou "lpadmin" (RHEL/CentOS) suffit.
+
 Si vous avez des difficultés à faire fonctionner le SDK3 sous votre OS, n'hésitez pas à activer les logs du SDK3 en positionnant les propriétés suivantes dans esupsgcclient.properties par exemple :
 ```
 printerEvolisLoglevel = TRACE
@@ -166,6 +168,8 @@ Dans le fichier de propriétés src/main/resources/esupsgcclient.properties, sui
 Si la ZC300 attend a priori 'other' pour spécifier le lecteur NFC USB intégré à celle-ci, la ZXP3 attend par exemple 'MIFARE'.
 
 Notez que la Zebra ZC 300 (avec l'encodeur cité) fonctionne aussi bien sous windows, macOS et linux.
+
+Sous linux, il faut s'assurer que l'utilisateur qui lance esup-sgc-client a les droits d'accès au port USB de l'imprimante ; généralement, l'ajout de l'utilisateur au groupe "lp" (Debian/Ubuntu) ou "lpadmin" (RHEL/CentOS) suffit.
 
 #### zxp3 - difficultés rencontrées
 
