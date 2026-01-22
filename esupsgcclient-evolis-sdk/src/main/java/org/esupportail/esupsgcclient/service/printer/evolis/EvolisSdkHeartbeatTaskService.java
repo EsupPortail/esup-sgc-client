@@ -2,6 +2,7 @@ package org.esupportail.esupsgcclient.service.printer.evolis;
 
 import javax.annotation.Resource;
 
+import com.evolis.sdk.CleaningInfo;
 import com.evolis.sdk.RibbonInfo;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -42,24 +43,33 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                     try {
                         String printerStatus = evolisPrinterService.getPrinterStatus();
                         if(printerStatus.contains("PRINTER_READY")) {
-                            // check ribbon only if printer is ready and only each hour to avoid too much requests
-                            // -> to avoid overuse of nfc chip of the ribbon
-                            // -> to avoid to burn out the nfc chip of the ribbon
-                            if(ribbonInfo == null || (lastRibbonInfoDate.getTime() + 1000*3600) < new Date().getTime()) {
-                                ribbonInfo = evolisPrinterService.getRibbonInfo();
-                                lastRibbonInfoDate = new Date();
-                            }
-                            if(ribbonInfo.getRemaining()<1) {
+                            CleaningInfo cleaningInfo = evolisPrinterService.getCleaningInfo();
+                            if(cleaningInfo!=null && cleaningInfo.getCardCountBeforeWarrantyLost()<10) {
                                 appSession.setPrinterReady(false);
-                                printerStatus = "Plus de ruban, merci de le changer";
-                            } else if(!appSession.isPrinterReady()) {
-                                evolisPrinterService.init();
-                                appSession.setPrinterReady(true);
+                                printerStatus = "Nettoyage nécessaire : " + cleaningInfo.getCardCountBeforeWarrantyLost() + " cartes avant perte de garantie";
+                            } else {
+                                // check ribbon only if printer is ready and only each hour to avoid too much requests
+                                // -> to avoid overuse of nfc chip of the ribbon
+                                // -> to avoid to burn out the nfc chip of the ribbon
+                                if (ribbonInfo == null || (lastRibbonInfoDate.getTime() + 1000 * 3600) < new Date().getTime()) {
+                                    ribbonInfo = evolisPrinterService.getRibbonInfo();
+                                    lastRibbonInfoDate = new Date();
+                                }
+                                if (ribbonInfo.getRemaining() < 1) {
+                                    appSession.setPrinterReady(false);
+                                    printerStatus = "Plus de ruban, merci de le changer";
+                                } else if (!appSession.isPrinterReady()) {
+                                    evolisPrinterService.init();
+                                    appSession.setPrinterReady(true);
+                                }
                             }
                         }
                         if(printerStatus!=null && !printerStatus.equals(lastPrinterStatus)) {
                             lastPrinterStatus = printerStatus;
                             updateTitle("Statut Evolis : " + lastPrinterStatus);
+                            if(!appSession.isPrinterReady()) {
+                                logTextAreaService.setInfoText("Imprimante Evolis non prête : " + lastPrinterStatus, "red");
+                            }
                         }
                     } catch(Exception e) {
                         appSession.setPrinterReady(false);

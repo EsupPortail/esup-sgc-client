@@ -83,6 +83,11 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		String printerInfoString = String.format("%s\n%s\nTotal Card Count : %s, CardCountBeforeWarrantyLost : %s, isPrintHeadUnderWarranty : %s, CardCountBeforeWarning : %s\n",
 				getInfo(), ribbonInfoString4MaintenanceInfo,
 				cleaningInfo.getTotalCardCount(), cleaningInfo.getCardCountBeforeWarrantyLost(), cleaningInfo.isPrintHeadUnderWarranty(), cleaningInfo.getCardCountBeforeWarning());
+
+		String cleaningInfoText = String.format("%s impressions avant nettoyage\n", cleaningInfo.getCardCountBeforeWarrantyLost());
+		String color = cleaningInfo.getCardCountBeforeWarrantyLost()>200 ? "green" : (cleaningInfo.getCardCountBeforeWarrantyLost()>100 ? "orange" : "red");
+		logTextAreaService.setInfoText(cleaningInfoText, color);
+
 		return printerInfoString;
 	}
 
@@ -289,6 +294,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 				if(!printerInfoString.isEmpty()) {
 					logTextAreaService.appendText(printerInfoString);
 				}
+				getMaintenanceInfo();
 			}
 		}
 	}
@@ -426,5 +432,9 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			logTextAreaService.appendText("Evolis connection closed");
 			init();
 		}
+	}
+
+	public CleaningInfo getCleaningInfo() {
+		return getEvolisConnection().getCleaningInfo();
 	}
 }

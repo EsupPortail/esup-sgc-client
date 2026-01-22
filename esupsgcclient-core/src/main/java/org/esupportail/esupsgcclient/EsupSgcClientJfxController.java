@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
@@ -89,6 +90,9 @@ public class EsupSgcClientJfxController implements Initializable {
 	Button stopButton;
 
 	@FXML
+	Text infoText;
+
+	@FXML
 	ComboBox<String> comboBox;
 
 	@FXML
@@ -156,7 +160,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 
-		logTextAreaService.initLogTextArea(logTextarea);
+		logTextAreaService.initLogTextArea(logTextarea, infoText);
 
 		logTextAreaService.appendText("Esup-SGC-Client " + appVersion.getVersion() + " - compilé le " + appVersion.getBuildDate());
 		logTextAreaService.appendText("ESUP-SGC : " + appConfig.getEsupSgcUrl());
