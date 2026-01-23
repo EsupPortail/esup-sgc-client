@@ -37,6 +37,28 @@
 				<module>esupsgcclient-zebra</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>nvd-check</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.owasp</groupId>
+						<artifactId>dependency-check-maven</artifactId>
+						<version>12.1.9</version>
+						<configuration>
+							<nvdApiKey>${nvd.api.key}</nvdApiKey>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>check</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 	<dependencies>
 		<dependency>
@@ -85,21 +107,6 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.owasp</groupId>
-				<artifactId>dependency-check-maven</artifactId>
-				<version>12.1.9</version>
-				<configuration>
-					<nvdApiKey>${nvd.api.key}</nvdApiKey>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.openjfx</groupId>
