@@ -75,18 +75,21 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	@Override
 	public synchronized String getMaintenanceInfo() {
-		CleaningInfo cleaningInfo = getEvolisConnection().getCleaningInfo();
+		String printerInfoString = "";
+				CleaningInfo cleaningInfo = getEvolisConnection().getCleaningInfo();
 		// check ribbon only if printer is ready and only each hour to avoid too much requests
 		if(ribbonInfoString4MaintenanceInfo.isEmpty() || (lastRibbonInfoDate.getTime() + 1000*3600) < new Date().getTime()) {
 			getRibbonInfo();
 		}
-		String printerInfoString = String.format("%s\n%s\nTotal Card Count : %s, CardCountBeforeWarrantyLost : %s, isPrintHeadUnderWarranty : %s, CardCountBeforeWarning : %s\n",
-				getInfo(), ribbonInfoString4MaintenanceInfo,
-				cleaningInfo.getTotalCardCount(), cleaningInfo.getCardCountBeforeWarrantyLost(), cleaningInfo.isPrintHeadUnderWarranty(), cleaningInfo.getCardCountBeforeWarning());
+		if(cleaningInfo != null && !StringUtils.isEmpty(ribbonInfoString4MaintenanceInfo)) {
+			printerInfoString = String.format("%s\n%s\nTotal Card Count : %s, CardCountBeforeWarrantyLost : %s, isPrintHeadUnderWarranty : %s, CardCountBeforeWarning : %s\n",
+					getInfo(), ribbonInfoString4MaintenanceInfo,
+					cleaningInfo.getTotalCardCount(), cleaningInfo.getCardCountBeforeWarrantyLost(), cleaningInfo.isPrintHeadUnderWarranty(), cleaningInfo.getCardCountBeforeWarning());
 
-		String cleaningInfoText = String.format("%s impressions avant nettoyage\n", cleaningInfo.getCardCountBeforeWarrantyLost());
-		String color = cleaningInfo.getCardCountBeforeWarrantyLost()>200 ? "green" : (cleaningInfo.getCardCountBeforeWarrantyLost()>100 ? "orange" : "red");
-		logTextAreaService.setInfoText(cleaningInfoText, color);
+			String cleaningInfoText = String.format("%s impressions avant nettoyage\n", cleaningInfo.getCardCountBeforeWarrantyLost());
+			String color = cleaningInfo.getCardCountBeforeWarrantyLost() > 200 ? "green" : (cleaningInfo.getCardCountBeforeWarrantyLost() > 100 ? "orange" : "red");
+			logTextAreaService.setInfoText(cleaningInfoText, color);
+		}
 
 		return printerInfoString;
 	}
