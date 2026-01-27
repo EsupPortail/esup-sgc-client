@@ -87,8 +87,8 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 					cleaningInfo.getTotalCardCount(), cleaningInfo.getCardCountBeforeWarrantyLost(), cleaningInfo.isPrintHeadUnderWarranty(), cleaningInfo.getCardCountBeforeWarning());
 
 			String cleaningInfoText = String.format("%s impressions avant nettoyage\n", cleaningInfo.getCardCountBeforeWarrantyLost());
-			String color = cleaningInfo.getCardCountBeforeWarrantyLost() > 200 ? "green" : (cleaningInfo.getCardCountBeforeWarrantyLost() > 100 ? "orange" : "red");
-			logTextAreaService.setInfoText(cleaningInfoText, color);
+			String style = cleaningInfo.getCardCountBeforeWarrantyLost() > 200 ? "alert-info" : (cleaningInfo.getCardCountBeforeWarrantyLost() > 100 ? "alert-warning" : "alert-danger");
+			logTextAreaService.setInfoText(cleaningInfoText, style);
 		}
 
 		return printerInfoString;

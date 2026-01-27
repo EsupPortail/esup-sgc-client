@@ -1,11 +1,11 @@
 package org.esupportail.esupsgcclient.ui;
 
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.esupportail.esupsgcclient.EsupSgcClientJfxController;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
@@ -18,7 +18,7 @@ public class LogTextAreaService {
 
     TextArea logTextarea;
 
-    Text infoText;
+    Label infoText;
 
     DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
 
@@ -26,7 +26,7 @@ public class LogTextAreaService {
 
     String lastInfoText = "";
 
-    public void initLogTextArea(TextArea logTextarea, Text infoText) {
+    public void initLogTextArea(TextArea logTextarea, Label infoText) {
         this.logTextarea = logTextarea;
         this.infoText = infoText;
     }
@@ -37,10 +37,12 @@ public class LogTextAreaService {
         log.info(text);
     }
 
-    public void setInfoText(String text, String color) {
+    public void setInfoText(String text, String style) {
         Utils.jfxRunLaterIfNeeded(() -> {
             infoText.setText(text);
-            infoText.setStyle("-fx-fill: " + color + ";");
+            TextFlow textFlow = (TextFlow) infoText.getParent();
+            textFlow.getStyleClass().clear();
+            textFlow.getStyleClass().add(style);
         });
         if(!lastInfoText.equals(text)) {
             appendText(text);

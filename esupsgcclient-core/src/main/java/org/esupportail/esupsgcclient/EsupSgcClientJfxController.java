@@ -90,7 +90,7 @@ public class EsupSgcClientJfxController implements Initializable {
 	Button stopButton;
 
 	@FXML
-	Text infoText;
+	Label infoText;
 
 	@FXML
 	ComboBox<String> comboBox;

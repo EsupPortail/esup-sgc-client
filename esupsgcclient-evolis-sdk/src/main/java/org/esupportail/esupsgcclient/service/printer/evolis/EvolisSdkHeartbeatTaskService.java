@@ -64,11 +64,11 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                                 }
                             }
                         }
-                        if(printerStatus!=null && !printerStatus.equals(lastPrinterStatus)) {
+                        if(!printerStatus.equals(lastPrinterStatus)) {
                             lastPrinterStatus = printerStatus;
                             updateTitle("Statut Evolis : " + lastPrinterStatus);
                             if(!appSession.isPrinterReady()) {
-                                logTextAreaService.setInfoText("Imprimante Evolis non prête : " + lastPrinterStatus, "red");
+                                logTextAreaService.setInfoText("Imprimante Evolis non prête : " + lastPrinterStatus, "alert-danger");
                             }
                         }
                     } catch(Exception e) {
@@ -77,6 +77,7 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                         if( e.getMessage()!=null && ! e.getMessage().equals(lastPrinterStatus)) {
                             lastPrinterStatus = e.getMessage();
                             updateTitle("Statut Evolis : " + lastPrinterStatus);
+                            logTextAreaService.setInfoText("Imprimante Evolis non prête", "alert-danger");
                         }
                     }
                     Utils.sleep(2000);
