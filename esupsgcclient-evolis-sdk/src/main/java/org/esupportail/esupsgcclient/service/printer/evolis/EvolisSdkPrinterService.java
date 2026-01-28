@@ -104,7 +104,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	@Override
 	public synchronized void setupJfxUi(Stage stage, Tooltip tooltip, MenuBar menuBar) {
 
-		init();
+		new Thread(this::init).start();
 
 		tooltip.textProperty().bind(evolisSdkHeartbeatTaskService.titleProperty());
 		evolisSdkHeartbeatTaskService.start();
