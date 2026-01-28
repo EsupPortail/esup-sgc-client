@@ -61,6 +61,7 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                                 } else if (!appSession.isPrinterReady()) {
                                     evolisPrinterService.init();
                                     appSession.setPrinterReady(true);
+                                    logTextAreaService.setInfoText("Imprimante Evolis prête", "alert-success");
                                 }
                             }
                         }
