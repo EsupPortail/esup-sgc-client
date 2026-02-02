@@ -216,6 +216,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 		cleanEvolis.setOnAction(actionEvent -> {
 			new Thread(() -> {
+				if(getCleaningInfo() != null) {
+					logTextAreaService.appendText("Merci de retirer le ruban avant de lancer un cycle de nettoyage !");
+					return;
+				}
 				logTextAreaService.appendText("Lancement d'un cycle de nettoyage ...");
 				String ret = getEvolisConnection().sendCommand("Scp;");
 				logTextAreaService.appendText("Return : " + ret);
@@ -426,6 +430,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	public synchronized void clearPrintStatus() {
 		logTextAreaService.appendText("Clear Printer status ...");
 		getEvolisConnection().sendCommand("Scs;");
+		logTextAreaService.appendText("Clear Printer status OK");
 	}
 
     @PreDestroy

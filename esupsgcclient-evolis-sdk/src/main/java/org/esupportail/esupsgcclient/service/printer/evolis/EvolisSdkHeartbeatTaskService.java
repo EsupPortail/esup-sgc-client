@@ -60,11 +60,11 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                                 if(ribbonInfo==null) {
                                     appSession.setPrinterReady(false);
                                     printerStatus = "Problème de lecture du ruban (puce)";
-                                    logTextAreaService.setInfoText("Imprimante Evolis prête : " + printerStatus, "alert-success");
+                                    logTextAreaService.setInfoText("Imprimante Evolis non prête : " + printerStatus, "alert-warning");
                                 } else if (ribbonInfo.getRemaining() < 1) {
                                     appSession.setPrinterReady(false);
                                     printerStatus = "Plus de ruban, merci de le changer";
-                                    logTextAreaService.setInfoText("Imprimante Evolis prête : " + printerStatus, "alert-success");
+                                    logTextAreaService.setInfoText("Imprimante Evolis non prête : " + printerStatus, "alert-warning");
                                 } else if (!appSession.isPrinterReady()) {
                                     evolisPrinterService.init();
                                     appSession.setPrinterReady(true);
