@@ -94,7 +94,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		return printerInfoString;
 	}
 
-	protected Connection getEvolisConnection() {
+	protected synchronized Connection getEvolisConnection() {
 		if(evolisConnection == null || !evolisConnection.isOpen()) {
 			init();
 		}
@@ -334,7 +334,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		return progressDesc;
 	}
 
-	public String getPrinterStatus() {
+	public synchronized String getPrinterStatus() {
 		State state = getEvolisConnection().getState();
 		String printerStatus = String.format("%s : %s", state.getMajorState(), state.getMinorState());
 		if(printerStatus.contains("WARNING : DEF_RIBBON_ENDED")) {
@@ -442,7 +442,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		}
 	}
 
-	public CleaningInfo getCleaningInfo() {
+	public synchronized CleaningInfo getCleaningInfo() {
 		return getEvolisConnection().getCleaningInfo();
 	}
 }
