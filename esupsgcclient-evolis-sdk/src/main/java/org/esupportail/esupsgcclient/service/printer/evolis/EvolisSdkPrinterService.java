@@ -15,7 +15,6 @@ import org.esupportail.esupsgcclient.ui.EsupSgcDesfireFullTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.EsupSgcTestPcscDialog;
 import org.esupportail.esupsgcclient.ui.FileLocalStorage;
 import org.esupportail.esupsgcclient.ui.LogTextAreaService;
-import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -95,7 +94,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		return printerInfoString;
 	}
 
-	protected synchronized Connection getEvolisConnection() {
+	protected Connection getEvolisConnection() {
 		if(evolisConnection == null || !evolisConnection.isOpen()) {
 			init();
 		}
@@ -251,18 +250,20 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			logTextAreaService.appendText("Merci de retirer le ruban avant de lancer un cycle de nettoyage !");
 			return;
 		}
-		logTextAreaService.appendText("Lancement d'un cycle de nettoyage ...");
+		logTextAreaService.appendText("Lancement d'un cycle de nettoyage ...\n" +
+				"\tpositionnez le curseur de largeaur de carte au maximum pour éviter tout bourrage pendant le nettoyage.\n" +
+				"\tinsérez une carte de nettoyage dans l'imprimante.\n" +
+				"\tCliquez sur 'Clear Printer status' pour annuler le cycle de nettoyage.\n" +
+				"\tEn fin de nettoyage, merci de remettre un ruban et des cartes dans le chargeur.\n");
 		String ret = getEvolisConnection().sendCommand("Scp;");
 		logTextAreaService.appendText("Return : " + ret);
-		while (true) {
-			String printerStatus = getPrinterStatus();
-			logTextAreaService.appendText("Printer status : " + printerStatus);
-			if(printerStatus.contains("PRINTER_READY")) {
-				logTextAreaService.appendText("Cycle de nettoyage terminé !");
-				break;
-			}
-			Utils.sleep(2000);
+		if("OK".equals(ret)) {
+			logTextAreaService.appendText("Cycle de nettoyage terminé, merci de remettre un ruban et des cartes dans le chargeur.");
 		}
+		if("FEEDER EMPTY".equals(ret)) {
+			logTextAreaService.appendText("Cycle de nettoyage annulé : pas de carte de nettoyage détectée dans l'imprimante.");
+		}
+		clearPrintStatus();
 	}
 
 	synchronized void evolisStopEpcSupervision() {
@@ -453,7 +454,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 		logTextAreaService.appendText("supervision démarrée :");
 	}
 
-	public synchronized void clearPrintStatus() {
+	public void clearPrintStatus() {
 		logTextAreaService.appendText("Clear Printer status ...");
 		getEvolisConnection().sendCommand("Scs;");
 		logTextAreaService.appendText("Clear Printer status OK");
