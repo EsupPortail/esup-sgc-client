@@ -9,7 +9,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.esupportail.esupsgcclient.service.sgc.EsupSgcHeartbeatService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskService;
 import org.esupportail.esupsgcclient.tasks.EsupSgcTaskSupervisionService;
@@ -18,7 +17,6 @@ import org.esupportail.esupsgcclient.ui.UiStep;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -59,8 +57,6 @@ public class EsupSgcTaskServiceFactory {
     @Resource
     EsupSgcTaskSupervisionService esupSgcTaskSupervisionService;
 
-    @Resource
-    HttpComponentsClientHttpRequestFactory httpRequestFactory;
 
     @Resource
     ThreadPoolExecutor sgcTaskExecutor;
@@ -161,14 +157,8 @@ public class EsupSgcTaskServiceFactory {
         if(oldServiceName != null && esupSgcTaskUis.get(oldServiceName)!=null) {
             esupSgcTaskUis.get(oldServiceName).cancelTaskService();
         }
-        // we destroy all http connections (used by RestTemplate used in all tasks) to help
-        try {
-            httpRequestFactory.destroy();
-        } catch (Exception e) {
-            log.debug("Exception destroying httpRequestFactory", e);
-        } finally {
-            httpRequestFactory.setHttpClient(HttpClients.createSystem());
-        }
+        // Avec SimpleClientHttpRequestFactory, les connexions sont automatiquement fermées
+        // après chaque requête, donc aucune action nécessaire ici
         resetUiSteps();
     }
 
