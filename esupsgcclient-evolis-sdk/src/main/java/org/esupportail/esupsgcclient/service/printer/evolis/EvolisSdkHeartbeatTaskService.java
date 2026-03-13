@@ -41,47 +41,49 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                 Date lastRibbonInfoDate = new Date();
                 while(true) {
                     try {
-                        String printerStatus = evolisPrinterService.getPrinterStatus();
-                        if(printerStatus.contains("PRINTER_READY")) {
-                            CleaningInfo cleaningInfo = evolisPrinterService.getCleaningInfo();
-                            if(cleaningInfo!=null && cleaningInfo.getCardCountBeforeWarrantyLost()<10) {
-                                appSession.setPrinterReady(false);
-                                printerStatus = "Nettoyage nécessaire : " + cleaningInfo.getCardCountBeforeWarrantyLost() + " cartes avant perte de garantie";
-                            } else {
-                                // check ribbon only if printer is ready and only each hour to avoid too much requests
-                                // -> to avoid overuse of nfc chip of the ribbon
-                                // -> to avoid to burn out the nfc chip of the ribbon
-                                if (ribbonInfo == null || (lastRibbonInfoDate.getTime() + 1000 * 3600) < new Date().getTime()) {
-                                    ribbonInfo = evolisPrinterService.getRibbonInfo();
-                                    if(ribbonInfo!=null) {
-                                        lastRibbonInfoDate = new Date();
+                        if(!evolisPrinterService.isInPrinting()) {
+                            String printerStatus = evolisPrinterService.getPrinterStatus();
+                            if (printerStatus.contains("PRINTER_READY")) {
+                                CleaningInfo cleaningInfo = evolisPrinterService.getCleaningInfo();
+                                if (cleaningInfo != null && cleaningInfo.getCardCountBeforeWarrantyLost() < 10) {
+                                    appSession.setPrinterReady(false);
+                                    printerStatus = "Nettoyage nécessaire : " + cleaningInfo.getCardCountBeforeWarrantyLost() + " cartes avant perte de garantie";
+                                } else {
+                                    // check ribbon only if printer is ready and only each hour to avoid too much requests
+                                    // -> to avoid overuse of nfc chip of the ribbon
+                                    // -> to avoid to burn out the nfc chip of the ribbon
+                                    if (ribbonInfo == null || (lastRibbonInfoDate.getTime() + 1000 * 3600) < new Date().getTime()) {
+                                        ribbonInfo = evolisPrinterService.getRibbonInfo();
+                                        if (ribbonInfo != null) {
+                                            lastRibbonInfoDate = new Date();
+                                        }
+                                    }
+                                    if (ribbonInfo == null) {
+                                        appSession.setPrinterReady(false);
+                                        printerStatus = "Problème de lecture du ruban (puce)";
+                                        logTextAreaService.setInfoText("Imprimante Evolis non prête : " + printerStatus, "alert-warning");
+                                    } else if (ribbonInfo.getRemaining() < 1) {
+                                        appSession.setPrinterReady(false);
+                                        printerStatus = "Plus de ruban, merci de le changer";
+                                        logTextAreaService.setInfoText("Imprimante Evolis non prête : " + printerStatus, "alert-warning");
+                                    } else if (!appSession.isPrinterReady()) {
+                                        evolisPrinterService.init();
+                                        appSession.setPrinterReady(true);
+                                        logTextAreaService.setInfoText("Imprimante Evolis prête", "alert-success");
+                                        logTextAreaService.appendText("Ruban : " + ribbonInfo.getRemaining() + " cartes restantes");
+                                        logTextAreaService.appendText("Nettoyage nécessaire dans : " + cleaningInfo.getCardCountBeforeWarrantyLost() + " cartes");
                                     }
                                 }
-                                if(ribbonInfo==null) {
-                                    appSession.setPrinterReady(false);
-                                    printerStatus = "Problème de lecture du ruban (puce)";
-                                    logTextAreaService.setInfoText("Imprimante Evolis non prête : " + printerStatus, "alert-warning");
-                                } else if (ribbonInfo.getRemaining() < 1) {
-                                    appSession.setPrinterReady(false);
-                                    printerStatus = "Plus de ruban, merci de le changer";
-                                    logTextAreaService.setInfoText("Imprimante Evolis non prête : " + printerStatus, "alert-warning");
-                                } else if (!appSession.isPrinterReady()) {
-                                    evolisPrinterService.init();
-                                    appSession.setPrinterReady(true);
-                                    logTextAreaService.setInfoText("Imprimante Evolis prête", "alert-success");
-                                    logTextAreaService.appendText("Ruban : " + ribbonInfo.getRemaining() + " cartes restantes");
-                                    logTextAreaService.appendText("Nettoyage nécessaire dans : " + cleaningInfo.getCardCountBeforeWarrantyLost() + " cartes");
-                                }
+                            } else {
+                                appSession.setPrinterReady(false);
+                                logTextAreaService.setInfoText("Imprimante Evolis non prête", "alert-danger");
                             }
-                        } else {
-                            appSession.setPrinterReady(false);
-                            logTextAreaService.setInfoText("Imprimante Evolis non prête", "alert-danger");
-                        }
-                        if(!printerStatus.equals(lastPrinterStatus)) {
-                            lastPrinterStatus = printerStatus;
-                            updateTitle("Statut Evolis : " + lastPrinterStatus);
-                            if(!appSession.isPrinterReady()) {
-                                logTextAreaService.setInfoText("Imprimante Evolis non prête : " + lastPrinterStatus, "alert-danger");
+                            if (!printerStatus.equals(lastPrinterStatus)) {
+                                lastPrinterStatus = printerStatus;
+                                updateTitle("Statut Evolis : " + lastPrinterStatus);
+                                if (!appSession.isPrinterReady()) {
+                                    logTextAreaService.setInfoText("Imprimante Evolis non prête : " + lastPrinterStatus, "alert-danger");
+                                }
                             }
                         }
                     } catch(Exception e) {

@@ -7,12 +7,12 @@ import org.esupportail.esupsgcclient.tasks.EsupSgcTask;
 import org.esupportail.esupsgcclient.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.*;
 
 @Component
 public class EsupSgcRestClientService {
@@ -27,7 +27,11 @@ public class EsupSgcRestClientService {
     @Resource
     RestTemplate restTemplate;
 
+    // ExecutorService pour les requêtes HTTP interruptibles
+    private final ExecutorService httpExecutor = Executors.newCachedThreadPool();
+
     public String getQrCode(EsupSgcTask esupSgcTask, String csn) {
+
         while (true) {
             if(esupSgcTask.isCancelled()) {
                 throw new RuntimeException("Task is cancelled");
@@ -41,7 +45,39 @@ public class EsupSgcRestClientService {
                     }
                     log.debug("Call " + sgcUrl);
                     esupSgcTask.updateTitle4thisTask("Call " + sgcUrl);
-                    String qrcode = restTemplate.getForObject(sgcUrl, String.class);
+                    
+                    // Exécuter la requête HTTP dans un Future pour pouvoir l'annuler
+                    final String finalSgcUrl = sgcUrl;
+                    Future<String> future = httpExecutor.submit(() ->
+                        restTemplate.getForObject(finalSgcUrl, String.class)
+                    );
+                    
+                    // Attendre la réponse tout en vérifiant l'annulation toutes les 100ms
+                    String qrcode = null;
+                    try {
+                        while (!future.isDone()) {
+                            if (esupSgcTask.isCancelled()) {
+                                future.cancel(true); // Interrompt le thread de la requête HTTP
+                                throw new RuntimeException("Task is cancelled");
+                            }
+                            try {
+                                // Attendre max 100ms à chaque fois pour pouvoir vérifier l'annulation
+                                qrcode = future.get(100, TimeUnit.MILLISECONDS);
+                            } catch (TimeoutException e) {
+                                // Continue à attendre
+                            }
+                        }
+                        if (qrcode == null) {
+                            qrcode = future.get(); // Récupère le résultat final
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        future.cancel(true);
+                        if (e.getCause() instanceof ResourceAccessException) {
+                            throw (ResourceAccessException) e.getCause();
+                        }
+                        throw new RuntimeException("HTTP request failed", e);
+                    }
+                    
                     if (qrcode != null) {
                         esupSgcTask.updateTitle4thisTask("qrcode : " + qrcode);
                         if("stop".equals(qrcode)) {
@@ -58,7 +94,7 @@ public class EsupSgcRestClientService {
                         }
                     }
                 } catch (ResourceAccessException e) {
-                    log.debug("timeout ... we recall esup-sgc in 2 sec");
+                    log.debug("timeout (10s) ... we recall esup-sgc in 2 sec");
                     Utils.sleep(2000);
                 }
             } else {

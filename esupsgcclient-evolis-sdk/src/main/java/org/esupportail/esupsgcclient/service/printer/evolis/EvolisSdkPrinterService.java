@@ -58,9 +58,21 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 
 	Date lastRibbonInfoDate = new Date();
 
+	boolean printerEvolisPrintDry = false;
+
+	boolean inPrinting = false;
+
+	public boolean isInPrinting() {
+		return inPrinting;
+	}
+
+	public void setInPrinting(boolean inPrinting) {
+		this.inPrinting = inPrinting;
+	}
 
 	public EvolisSdkPrinterService(@Value("${printerEvolisLoglevel:}") String printerEvolisLoglevel,
-								   @Value("${printerEvolisLogPath:}") String printerEvolisLogPath) {
+	                               @Value("${printerEvolisLogPath:}") String printerEvolisLogPath,
+	                               @Value("${printerEvolisPrintDry:false}") boolean printerEvolisPrintDry) {
 		if(!StringUtils.isEmpty(printerEvolisLoglevel)) {
 			LogLevel logLevel = LogLevel.valueOf(printerEvolisLoglevel);
 			Evolis.setLogLevel(logLevel);
@@ -70,6 +82,7 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			Evolis.setLogPath(printerEvolisLogPath);
 			log.info("Set Evolis log path to " + printerEvolisLogPath);
 		}
+		this.printerEvolisPrintDry = printerEvolisPrintDry;
 	}
 
 
@@ -105,6 +118,10 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	public synchronized void setupJfxUi(Stage stage, Tooltip tooltip, MenuBar menuBar) {
 
 		new Thread(this::init).start();
+
+		if(this.printerEvolisPrintDry) {
+			logTextAreaService.appendText("Evolis printer print dry - no real print will be done but card will be encoded");
+		}
 
 		tooltip.textProperty().bind(evolisSdkHeartbeatTaskService.titleProperty());
 		evolisSdkHeartbeatTaskService.start();
@@ -412,6 +429,17 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 	}
 
 	public synchronized void print() {
+		if(printerEvolisPrintDry)  {
+			logTextAreaService.appendText("Dry print enabled - no real print will be done");
+			logTextAreaService.appendText("wait 5 secondes to simulate print time ...");
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				log.error("Error during dry print sleep", e);
+				return;
+			}
+			return;
+		}
 		ReturnCode returnCode = getPrintSession().print();
 		logTextAreaService.appendText("Print return code : " + returnCode.name());
 		if(returnCode != ReturnCode.OK) {

@@ -73,6 +73,7 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             log.debug("try to get qrcode ...");
             String qrcode = esupSgcRestClientService.getQrCode(this, null);
             long start = System.currentTimeMillis();
+            evolisPrinterService.setInPrinting(true);
             setUiStepSuccess(UiStep.long_poll);
             String bmpBlackAsBase64 = encodingService.getBmpAsBase64(qrcode, EncodingService.BmpType.black);
             updateBmpUi(bmpBlackAsBase64, bmpBlackImageView);
@@ -124,6 +125,7 @@ public class EvolisSdkPrintEncodeTask extends EsupSgcTask {
             }
             throw new RuntimeException("Exception on  EvolisTask : " + e.getMessage(), e);
         } finally {
+            evolisPrinterService.setInPrinting(false);
             resetBmpUi();
         }
 		return null;
