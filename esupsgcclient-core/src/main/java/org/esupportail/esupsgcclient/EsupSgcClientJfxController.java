@@ -70,40 +70,10 @@ public class EsupSgcClientJfxController implements Initializable {
 	CheckMenuItem autostart;
 
 	@FXML
-	ToggleGroup esupLogLevelToggleGroup;
+	Menu esupLogMenu;
 
 	@FXML
-	RadioMenuItem esupLogLevelTraceMenuItem;
-
-	@FXML
-	RadioMenuItem esupLogLevelDebugMenuItem;
-
-	@FXML
-	RadioMenuItem esupLogLevelInfoMenuItem;
-
-	@FXML
-	RadioMenuItem esupLogLevelWarnMenuItem;
-
-	@FXML
-	RadioMenuItem esupLogLevelErrorMenuItem;
-
-	@FXML
-	ToggleGroup generalLogLevelToggleGroup;
-
-	@FXML
-	RadioMenuItem generalLogLevelTraceMenuItem;
-
-	@FXML
-	RadioMenuItem generalLogLevelDebugMenuItem;
-
-	@FXML
-	RadioMenuItem generalLogLevelInfoMenuItem;
-
-	@FXML
-	RadioMenuItem generalLogLevelWarnMenuItem;
-
-	@FXML
-	RadioMenuItem generalLogLevelErrorMenuItem;
+	Menu generalLogMenu;
 
 	@FXML
 	MenuItem reinitAndExit;
@@ -219,73 +189,29 @@ public class EsupSgcClientJfxController implements Initializable {
 	LogTextAreaService logTextAreaService;
 
 	private void initEsupLogLevelMenu() {
-		initLogLevelMenu(
-			ESUP_LOG_LEVEL_STORAGE_KEY,
-			LogLevelManager.ESUP_LOGGER_NAME,
-			esupLogLevelToggleGroup,
-			esupLogLevelTraceMenuItem,
-			esupLogLevelDebugMenuItem,
-			esupLogLevelInfoMenuItem,
-			esupLogLevelWarnMenuItem,
-			esupLogLevelErrorMenuItem
-		);
+		initLogLevelMenu(esupLogMenu, ESUP_LOG_LEVEL_STORAGE_KEY, LogLevelManager.ESUP_LOGGER_NAME);
 	}
 
 	private void initGeneralLogLevelMenu() {
-		initLogLevelMenu(
-			GENERAL_LOG_LEVEL_STORAGE_KEY,
-			org.slf4j.Logger.ROOT_LOGGER_NAME,
-			generalLogLevelToggleGroup,
-			generalLogLevelTraceMenuItem,
-			generalLogLevelDebugMenuItem,
-			generalLogLevelInfoMenuItem,
-			generalLogLevelWarnMenuItem,
-			generalLogLevelErrorMenuItem
-		);
+		initLogLevelMenu(generalLogMenu, GENERAL_LOG_LEVEL_STORAGE_KEY, org.slf4j.Logger.ROOT_LOGGER_NAME);
 	}
 
-	private void initLogLevelMenu(String storageKey, String loggerName, ToggleGroup toggleGroup,
-			RadioMenuItem traceItem, RadioMenuItem debugItem, RadioMenuItem infoItem,
-			RadioMenuItem warnItem, RadioMenuItem errorItem) {
+	private void initLogLevelMenu(Menu menu, String storageKey, String loggerName) {
+		ToggleGroup toggleGroup = new ToggleGroup();
 		LogLevelManager.LogLevelChoice savedChoice = LogLevelManager.LogLevelChoice.fromName(fileLocalStorage.getItem(storageKey));
-		selectLogLevel(savedChoice, traceItem, debugItem, infoItem, warnItem, errorItem);
-		applyLogLevelChoice(loggerName, savedChoice, storageKey);
+		menu.getItems().clear();
 
-		toggleGroup.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-			if (newToggle == traceItem) {
-				applyLogLevelChoice(loggerName, LogLevelManager.LogLevelChoice.TRACE, storageKey);
-			} else if (newToggle == debugItem) {
-				applyLogLevelChoice(loggerName, LogLevelManager.LogLevelChoice.DEBUG, storageKey);
-			} else if (newToggle == infoItem) {
-				applyLogLevelChoice(loggerName, LogLevelManager.LogLevelChoice.INFO, storageKey);
-			} else if (newToggle == warnItem) {
-				applyLogLevelChoice(loggerName, LogLevelManager.LogLevelChoice.WARN, storageKey);
-			} else if (newToggle == errorItem) {
-				applyLogLevelChoice(loggerName, LogLevelManager.LogLevelChoice.ERROR, storageKey);
+		for (LogLevelManager.LogLevelChoice choice : LogLevelManager.LogLevelChoice.values()) {
+			RadioMenuItem item = new RadioMenuItem(choice.getLabel());
+			item.setToggleGroup(toggleGroup);
+			if (choice == savedChoice) {
+				item.setSelected(true);
 			}
-		});
-	}
-
-	private void selectLogLevel(LogLevelManager.LogLevelChoice choice, RadioMenuItem traceItem, RadioMenuItem debugItem,
-			RadioMenuItem infoItem, RadioMenuItem warnItem, RadioMenuItem errorItem) {
-		switch (choice) {
-			case TRACE:
-				traceItem.setSelected(true);
-				break;
-			case DEBUG:
-				debugItem.setSelected(true);
-				break;
-			case WARN:
-				warnItem.setSelected(true);
-				break;
-			case ERROR:
-				errorItem.setSelected(true);
-				break;
-			case INFO:
-			default:
-				infoItem.setSelected(true);
-				break;
+			item.setOnAction(event -> applyLogLevelChoice(loggerName, choice, storageKey));
+			menu.getItems().add(item);
 		}
+
+		applyLogLevelChoice(loggerName, savedChoice, storageKey);
 	}
 
 	private void applyLogLevelChoice(String loggerName, LogLevelManager.LogLevelChoice choice, String storageKey) {
