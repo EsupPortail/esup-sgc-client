@@ -26,7 +26,8 @@
 <VBox stylesheets="@/org/kordamp/bootstrapfx/bootstrapfx.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.esupportail.esupsgcclient.EsupSgcClientJfxController">
    <fx:define>
-       <ToggleGroup fx:id="esupLogLevelToggleGroup" />
+      <ToggleGroup fx:id="esupLogLevelToggleGroup" />
+      <ToggleGroup fx:id="generalLogLevelToggleGroup" />
    </fx:define>
    <children>
       <MenuBar fx:id="menuBar">
@@ -41,6 +42,15 @@
                         <RadioMenuItem fx:id="esupLogLevelInfoMenuItem" selected="true" text="INFO" toggleGroup="$esupLogLevelToggleGroup" />
                         <RadioMenuItem fx:id="esupLogLevelWarnMenuItem" text="WARN" toggleGroup="$esupLogLevelToggleGroup" />
                         <RadioMenuItem fx:id="esupLogLevelErrorMenuItem" text="ERROR" toggleGroup="$esupLogLevelToggleGroup" />
+                     </items>
+                  </Menu>
+                  <Menu text="Niveau de logs Général">
+                     <items>
+                        <RadioMenuItem fx:id="generalLogLevelTraceMenuItem" text="TRACE" toggleGroup="$generalLogLevelToggleGroup" />
+                        <RadioMenuItem fx:id="generalLogLevelDebugMenuItem" text="DEBUG" toggleGroup="$generalLogLevelToggleGroup" />
+                        <RadioMenuItem fx:id="generalLogLevelInfoMenuItem" selected="true" text="INFO" toggleGroup="$generalLogLevelToggleGroup" />
+                        <RadioMenuItem fx:id="generalLogLevelWarnMenuItem" text="WARN" toggleGroup="$generalLogLevelToggleGroup" />
+                        <RadioMenuItem fx:id="generalLogLevelErrorMenuItem" text="ERROR" toggleGroup="$generalLogLevelToggleGroup" />
                      </items>
                   </Menu>
                   <Menu text="Logs">
