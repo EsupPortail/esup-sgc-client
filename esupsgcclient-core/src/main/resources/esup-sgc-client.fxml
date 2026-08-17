@@ -43,6 +43,12 @@
                         <RadioMenuItem fx:id="esupLogLevelErrorMenuItem" text="ERROR" toggleGroup="$esupLogLevelToggleGroup" />
                      </items>
                   </Menu>
+                  <Menu text="Logs">
+                     <items>
+                        <MenuItem fx:id="tailLogFile" mnemonicParsing="false" text="Suivi live (tail -f)" />
+                        <MenuItem fx:id="downloadLogFile" mnemonicParsing="false" text="Télécharger le fichier de log" />
+                     </items>
+                  </Menu>
                   <MenuItem fx:id="reinitAndExit" mnemonicParsing="false" text="Réinitialiser et quitter" />
                   <MenuItem fx:id="pcscTest" mnemonicParsing="false" text="Test PC/SC" />
                   <MenuItem fx:id="pcscDesfireTest" mnemonicParsing="false" text="Test PC/SC DES Blank Desfire" />

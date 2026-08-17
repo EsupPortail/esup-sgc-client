@@ -3,6 +3,9 @@ package org.esupportail.esupsgcclient;
 import ch.qos.logback.classic.Level;
 import com.github.eduramiba.webcamcapture.drivers.NativeDriver;
 import com.github.sarxos.webcam.Webcam;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.FileAppender;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -10,10 +13,14 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.esupportail.esupsgcclient.service.pcsc.NfcHeartbeatTaskService;
@@ -28,8 +35,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Iterator;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class EsupSgcClientJfxController implements Initializable {
@@ -83,6 +98,12 @@ public class EsupSgcClientJfxController implements Initializable {
 
 	@FXML
 	MenuItem exit;
+
+	@FXML
+	MenuItem downloadLogFile;
+
+	@FXML
+	MenuItem tailLogFile;
 
 	@FXML
 	MenuBar menuBar;
@@ -236,6 +257,107 @@ public class EsupSgcClientJfxController implements Initializable {
 		fileLocalStorage.setItem(ESUP_LOG_LEVEL_STORAGE_KEY, levelName);
 	}
 
+	private File resolveLogFile() {
+		String logPath = System.getProperty("LOG_PATH");
+		if (StringUtils.isNotBlank(logPath)) {
+			return new File(logPath);
+		}
+
+		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+		for (ch.qos.logback.classic.Logger logger : context.getLoggerList()) {
+			Iterator<Appender<ch.qos.logback.classic.spi.ILoggingEvent>> it = logger.iteratorForAppenders();
+			while (it.hasNext()) {
+				Appender<ch.qos.logback.classic.spi.ILoggingEvent> appender = it.next();
+				if (appender instanceof FileAppender) {
+					File file = new File(((FileAppender<?>) appender).getFile());
+					if (file.isAbsolute()) {
+						return file;
+					}
+					return new File(System.getProperty("user.dir"), file.getPath());
+				}
+			}
+		}
+		return new File("esupsgcclient.log");
+	}
+
+	private void downloadLogFile() {
+		File logFile = resolveLogFile();
+		if (!logFile.exists()) {
+			logTextAreaService.appendText("Le fichier de log n'existe pas : " + logFile.getAbsolutePath());
+			return;
+		}
+
+		FileChooser chooser = new FileChooser();
+		chooser.setTitle("Télécharger le fichier de log");
+		chooser.setInitialFileName(logFile.getName());
+		File target = chooser.showSaveDialog(stage);
+		if (target != null) {
+			try {
+				Files.copy(logFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				logTextAreaService.appendText("Fichier de log téléchargé vers : " + target.getAbsolutePath());
+			} catch (IOException e) {
+				log.error("Erreur lors du téléchargement du fichier de log {}", logFile.getAbsolutePath(), e);
+				logTextAreaService.appendText("Erreur lors du téléchargement du fichier de log");
+			}
+		}
+	}
+
+	private void openLiveLogWindow() {
+		File logFile = resolveLogFile();
+		Stage dialog = new Stage();
+		dialog.setTitle("Suivi des logs en direct");
+		if (stage != null) {
+			dialog.initOwner(stage);
+		}
+
+		TextArea liveLogArea = new TextArea();
+		liveLogArea.setEditable(false);
+		liveLogArea.setWrapText(true);
+		VBox root = new VBox(10, liveLogArea);
+		root.setPadding(new Insets(10));
+		dialog.setScene(new Scene(root, 900, 500));
+
+		AtomicLong filePointer = new AtomicLong(logFile.exists() ? logFile.length() : 0L);
+		Thread tailThread = new Thread(() -> {
+			while (!Thread.currentThread().isInterrupted()) {
+				try {
+					if (logFile.exists()) {
+						try (RandomAccessFile raf = new RandomAccessFile(logFile, "r")) {
+							if (filePointer.get() > raf.length()) {
+								filePointer.set(0L);
+							}
+							raf.seek(filePointer.get());
+							String line;
+							while ((line = raf.readLine()) != null) {
+								String decodedLine = new String(line.getBytes("ISO-8859-1"), "UTF-8");
+								String text = decodedLine + System.lineSeparator();
+								Platform.runLater(() -> liveLogArea.appendText(text));
+								filePointer.set(raf.getFilePointer());
+							}
+						}
+					}
+					Thread.sleep(500L);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					break;
+				} catch (IOException e) {
+					log.error("Erreur de lecture du fichier de log {}", logFile.getAbsolutePath(), e);
+					Platform.runLater(() -> liveLogArea.appendText("Erreur de lecture du fichier de log.\n"));
+					try {
+						Thread.sleep(2000L);
+					} catch (InterruptedException interruptedException) {
+						Thread.currentThread().interrupt();
+						break;
+					}
+				}
+			}
+		}, "esup-log-tail");
+		tailThread.setDaemon(true);
+		dialog.setOnCloseRequest(event -> tailThread.interrupt());
+		dialog.show();
+		tailThread.start();
+	}
+
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		initEsupLogLevelMenu();
@@ -310,6 +432,9 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		pcscDesfireTest.setOnAction(event -> esupSgcDesfireFullTestPcscDialog.getTestPcscDialog(null, null).show());
 		pcscDesfireTest.disableProperty().bind(appSession.nfcReadyProperty().not().or(appSession.taskIsRunningProperty()));
+
+		downloadLogFile.setOnAction(event -> downloadLogFile());
+		tailLogFile.setOnAction(event -> openLiveLogWindow());
 
 		exit.setOnAction(event -> {
 			this.exit();
