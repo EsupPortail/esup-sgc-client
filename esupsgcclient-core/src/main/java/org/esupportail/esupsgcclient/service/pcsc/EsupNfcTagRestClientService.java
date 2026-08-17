@@ -1,9 +1,7 @@
 package org.esupportail.esupsgcclient.service.pcsc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.annotation.Resource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.esupportail.esupsgcclient.AppConfig;
@@ -14,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 
 @Component
