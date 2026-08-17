@@ -60,7 +60,7 @@ public class EvolisSdkHeartbeatTaskService extends Service<Void> {
                                     }
                                     if (ribbonInfo == null) {
                                         appSession.setPrinterReady(false);
-                                        printerStatus = "Problème de lecture du ruban (puce)";
+                                        printerStatus = "Problème de lecture du ruban (puce) - merci de tenter un 'Reset Evolis'";
                                         logTextAreaService.setInfoText("Imprimante Evolis non prête : " + printerStatus, "alert-warning");
                                     } else if (ribbonInfo.getRemaining() < 1) {
                                         appSession.setPrinterReady(false);
