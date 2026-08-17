@@ -103,13 +103,14 @@ public class EvolisSdkPrinterService extends EsupSgcPrinterService {
 			String style = cleaningInfo.getCardCountBeforeWarrantyLost() > 200 ? "alert-info" : (cleaningInfo.getCardCountBeforeWarrantyLost() > 100 ? "alert-warning" : "alert-danger");
 			logTextAreaService.setInfoText(cleaningInfoText, style);
 		}
-
+		log.trace("Maintenance info : " + printerInfoString);
 		return printerInfoString;
 	}
 
 	protected Connection getEvolisConnection() {
 		if(evolisConnection == null || !evolisConnection.isOpen()) {
 			init();
+			log.trace("getEvolisConnection : " + (evolisConnection != null && evolisConnection.isOpen() ? "OK" : "KO"));
 		}
 		return evolisConnection;
 	}
