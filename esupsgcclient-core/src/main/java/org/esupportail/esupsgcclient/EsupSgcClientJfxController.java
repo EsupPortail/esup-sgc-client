@@ -247,47 +247,54 @@ public class EsupSgcClientJfxController implements Initializable {
 	private void initLogLevelMenu(String storageKey, String loggerName, ToggleGroup toggleGroup,
 			RadioMenuItem traceItem, RadioMenuItem debugItem, RadioMenuItem infoItem,
 			RadioMenuItem warnItem, RadioMenuItem errorItem) {
-		Level savedLevel = LogLevelManager.parseLevel(fileLocalStorage.getItem(storageKey), Level.INFO);
-		selectLogLevel(savedLevel, traceItem, debugItem, infoItem, warnItem, errorItem);
-		setLoggerLevel(loggerName, savedLevel, storageKey);
+		LogLevelManager.LogLevelChoice savedChoice = LogLevelManager.LogLevelChoice.fromName(fileLocalStorage.getItem(storageKey));
+		selectLogLevel(savedChoice, traceItem, debugItem, infoItem, warnItem, errorItem);
+		applyLogLevelChoice(loggerName, savedChoice, storageKey);
 
 		toggleGroup.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
 			if (newToggle == traceItem) {
-				setLoggerLevel(loggerName, Level.TRACE, storageKey);
+				applyLogLevelChoice(loggerName, LogLevelManager.LogLevelChoice.TRACE, storageKey);
 			} else if (newToggle == debugItem) {
-				setLoggerLevel(loggerName, Level.DEBUG, storageKey);
+				applyLogLevelChoice(loggerName, LogLevelManager.LogLevelChoice.DEBUG, storageKey);
 			} else if (newToggle == infoItem) {
-				setLoggerLevel(loggerName, Level.INFO, storageKey);
+				applyLogLevelChoice(loggerName, LogLevelManager.LogLevelChoice.INFO, storageKey);
 			} else if (newToggle == warnItem) {
-				setLoggerLevel(loggerName, Level.WARN, storageKey);
+				applyLogLevelChoice(loggerName, LogLevelManager.LogLevelChoice.WARN, storageKey);
 			} else if (newToggle == errorItem) {
-				setLoggerLevel(loggerName, Level.ERROR, storageKey);
+				applyLogLevelChoice(loggerName, LogLevelManager.LogLevelChoice.ERROR, storageKey);
 			}
 		});
 	}
 
-	private void selectLogLevel(Level level, RadioMenuItem traceItem, RadioMenuItem debugItem,
+	private void selectLogLevel(LogLevelManager.LogLevelChoice choice, RadioMenuItem traceItem, RadioMenuItem debugItem,
 			RadioMenuItem infoItem, RadioMenuItem warnItem, RadioMenuItem errorItem) {
-		if (level == Level.TRACE) {
-			traceItem.setSelected(true);
-		} else if (level == Level.DEBUG) {
-			debugItem.setSelected(true);
-		} else if (level == Level.WARN) {
-			warnItem.setSelected(true);
-		} else if (level == Level.ERROR) {
-			errorItem.setSelected(true);
-		} else {
-			infoItem.setSelected(true);
+		switch (choice) {
+			case TRACE:
+				traceItem.setSelected(true);
+				break;
+			case DEBUG:
+				debugItem.setSelected(true);
+				break;
+			case WARN:
+				warnItem.setSelected(true);
+				break;
+			case ERROR:
+				errorItem.setSelected(true);
+				break;
+			case INFO:
+			default:
+				infoItem.setSelected(true);
+				break;
 		}
 	}
 
-	private void setLoggerLevel(String loggerName, Level level, String storageKey) {
+	private void applyLogLevelChoice(String loggerName, LogLevelManager.LogLevelChoice choice, String storageKey) {
 		if (org.slf4j.Logger.ROOT_LOGGER_NAME.equals(loggerName)) {
-			LogLevelManager.setRootLoggerLevel(level);
+			LogLevelManager.setRootLoggerLevel(choice.getLevel());
 		} else {
-			LogLevelManager.setLoggerLevel(loggerName, level);
+			LogLevelManager.setLoggerLevel(loggerName, choice.getLevel());
 		}
-		fileLocalStorage.setItem(storageKey, LogLevelManager.toName(level));
+		fileLocalStorage.setItem(storageKey, choice.getLabel());
 	}
 
 	private File resolveLogFile() {

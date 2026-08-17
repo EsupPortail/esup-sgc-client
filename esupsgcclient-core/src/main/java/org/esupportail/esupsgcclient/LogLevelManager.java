@@ -8,46 +8,64 @@ public final class LogLevelManager {
     public static final String ESUP_LOGGER_NAME = "org.esupportail";
     public static final String DEFAULT_LEVEL_NAME = "INFO";
 
+    public enum LogLevelChoice {
+        TRACE("TRACE", Level.TRACE),
+        DEBUG("DEBUG", Level.DEBUG),
+        INFO("INFO", Level.INFO),
+        WARN("WARN", Level.WARN),
+        ERROR("ERROR", Level.ERROR);
+
+        private final String label;
+        private final Level level;
+
+        LogLevelChoice(String label, Level level) {
+            this.label = label;
+            this.level = level;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public Level getLevel() {
+            return level;
+        }
+
+        public static LogLevelChoice fromName(String value) {
+            if (value == null || value.isBlank()) {
+                return INFO;
+            }
+            for (LogLevelChoice choice : values()) {
+                if (choice.label.equalsIgnoreCase(value.trim())) {
+                    return choice;
+                }
+            }
+            return INFO;
+        }
+
+        public static LogLevelChoice fromLevel(Level level) {
+            if (level == null) {
+                return INFO;
+            }
+            for (LogLevelChoice choice : values()) {
+                if (choice.level.equals(level)) {
+                    return choice;
+                }
+            }
+            return INFO;
+        }
+    }
+
     private LogLevelManager() {
     }
 
     public static Level parseLevel(String value, Level defaultLevel) {
-        if (value == null || value.isBlank()) {
-            return defaultLevel;
-        }
-
-        switch (value.trim().toUpperCase()) {
-            case "TRACE":
-                return Level.TRACE;
-            case "DEBUG":
-                return Level.DEBUG;
-            case "INFO":
-                return Level.INFO;
-            case "WARN":
-                return Level.WARN;
-            case "ERROR":
-                return Level.ERROR;
-            default:
-                return defaultLevel;
-        }
+        LogLevelChoice choice = LogLevelChoice.fromName(value);
+        return choice.getLevel() != null ? choice.getLevel() : defaultLevel;
     }
 
     public static String toName(Level level) {
-        if (level == null) {
-            return DEFAULT_LEVEL_NAME;
-        }
-        switch (level.toInt()) {
-            case Level.TRACE_INT:
-                return "TRACE";
-            case Level.DEBUG_INT:
-                return "DEBUG";
-            case Level.WARN_INT:
-                return "WARN";
-            case Level.ERROR_INT:
-                return "ERROR";
-            default:
-                return "INFO";
-        }
+        return LogLevelChoice.fromLevel(level).getLabel();
     }
 
     public static void setLoggerLevel(String loggerName, Level level) {
