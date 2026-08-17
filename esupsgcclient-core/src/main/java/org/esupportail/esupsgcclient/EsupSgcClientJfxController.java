@@ -1,5 +1,6 @@
 package org.esupportail.esupsgcclient;
 
+import ch.qos.logback.classic.Level;
 import com.github.eduramiba.webcamcapture.drivers.NativeDriver;
 import com.github.sarxos.webcam.Webcam;
 import javafx.application.Platform;
@@ -47,8 +48,29 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Resource
 	FileLocalStorage fileLocalStorage;
 
+	private static final String ESUP_LOGGER_NAME = "org.esupportail";
+	private static final String ESUP_LOG_LEVEL_STORAGE_KEY = "esupLogLevel";
+
 	@FXML
 	CheckMenuItem autostart;
+
+	@FXML
+	ToggleGroup esupLogLevelToggleGroup;
+
+	@FXML
+	RadioMenuItem esupLogLevelTraceMenuItem;
+
+	@FXML
+	RadioMenuItem esupLogLevelDebugMenuItem;
+
+	@FXML
+	RadioMenuItem esupLogLevelInfoMenuItem;
+
+	@FXML
+	RadioMenuItem esupLogLevelWarnMenuItem;
+
+	@FXML
+	RadioMenuItem esupLogLevelErrorMenuItem;
 
 	@FXML
 	MenuItem reinitAndExit;
@@ -157,8 +179,66 @@ public class EsupSgcClientJfxController implements Initializable {
 	@Resource
 	LogTextAreaService logTextAreaService;
 
+	private void initEsupLogLevelMenu() {
+		String savedLevel = fileLocalStorage.getItem(ESUP_LOG_LEVEL_STORAGE_KEY);
+		if (StringUtils.isEmpty(savedLevel)) {
+			savedLevel = "INFO";
+		}
+		selectEsupLogLevel(savedLevel);
+		applyEsupLoggerLevel(savedLevel);
+
+		esupLogLevelToggleGroup.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
+			if (newToggle == esupLogLevelTraceMenuItem) {
+				setEsupLoggerLevel(Level.TRACE, "TRACE");
+			} else if (newToggle == esupLogLevelDebugMenuItem) {
+				setEsupLoggerLevel(Level.DEBUG, "DEBUG");
+			} else if (newToggle == esupLogLevelInfoMenuItem) {
+				setEsupLoggerLevel(Level.INFO, "INFO");
+			} else if (newToggle == esupLogLevelWarnMenuItem) {
+				setEsupLoggerLevel(Level.WARN, "WARN");
+			} else if (newToggle == esupLogLevelErrorMenuItem) {
+				setEsupLoggerLevel(Level.ERROR, "ERROR");
+			}
+		});
+	}
+
+	private void selectEsupLogLevel(String levelName) {
+		if ("TRACE".equalsIgnoreCase(levelName)) {
+			esupLogLevelTraceMenuItem.setSelected(true);
+		} else if ("DEBUG".equalsIgnoreCase(levelName)) {
+			esupLogLevelDebugMenuItem.setSelected(true);
+		} else if ("WARN".equalsIgnoreCase(levelName)) {
+			esupLogLevelWarnMenuItem.setSelected(true);
+		} else if ("ERROR".equalsIgnoreCase(levelName)) {
+			esupLogLevelErrorMenuItem.setSelected(true);
+		} else {
+			esupLogLevelInfoMenuItem.setSelected(true);
+		}
+	}
+
+	private void applyEsupLoggerLevel(String levelName) {
+		if ("TRACE".equalsIgnoreCase(levelName)) {
+			setEsupLoggerLevel(Level.TRACE, "TRACE");
+		} else if ("DEBUG".equalsIgnoreCase(levelName)) {
+			setEsupLoggerLevel(Level.DEBUG, "DEBUG");
+		} else if ("WARN".equalsIgnoreCase(levelName)) {
+			setEsupLoggerLevel(Level.WARN, "WARN");
+		} else if ("ERROR".equalsIgnoreCase(levelName)) {
+			setEsupLoggerLevel(Level.ERROR, "ERROR");
+		} else {
+			setEsupLoggerLevel(Level.INFO, "INFO");
+		}
+	}
+
+	private void setEsupLoggerLevel(Level level, String levelName) {
+		ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ESUP_LOGGER_NAME);
+		logger.setLevel(level);
+		fileLocalStorage.setItem(ESUP_LOG_LEVEL_STORAGE_KEY, levelName);
+	}
+
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
+		initEsupLogLevelMenu();
 
 		logTextAreaService.initLogTextArea(logTextarea, infoText);
 

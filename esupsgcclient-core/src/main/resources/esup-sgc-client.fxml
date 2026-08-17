@@ -10,7 +10,9 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.FlowPane?>
@@ -23,12 +25,24 @@
 <?import javafx.scene.text.TextFlow?>
 <VBox stylesheets="@/org/kordamp/bootstrapfx/bootstrapfx.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.esupportail.esupsgcclient.EsupSgcClientJfxController">
+   <fx:define>
+       <ToggleGroup fx:id="esupLogLevelToggleGroup" />
+   </fx:define>
    <children>
       <MenuBar fx:id="menuBar">
         <menus>
             <Menu mnemonicParsing="false" text="Général">
                <items>
                   <CheckMenuItem fx:id="autostart" mnemonicParsing="false" selected="false" text="Autostart" />
+                  <Menu text="Niveau de logs ESUP">
+                     <items>
+                        <RadioMenuItem fx:id="esupLogLevelTraceMenuItem" text="TRACE" toggleGroup="$esupLogLevelToggleGroup" />
+                        <RadioMenuItem fx:id="esupLogLevelDebugMenuItem" text="DEBUG" toggleGroup="$esupLogLevelToggleGroup" />
+                        <RadioMenuItem fx:id="esupLogLevelInfoMenuItem" selected="true" text="INFO" toggleGroup="$esupLogLevelToggleGroup" />
+                        <RadioMenuItem fx:id="esupLogLevelWarnMenuItem" text="WARN" toggleGroup="$esupLogLevelToggleGroup" />
+                        <RadioMenuItem fx:id="esupLogLevelErrorMenuItem" text="ERROR" toggleGroup="$esupLogLevelToggleGroup" />
+                     </items>
+                  </Menu>
                   <MenuItem fx:id="reinitAndExit" mnemonicParsing="false" text="Réinitialiser et quitter" />
                   <MenuItem fx:id="pcscTest" mnemonicParsing="false" text="Test PC/SC" />
                   <MenuItem fx:id="pcscDesfireTest" mnemonicParsing="false" text="Test PC/SC DES Blank Desfire" />
