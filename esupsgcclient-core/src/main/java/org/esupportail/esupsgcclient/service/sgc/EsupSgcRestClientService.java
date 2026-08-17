@@ -108,9 +108,9 @@ public class EsupSgcRestClientService {
             Utils.sleep(1000);
         }
         String sgcUrl = appConfig.getEsupSgcUrl() + "/wsrest/nfc/encodePrintHeartbeat?authToken=" + sgcAuthToken;
-        log.debug("Call " + sgcUrl);
+        log.debug("Call {} with POST data : {}", sgcUrl, maintenanceInfo);
         String esupSgcHeartbeatResponse = restTemplate.postForObject(sgcUrl, maintenanceInfo, String.class);
-        log.debug ("Esup Sgc Heartbeat Response : " + esupSgcHeartbeatResponse);
+        log.debug("Esup Sgc Heartbeat Response : {}", esupSgcHeartbeatResponse);
         return esupSgcHeartbeatResponse;
     }
 }
