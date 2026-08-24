@@ -4,8 +4,11 @@ import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URL;
 import java.util.Enumeration;
 
 @SuppressWarnings("restriction")
@@ -57,5 +60,23 @@ public class Utils {
 			Platform.runLater(runnable);
 		}
 	}
-	
+
+	public static int getHttpCode(String url) throws IOException {
+		if (url == null || url.isBlank()) {
+			throw new IllegalArgumentException("URL is empty");
+		}
+		HttpURLConnection connection = null;
+		try {
+			connection = (HttpURLConnection) new URL(url).openConnection();
+			connection.setRequestMethod("GET");
+			connection.setConnectTimeout(5000);
+			connection.setReadTimeout(5000);
+			connection.setInstanceFollowRedirects(true);
+			return connection.getResponseCode();
+		} finally {
+			if (connection != null) {
+				connection.disconnect();
+			}
+		}
+	}
 }

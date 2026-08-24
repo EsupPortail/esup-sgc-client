@@ -333,7 +333,9 @@ public class EsupSgcClientJfxController implements Initializable {
 
 		logTextAreaService.appendText("Esup-SGC-Client " + appVersion.getVersion() + " - compilé le " + appVersion.getBuildDate());
 		logTextAreaService.appendText("ESUP-SGC : " + appConfig.getEsupSgcUrl());
+		checkUrl(appConfig.getEsupSgcUrl());
 		logTextAreaService.appendText("Esup-NFC-Tag-Server : " + appConfig.getEsupNfcTagServerUrl());
+		checkUrl(appConfig.getEsupNfcTagServerUrl());
 
 		esupSgcTaskServiceFactory.init(webcamImageView, bmpColorImageView, bmpBlackImageView, bmpBackImageView, progressBar, textPrincipal, actionsPane, autostart);
 
@@ -525,6 +527,24 @@ public class EsupSgcClientJfxController implements Initializable {
 			}
 		});
 
+	}
+
+	/*
+	 * check url with simple get in a new thread
+	 * return http code and error if any in logtextarea
+	 */
+	private void checkUrl(String url) {
+		Thread thread = new Thread(() -> {
+			try {
+				int code = Utils.getHttpCode(url);
+				logTextAreaService.appendText(String.format("Check URL %s : %d", url, code));
+			} catch (Exception e) {
+				log.error("Check URL {} failed", url, e);
+				logTextAreaService.appendText(String.format("Check URL %s failed : %s", url, e.getMessage()));
+			}
+		}, "check-url");
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 	// For macOS, this part must be in the main Thread / Static Method
