@@ -18,6 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -280,8 +281,12 @@ public class EsupSgcClientJfxController implements Initializable {
 		liveLogArea.setEditable(false);
 		liveLogArea.setWrapText(true);
 		VBox root = new VBox(10, liveLogArea);
+		// allow the TextArea to grow vertically with the dialog
+		VBox.setVgrow(liveLogArea, Priority.ALWAYS);
+		liveLogArea.setMaxHeight(Double.MAX_VALUE);
 		root.setPadding(new Insets(10));
 		dialog.setScene(new Scene(root, 900, 500));
+
 
 		AtomicLong filePointer = new AtomicLong(logFile.exists() ? logFile.length() : 0L);
 		Thread tailThread = new Thread(() -> {
